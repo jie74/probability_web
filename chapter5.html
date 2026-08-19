@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大数定律及中心极限定理 — 概率论与数理统计可视化平台</title>
+<!-- TailwindCSS CDN（与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#2563eb',
+        'primary-light': '#3b82f6',
+        'primary-dark': '#1d4ed8',
+        'primary-bg': '#eff6ff',
+      }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"></script>
+<script src="js/katex-setup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4/dist/echarts.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<link rel="stylesheet" href="css/sidebar.css">
+<style>
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8fafc; }
+.main-content { margin-left: 256px; min-height: 100vh; }
+.card {
+  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;
+  margin-bottom: 24px; transition: all 0.2s;
+}
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+.formula-panel {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 12px; overflow: hidden;
+}
+.formula-toggle {
+  display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer;
+  font-size: 14px; font-weight: 500; color: #475569; user-select: none;
+  transition: background 0.15s;
+}
+.formula-toggle:hover { background: #f1f5f9; }
+.formula-toggle .arrow { transition: transform 0.2s; font-size: 12px; }
+.formula-toggle.open .arrow { transform: rotate(90deg); }
+.formula-body { display: none; padding: 0 16px 16px 16px; }
+.formula-body.show { display: block; }
+.exam-tip {
+  background: #fef9c3; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px 16px; margin-top: 16px;
+}
+.quiz-option {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.15s; font-size: 14px;
+}
+.quiz-option:hover { border-color: #93c5fd; background: #eff6ff; }
+.quiz-option.selected { border-color: #2563eb; background: #eff6ff; }
+.quiz-option.correct { border-color: #16a34a; background: #f0fdf4; }
+.quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
+.slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
+.slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+<div id="sidebar-container"></div>
+<script src="js/sidebar.js"></script>
+
+<main class="main-content">
+
+  <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第5章</span>
+      <span class="text-xs text-slate-400">模块一 · 概率论</span>
+    </div>
+    <h1 class="text-2xl font-bold text-slate-900 mb-2">大数定律及中心极限定理</h1>
+    <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
+      大数定律：样本均值收敛于理论期望；
+      中心极限定理(CLT)：大量独立同分布样本均值近似服从正态分布，<strong>原始总体不需要正态</strong>。
+      应试重点：中心极限定理大题。
+    </p>
+  </section>
+
+  <!-- ===== 卡片1：大数定律模拟 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📈 大数定律模拟</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          n 增大，样本算术平均值趋近总体数学期望。无论总体是什么分布，只要期望存在，样本均值依概率收敛到总体期望。
+        </p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 样本均值收敛演示</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">总体分布：</span>
+          <select id="llnDistSelect" onchange="resetLLN()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="uniform">均匀分布 U(0,1)</option>
+            <option value="exponential">指数分布 E(1)</option>
+            <option value="binomial">二项分布 B(1, 0.5)</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">n =</span>
+          <input type="range" id="llnSlider" min="10" max="5000" value="1000" step="10" oninput="updateLLNSlider()" class="slider-input w-40">
+          <span id="llnSliderVal" class="text-sm font-mono text-slate-700 w-14">1000</span>
+        </div>
+        <button onclick="runLLN()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 开始模拟</button>
+        <button onclick="resetLLN()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="llnChart" style="width:100%;height:340px;"></div>
+      <div class="flex items-center gap-6 mt-2 text-sm justify-center">
+        <span class="text-slate-600">样本均值 = <strong id="llnMean" class="text-blue-600">—</strong></span>
+        <span class="text-slate-600">理论期望 = <strong id="llnTheory" class="text-red-500">—</strong></span>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">大数定律说明样本均值<strong>依概率收敛</strong>到总体期望。注意区分：大数定律涉及样本均值收敛，中心极限定理涉及样本均值的<strong>分布</strong>收敛到正态。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片2：中心极限定理 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">🔔 中心极限定理（王牌可视化）</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          无论原来总体是什么分布，独立同分布条件下，n 足够大时，<strong>样本均值近似服从正态分布</strong>。
+          原始总体可以是均匀、指数、二项...任何分布。
+        </p>
+      </div>
+
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">独立同分布CLT：</span><span class="katex-render" data-expr="\frac{\overline{X}-\mu}{\sigma/\sqrt{n}} \stackrel{\text{近似}}{\sim} N(0,1)"></span></div>
+            <div><span class="text-xs text-slate-400">等价形式：</span><span class="katex-render" data-expr="\overline{X} \stackrel{\text{近似}}{\sim} N\left(\mu,\frac{\sigma^2}{n}\right)"></span></div>
+            <div><span class="text-xs text-slate-400">棣莫弗-拉普拉斯：</span><span class="katex-render" data-expr="\frac{S_n-np}{\sqrt{np(1-p)}} \stackrel{\text{近似}}{\sim} N(0,1)"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ CLT演示 — 样本均值直方图 + 正态曲线</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">原始总体：</span>
+          <select id="cltDistSelect" onchange="resetCLT()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="uniform">均匀分布 U(0,1)</option>
+            <option value="exponential">指数分布 E(1)</option>
+            <option value="binomial">二项分布 B(1,0.3)</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">样本容量 n =</span>
+          <input type="range" id="cltNSlider" min="1" max="50" value="5" step="1" oninput="updateCLTSlider()" class="slider-input w-36">
+          <span id="cltNSliderVal" class="text-sm font-mono text-slate-700 w-8">5</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">模拟次数 =</span>
+          <input type="range" id="cltSimSlider" min="200" max="5000" value="1000" step="100" oninput="document.getElementById('cltSimVal').textContent=this.value;" class="slider-input w-36">
+          <span id="cltSimVal" class="text-sm font-mono text-slate-700 w-12">1000</span>
+        </div>
+        <button onclick="runCLT()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 开始模拟</button>
+        <button onclick="resetCLT()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="cltChart" style="width:100%;height:380px;"></div>
+      <div class="text-center mt-2 text-sm text-slate-500">
+        n 越大，直方图越接近钟形正态曲线；n 很小时直方图形状怪异
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">期末考试<strong>大题高频考点</strong>。记住核心：是<strong>样本均值</strong>趋近正态，不是原始数据趋近正态。原始总体可以任意分布，只要期望方差存在且 n 足够大。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 底部自测题 ===== -->
+  <section class="max-w-5xl mx-auto px-10 pb-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">📝 自测题（单选）</h2>
+
+      <div class="mb-6" id="quiz1">
+        <p class="text-sm font-semibold text-slate-700 mb-3">1. 大数定律说明的是？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q1', 0, this)">A. 样本均值分布收敛到正态</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 1, this)">B. 样本均值依概率收敛到总体期望</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 2, this)">C. 原始数据分布收敛到正态</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">D. 样本方差收敛到0</div>
+        </div>
+        <div id="q1Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz2">
+        <p class="text-sm font-semibold text-slate-700 mb-3">2. 中心极限定理要求原始总体服从什么分布？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q2', 0, this)">A. 必须正态分布</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 1, this)">B. 必须均匀分布</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 2, this)">C. 任意分布，只要期望和方差存在</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 3, this)">D. 必须二项分布</div>
+        </div>
+        <div id="q2Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz3">
+        <p class="text-sm font-semibold text-slate-700 mb-3">3. CLT中 \(\frac{\overline{X}-\mu}{\sigma/\sqrt{n}}\) 近似服从什么分布？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q3', 0, this)">A. t分布</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 1, this)">B. χ²分布</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 2, this)">C. N(0,1)</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 3, this)">D. 与原始总体相同分布</div>
+        </div>
+        <div id="q3Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+function renderAllKatex() {
+  document.querySelectorAll('.katex-render').forEach(function(el) {
+    try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
+    catch(e) { el.textContent = el.getAttribute('data-expr'); }
+  });
+}
+renderAllKatex();
+
+function toggleFormula(toggle) {
+  toggle.classList.toggle('open');
+  var body = toggle.nextElementSibling;
+  body.classList.toggle('show');
+  if (body.classList.contains('show')) renderAllKatex();
+}
+
+// ===== 卡片1：大数定律 =====
+var llnChart = echarts.init(document.getElementById('llnChart'));
+
+function getLLNTheory() {
+  var dist = document.getElementById('llnDistSelect').value;
+  if (dist === 'uniform') return 0.5;
+  if (dist === 'exponential') return 1;
+  return 0.5;
+}
+
+function sampleOne(dist) {
+  if (dist === 'uniform') return Math.random();
+  if (dist === 'exponential') return -Math.log(Math.random());
+  return Math.random() < 0.5 ? 1 : 0;
+}
+
+function runLLN() {
+  var n = parseInt(document.getElementById('llnSlider').value);
+  var dist = document.getElementById('llnDistSelect').value;
+  var theory = getLLNTheory();
+  document.getElementById('llnTheory').textContent = theory.toFixed(4);
+
+  var cumSum = 0;
+  var data = [];
+  var step = Math.max(1, Math.floor(n / 300));
+  for (var i = 1; i <= n; i++) {
+    cumSum += sampleOne(dist);
+    if (i % step === 0 || i === n) {
+      data.push([i, cumSum / i]);
+    }
+  }
+
+  document.getElementById('llnMean').textContent = (cumSum / n).toFixed(4);
+
+  llnChart.setOption({
+    tooltip: { trigger: 'axis', formatter: function(p) { return 'n='+p[0].data[0]+'<br/>均值='+p[0].data[1].toFixed(4); } },
+    grid: { left: 55, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'value', name: '样本量 n', nameLocation: 'center', nameGap: 25, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', name: '样本均值', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'line', data: data, smooth: false, symbol: 'none',
+      lineStyle: { color: '#2563eb', width: 1.5 },
+      markLine: { silent: true, symbol: 'none', lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 }, label: { fontSize: 11, formatter: 'E(X)={c}' }, data: [{ yAxis: theory }] }
+    }]
+  });
+}
+
+function updateLLNSlider() {
+  document.getElementById('llnSliderVal').textContent = document.getElementById('llnSlider').value;
+}
+
+function resetLLN() {
+  document.getElementById('llnSlider').value = 1000;
+  document.getElementById('llnSliderVal').textContent = '1000';
+  document.getElementById('llnMean').textContent = '—';
+  document.getElementById('llnTheory').textContent = '—';
+  llnChart.setOption({ series: [{ data: [] }] });
+}
+updateLLNSlider();
+
+// ===== 卡片2：中心极限定理 =====
+var cltChart = echarts.init(document.getElementById('cltChart'));
+
+function normalPDF(x, mu, sigma) { return 1/(sigma*Math.sqrt(2*Math.PI)) * Math.exp(-0.5*Math.pow((x-mu)/sigma, 2)); }
+
+function runCLT() {
+  var dist = document.getElementById('cltDistSelect').value;
+  var n = parseInt(document.getElementById('cltNSlider').value);
+  var sims = parseInt(document.getElementById('cltSimSlider').value);
+
+  // 理论均值和方差
+  var mu, sigma2;
+  if (dist === 'uniform') { mu = 0.5; sigma2 = 1/12; }
+  else if (dist === 'exponential') { mu = 1; sigma2 = 1; }
+  else { mu = 0.3; sigma2 = 0.3*0.7; }
+
+  var sampMeans = [];
+  for (var s = 0; s < sims; s++) {
+    var sum = 0;
+    for (var i = 0; i < n; i++) {
+      if (dist === 'uniform') sum += Math.random();
+      else if (dist === 'exponential') sum += -Math.log(Math.random());
+      else sum += (Math.random() < 0.3 ? 1 : 0);
+    }
+    sampMeans.push(sum / n);
+  }
+
+  // 直方图
+  var bins = Math.min(40, Math.max(15, Math.floor(3.5*Math.sqrt(sims))));
+  var minM = Math.min.apply(null, sampMeans), maxM = Math.max.apply(null, sampMeans);
+  var binW = (maxM - minM) / bins;
+  var counts = new Array(bins).fill(0);
+  for (var i = 0; i < sims; i++) {
+    var idx = Math.min(Math.floor((sampMeans[i] - minM) / binW), bins - 1);
+    counts[idx]++;
+  }
+
+  var barData = [];
+  var barCats = [];
+  for (var i = 0; i < bins; i++) {
+    var center = minM + (i + 0.5) * binW;
+    barData.push({ value: counts[i] / sims / binW, itemStyle: { color: '#2563eb', borderRadius: [3,3,0,0] } });
+    barCats.push(center.toFixed(3));
+  }
+
+  // 理论正态曲线
+  var cltMu = mu, cltSigma = Math.sqrt(sigma2 / n);
+  var curveData = [];
+  var xMin = minM - binW, xMax = maxM + binW;
+  for (var i = 0; i <= 150; i++) {
+    var x = xMin + i*(xMax-xMin)/150;
+    curveData.push([x, normalPDF(x, cltMu, cltSigma)]);
+  }
+
+  cltChart.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['样本均值直方图', '理论正态曲线'], bottom: 0, textStyle: { fontSize: 11 } },
+    grid: { left: 50, right: 20, top: 20, bottom: 40 },
+    xAxis: { type: 'category', data: barCats, axisLabel: { fontSize: 9, interval: Math.max(1, Math.floor(bins/8)) }, splitLine: { show: false } },
+    yAxis: { type: 'value', name: '密度', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [
+      { name: '样本均值直方图', type: 'bar', data: barData, barWidth: '90%' },
+      { name: '理论正态曲线', type: 'line', data: curveData, smooth: true, symbol: 'none', lineStyle: { color: '#ef4444', width: 2.5 } }
+    ]
+  });
+}
+
+function updateCLTSlider() {
+  document.getElementById('cltNSliderVal').textContent = document.getElementById('cltNSlider').value;
+}
+
+function resetCLT() {
+  document.getElementById('cltNSlider').value = 5;
+  document.getElementById('cltNSliderVal').textContent = '5';
+  document.getElementById('cltSimSlider').value = 1000;
+  document.getElementById('cltSimVal').textContent = '1000';
+  cltChart.setOption({ series: [{ data: [] }, { data: [] }] });
+}
+updateCLTSlider();
+
+// ===== 自测题 =====
+var quizAnswers = { q1: 1, q2: 2, q3: 2 };
+var quizFeedback = {
+  q1: { correct: '正确！大数定律说明样本均值依概率收敛到总体期望。', wrong: '错误。大数定律说明的是样本均值依概率收敛到总体期望。中心极限定理才涉及分布收敛到正态。正确答案是 B。' },
+  q2: { correct: '正确！CLT不要求原始总体正态，只要独立同分布且期望方差存在即可。', wrong: '错误。中心极限定理不要求原始总体服从特定分布，只要独立同分布且期望方差存在，n足够大时样本均值近似正态。正确答案是 C。' },
+  q3: { correct: '正确！\(\frac{\overline{X}-\mu}{\sigma/\sqrt{n}}\) 近似服从标准正态分布 N(0,1)。', wrong: '错误。根据中心极限定理，标准化后的样本均值近似服从 N(0,1)。正确答案是 C。' }
+};
+
+function selectQuiz(qid, choice, el) {
+  var container = document.getElementById('quiz' + qid.slice(1));
+  var allOptions = container.querySelectorAll('.quiz-option');
+  var feedback = document.getElementById(qid + 'Feedback');
+  var correctAnswer = quizAnswers[qid];
+
+  allOptions.forEach(function(opt) { opt.classList.remove('selected', 'correct', 'wrong'); });
+  el.classList.add('selected');
+
+  if (choice === correctAnswer) {
+    el.classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-green-600';
+    feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
+  } else {
+    el.classList.add('wrong');
+    allOptions[correctAnswer].classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-red-600';
+    feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
+  }
+  feedback.classList.remove('hidden');
+  renderAllKatex();
+}
+
+window.addEventListener('resize', function() { llnChart.resize(); cltChart.resize(); });
+</script>
+
+</body>
+</html>

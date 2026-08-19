@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>随机变量的数字特征 — 概率论与数理统计可视化平台</title>
+<!-- TailwindCSS CDN（与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#2563eb',
+        'primary-light': '#3b82f6',
+        'primary-dark': '#1d4ed8',
+        'primary-bg': '#eff6ff',
+      }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"></script>
+<script src="js/katex-setup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4/dist/echarts.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<link rel="stylesheet" href="css/sidebar.css">
+<style>
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8fafc; }
+.main-content { margin-left: 256px; min-height: 100vh; }
+.card {
+  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;
+  margin-bottom: 24px; transition: all 0.2s;
+}
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+.formula-panel {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 12px; overflow: hidden;
+}
+.formula-toggle {
+  display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer;
+  font-size: 14px; font-weight: 500; color: #475569; user-select: none;
+  transition: background 0.15s;
+}
+.formula-toggle:hover { background: #f1f5f9; }
+.formula-toggle .arrow { transition: transform 0.2s; font-size: 12px; }
+.formula-toggle.open .arrow { transform: rotate(90deg); }
+.formula-body { display: none; padding: 0 16px 16px 16px; }
+.formula-body.show { display: block; }
+.exam-tip {
+  background: #fef9c3; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px 16px; margin-top: 16px;
+}
+.quiz-option {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.15s; font-size: 14px;
+}
+.quiz-option:hover { border-color: #93c5fd; background: #eff6ff; }
+.quiz-option.selected { border-color: #2563eb; background: #eff6ff; }
+.quiz-option.correct { border-color: #16a34a; background: #f0fdf4; }
+.quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
+.slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
+.slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+<div id="sidebar-container"></div>
+<script src="js/sidebar.js"></script>
+
+<main class="main-content">
+
+  <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第4章</span>
+      <span class="text-xs text-slate-400">模块一 · 概率论</span>
+    </div>
+    <h1 class="text-2xl font-bold text-slate-900 mb-2">随机变量的数字特征</h1>
+    <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
+      核心：期望、方差、协方差、相关系数；性质公式。
+      应试重点：期望方差性质；协方差；相关系数含义；\(\rho=0\) 不代表独立。
+    </p>
+  </section>
+
+  <!-- ===== 卡片1：期望 — 概率重心 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">⚖️ 期望 — 概率重心</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          期望是<strong>加权平均</strong>，物理上相当于概率分布的重心，不一定是随机变量可以取到的值。
+          期望的线性性质永远成立，不要求独立。
+        </p>
+      </div>
+
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">离散：</span><span class="katex-render" data-expr="E(X)=\sum_i x_i p_i"></span></div>
+            <div><span class="text-xs text-slate-400">连续：</span><span class="katex-render" data-expr="E(X)=\int_{-\infty}^{+\infty} x f(x) dx"></span></div>
+            <div><span class="text-xs text-slate-400">线性性质：</span><span class="katex-render" data-expr="E(aX+b)=aE(X)+b"></span></div>
+            <div><span class="text-xs text-slate-400">和的期望：</span><span class="katex-render" data-expr="E(X+Y)=E(X)+E(Y)"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 期望可视化 — 概率分布的重心</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">分布：</span>
+          <select id="expDistSelect" onchange="updateExpectation()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="binomial">二项分布 B(n,p)</option>
+            <option value="poisson">泊松分布 P(λ)</option>
+            <option value="asymmetric">非对称离散分布</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2" id="expParamGroup">
+          <span class="text-sm text-slate-600">p =</span>
+          <input type="range" id="expParamSlider" min="0.1" max="0.9" value="0.5" step="0.05" oninput="updateExpectation()" class="slider-input w-36">
+          <span id="expParamVal" class="text-sm font-mono text-slate-700 w-10">0.50</span>
+        </div>
+        <button onclick="resetExpectation()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="expChart" style="width:100%;height:340px;"></div>
+      <div class="text-center mt-2 text-sm text-slate-600">
+        E(X) = <strong id="expVal" class="text-blue-600 text-lg">5.00</strong>
+        <span class="text-slate-400 ml-4">红色竖线标记期望位置</span>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">期望线性性质<strong>永远成立</strong>，不要求独立。E(X+Y)=E(X)+E(Y) 无条件成立，这是高频考点。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片2：方差 — 离散程度 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📏 方差 — 离散程度</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          方差衡量随机变量取值<strong>波动大小</strong>。标准差 \(\sigma=\sqrt{D(X)}\)。
+          \(D(aX+b)=a^2 D(X)\)，常数 b 不影响方差。
+        </p>
+      </div>
+
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">定义：</span><span class="katex-render" data-expr="D(X)=E\left[(X-E(X))^2\right]"></span></div>
+            <div><span class="text-xs text-slate-400">计算式：</span><span class="katex-render" data-expr="D(X)=E(X^2)-[E(X)]^2"></span></div>
+            <div><span class="text-xs text-slate-400">线性性质：</span><span class="katex-render" data-expr="D(aX+b)=a^2 D(X)"></span></div>
+            <div><span class="text-xs text-slate-400">独立时：</span><span class="katex-render" data-expr="D(X+Y)=D(X)+D(Y)"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 方差与分布形态</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">μ =</span>
+          <input type="range" id="varMuSlider" min="-3" max="3" value="0" step="0.1" oninput="updateVariance()" class="slider-input w-36">
+          <span id="varMuVal" class="text-sm font-mono text-slate-700 w-10">0.0</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">σ =</span>
+          <input type="range" id="varSigmaSlider" min="0.3" max="3" value="1" step="0.1" oninput="updateVariance()" class="slider-input w-36">
+          <span id="varSigmaVal" class="text-sm font-mono text-slate-700 w-10">1.0</span>
+        </div>
+        <button onclick="resetVariance()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="varChart" style="width:100%;height:340px;"></div>
+      <div class="text-center mt-2 text-sm text-slate-600">
+        D(X) = σ² = <strong id="varVal" class="text-blue-600 text-lg">1.00</strong>
+        <span class="text-slate-400 ml-4">标准差 σ = <strong id="stdVal" class="text-blue-600">1.00</strong></span>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">\(D(aX+b)=a^2 D(X)\) 系数是 <strong>a²</strong>，很多学生写成 a，<strong>高频错误</strong>。注意 D(X+Y)=D(X)+D(Y) 需要独立条件。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片3：协方差、相关系数散点模拟 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">🔗 协方差与相关系数 — 散点模拟</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          <strong>协方差</strong>衡量 X, Y 协同变化方向；<strong>相关系数</strong> \(\rho\in[-1,1]\) 只刻画<strong>线性相关</strong>程度。
+        </p>
+        <p class="text-sm text-red-500 mt-1 font-medium">⚠ 重要：\(\rho=0\) 不代表相互独立，只代表不线性相关。</p>
+      </div>
+
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">协方差：</span><span class="katex-render" data-expr="Cov(X,Y)=E[(X-EX)(Y-EY)]"></span></div>
+            <div><span class="text-xs text-slate-400">计算式：</span><span class="katex-render" data-expr="Cov(X,Y)=E(XY)-E(X)E(Y)"></span></div>
+            <div><span class="text-xs text-slate-400">相关系数：</span><span class="katex-render" data-expr="\rho_{XY}=\frac{Cov(X,Y)}{\sqrt{D(X)}\sqrt{D(Y)}}"></span></div>
+            <div><span class="text-xs text-slate-400">方差展开：</span><span class="katex-render" data-expr="D(X+Y)=D(X)+D(Y)+2Cov(X,Y)"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 相关系数散点图</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">ρ =</span>
+          <input type="range" id="corrRhoSlider" min="-0.95" max="0.95" value="0.7" step="0.05" oninput="updateCorr()" class="slider-input w-36">
+          <span id="corrRhoVal" class="text-sm font-mono text-slate-700 w-10">0.70</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">样本量：</span>
+          <select id="corrNSlider" onchange="updateCorr()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="100">100</option>
+            <option value="300" selected>300</option>
+            <option value="500">500</option>
+          </select>
+        </div>
+        <button onclick="updateCorr()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 生成样本</button>
+        <button onclick="resetCorr()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div class="text-xs text-slate-400 mb-1 text-center">线性相关样本</div>
+          <div id="corrLinearChart" style="width:100%;height:340px;"></div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 mb-1 text-center">非线性相关（ρ≈0但不独立）</div>
+          <div id="corrNonLinearChart" style="width:100%;height:340px;"></div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-6 mt-3 text-sm justify-center">
+        <span class="text-slate-600">线性样本 Cov ≈ <strong id="corrCov" class="text-blue-600">0.70</strong></span>
+        <span class="text-slate-600">ρ ≈ <strong id="corrRho" class="text-blue-600">0.70</strong></span>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">填空选择题高频考点：ρ=0 只代表不线性相关，不代表独立。右图演示了非线性关系（抛物线）ρ≈0 但明显不独立的情况。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 底部自测题 ===== -->
+  <section class="max-w-5xl mx-auto px-10 pb-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">📝 自测题（单选）</h2>
+
+      <div class="mb-6" id="quiz1">
+        <p class="text-sm font-semibold text-slate-700 mb-3">1. D(aX+b) = ？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q1', 0, this)">A. a·D(X) + b</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 1, this)">B. a²·D(X)</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 2, this)">C. a·D(X)</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">D. a²·D(X) + b²</div>
+        </div>
+        <div id="q1Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz2">
+        <p class="text-sm font-semibold text-slate-700 mb-3">2. E(X+Y) = E(X) + E(Y) 成立的条件是？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q2', 0, this)">A. X 和 Y 独立</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 1, this)">B. X 和 Y 不相关</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 2, this)">C. 无条件成立</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 3, this)">D. X 和 Y 同分布</div>
+        </div>
+        <div id="q2Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz3">
+        <p class="text-sm font-semibold text-slate-700 mb-3">3. ρ = 0 意味着什么？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q3', 0, this)">A. X 和 Y 独立</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 1, this)">B. X 和 Y 没有关系</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 2, this)">C. X 和 Y 不线性相关，但不一定独立</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 3, this)">D. Cov(X,Y) = 1</div>
+        </div>
+        <div id="q3Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+function renderAllKatex() {
+  document.querySelectorAll('.katex-render').forEach(function(el) {
+    try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
+    catch(e) { el.textContent = el.getAttribute('data-expr'); }
+  });
+}
+renderAllKatex();
+
+function toggleFormula(toggle) {
+  toggle.classList.toggle('open');
+  var body = toggle.nextElementSibling;
+  body.classList.toggle('show');
+  if (body.classList.contains('show')) renderAllKatex();
+}
+
+// ===== 卡片1：期望 =====
+var expChart = echarts.init(document.getElementById('expChart'));
+
+function updateExpectation() {
+  var dist = document.getElementById('expDistSelect').value;
+  var p = parseFloat(document.getElementById('expParamSlider').value);
+  document.getElementById('expParamVal').textContent = p.toFixed(2);
+
+  var data = [], ex = 0;
+  if (dist === 'binomial') {
+    var n = 10;
+    for (var k = 0; k <= n; k++) {
+      var prob = binomialPMF(k, n, p);
+      data.push({value: k, prob: prob});
+      ex += k * prob;
+    }
+  } else if (dist === 'poisson') {
+    var lam = 4;
+    var maxK = Math.ceil(lam + 4*Math.sqrt(lam));
+    for (var k = 0; k <= maxK; k++) {
+      var prob = Math.exp(-lam + k*Math.log(lam) - logFactorial(k));
+      data.push({value: k, prob: prob});
+      ex += k * prob;
+    }
+  } else {
+    // 非对称分布
+    var vals = [0, 1, 2, 3, 5, 8];
+    var probs = [0.05, 0.15, 0.25, 0.20, 0.25, 0.10];
+    for (var i = 0; i < vals.length; i++) {
+      data.push({value: vals[i], prob: probs[i]});
+      ex += vals[i] * probs[i];
+    }
+  }
+
+  document.getElementById('expVal').textContent = ex.toFixed(2);
+
+  var xData = data.map(function(d) { return d.value; });
+  var yData = data.map(function(d) { return d.prob; });
+
+  expChart.setOption({
+    tooltip: { trigger: 'axis', formatter: function(p) { return 'X='+p[0].data[0]+'<br/>P='+p[0].data[1].toFixed(4); } },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'category', data: xData, axisLabel: { fontSize: 11 }, splitLine: { show: false } },
+    yAxis: { type: 'value', name: 'P(X=k)', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'bar', data: yData, barWidth: '50%',
+      itemStyle: { color: '#2563eb', borderRadius: [4, 4, 0, 0] },
+      markLine: {
+        silent: true, symbol: 'none',
+        lineStyle: { color: '#ef4444', type: 'dashed', width: 2 },
+        label: { fontSize: 11, formatter: 'E(X)={c}', position: 'start' },
+        data: [{ xAxis: data.reduce(function(_, d, i, arr) { return Math.abs(d.value - ex) < Math.abs(arr[0].value - ex) ? i : 0; }, 0) }]
+      }
+    }]
+  });
+}
+
+function logFactorial(n) { if (n <= 1) return 0; var s = 0; for (var i = 2; i <= n; i++) s += Math.log(i); return s; }
+function binomialPMF(k, n, p) { if (k < 0 || k > n) return 0; var logC = 0; for (var i = 1; i <= k; i++) logC += Math.log(n - k + i) - Math.log(i); return Math.exp(logC + k*Math.log(p) + (n-k)*Math.log(1-p)); }
+
+function resetExpectation() {
+  document.getElementById('expDistSelect').value = 'binomial';
+  document.getElementById('expParamSlider').value = 0.5;
+  updateExpectation();
+}
+updateExpectation();
+
+// ===== 卡片2：方差 =====
+var varChart = echarts.init(document.getElementById('varChart'));
+
+function normalPDF(x, mu, sigma) { return 1/(sigma*Math.sqrt(2*Math.PI)) * Math.exp(-0.5*Math.pow((x-mu)/sigma, 2)); }
+
+function updateVariance() {
+  var mu = parseFloat(document.getElementById('varMuSlider').value);
+  var sigma = parseFloat(document.getElementById('varSigmaSlider').value);
+  document.getElementById('varMuVal').textContent = mu.toFixed(1);
+  document.getElementById('varSigmaVal').textContent = sigma.toFixed(1);
+  document.getElementById('varVal').textContent = (sigma*sigma).toFixed(2);
+  document.getElementById('stdVal').textContent = sigma.toFixed(2);
+
+  var N = 200;
+  var data = [];
+  for (var i = 0; i <= N; i++) {
+    var x = mu - 4*sigma + i*8*sigma/N;
+    data.push([x, normalPDF(x, mu, sigma)]);
+  }
+
+  var pmSigma = [[mu-sigma, 0], [mu-sigma, normalPDF(mu-sigma, mu, sigma)]];
+  var ppSigma = [[mu+sigma, 0], [mu+sigma, normalPDF(mu+sigma, mu, sigma)]];
+
+  varChart.setOption({
+    tooltip: { trigger: 'axis', formatter: function(p) { return 'x='+p[0].data[0].toFixed(3)+'<br/>f(x)='+p[0].data[1].toFixed(4); } },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'value', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'line', data: data, smooth: true, symbol: 'none',
+      lineStyle: { color: '#2563eb', width: 2.5 },
+      areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,0.25)'},{offset:1,color:'rgba(37,99,235,0.02)'}]) },
+      markLine: {
+        silent: true, symbol: 'none', lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 },
+        label: { fontSize: 10, formatter: 'μ={c}' },
+        data: [{ xAxis: mu }]
+      }
+    }, {
+      type: 'line', data: pmSigma, symbol: 'none', lineStyle: { color: '#f59e0b', type: 'dashed', width: 1.2 }, silent: true
+    }, {
+      type: 'line', data: ppSigma, symbol: 'none', lineStyle: { color: '#f59e0b', type: 'dashed', width: 1.2 }, silent: true
+    }]
+  });
+}
+
+function resetVariance() {
+  document.getElementById('varMuSlider').value = 0;
+  document.getElementById('varSigmaSlider').value = 1;
+  updateVariance();
+}
+updateVariance();
+
+// ===== 卡片3：协方差和相关系数 =====
+var corrLinearChart = echarts.init(document.getElementById('corrLinearChart'));
+var corrNonLinearChart = echarts.init(document.getElementById('corrNonLinearChart'));
+
+function boxMuller() { var u1=Math.random(),u2=Math.random(); return Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2); }
+
+function updateCorr() {
+  var rho = parseFloat(document.getElementById('corrRhoSlider').value);
+  var N = parseInt(document.getElementById('corrNSlider').value);
+  document.getElementById('corrRhoVal').textContent = rho.toFixed(2);
+
+  // 线性样本
+  var xs = [], ys = [];
+  for (var i = 0; i < N; i++) {
+    var z1 = boxMuller(), z2 = boxMuller();
+    xs.push(z1);
+    ys.push(rho*z1 + Math.sqrt(1-rho*rho)*z2);
+  }
+  var covXY = 0, meanX = 0, meanY = 0;
+  for (var i = 0; i < N; i++) { meanX += xs[i]; meanY += ys[i]; }
+  meanX /= N; meanY /= N;
+  var varX = 0, varY = 0;
+  for (var i = 0; i < N; i++) {
+    covXY += (xs[i]-meanX)*(ys[i]-meanY);
+    varX += (xs[i]-meanX)*(xs[i]-meanX);
+    varY += (ys[i]-meanY)*(ys[i]-meanY);
+  }
+  covXY /= N; varX /= N; varY /= N;
+  var rhoEst = covXY / Math.sqrt(varX*varY);
+
+  document.getElementById('corrCov').textContent = covXY.toFixed(3);
+  document.getElementById('corrRho').textContent = rhoEst.toFixed(3);
+
+  var scatterData = xs.map(function(x, i) { return [x, ys[i]]; });
+
+  corrLinearChart.setOption({
+    tooltip: { trigger: 'item' },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'value', name: 'X', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', name: 'Y', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'scatter', data: scatterData, symbolSize: 4,
+      itemStyle: { color: 'rgba(37,99,235,0.5)' }
+    }]
+  });
+
+  // 非线性样本：抛物线 Y = X² + noise
+  var nxs = [], nys = [];
+  for (var i = 0; i < N; i++) {
+    var x = (Math.random() - 0.5) * 6;
+    nxs.push(x);
+    nys.push(x*x*0.5 + boxMuller()*0.5);
+  }
+
+  corrNonLinearChart.setOption({
+    tooltip: { trigger: 'item' },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'value', name: 'X', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', name: 'Y', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'scatter', data: nxs.map(function(x, i) { return [x, nys[i]]; }), symbolSize: 4,
+      itemStyle: { color: 'rgba(239,68,68,0.5)' }
+    }]
+  });
+}
+
+function resetCorr() {
+  document.getElementById('corrRhoSlider').value = 0.7;
+  document.getElementById('corrNSlider').value = '300';
+  updateCorr();
+}
+updateCorr();
+
+// ===== 自测题 =====
+var quizAnswers = { q1: 1, q2: 2, q3: 2 };
+var quizFeedback = {
+  q1: { correct: '正确！D(aX+b) = a²·D(X)，常数 b 不影响方差。', wrong: '错误。D(aX+b) = a²·D(X)，系数是 a²，常数项 b 消失。正确答案是 B。' },
+  q2: { correct: '正确！期望的线性性质 E(X+Y)=E(X)+E(Y) 无条件成立，不要求独立。', wrong: '错误。E(X+Y)=E(X)+E(Y) 无条件成立，期望的线性性质永远成立。正确答案是 C。' },
+  q3: { correct: '正确！ρ=0 只代表不线性相关，不代表独立。非线性关系也可能有 ρ≈0。', wrong: '错误。ρ=0 只代表不线性相关，不代表独立。例如抛物线关系 Y=X² 的 ρ≈0 但明显不独立。正确答案是 C。' }
+};
+
+function selectQuiz(qid, choice, el) {
+  var container = document.getElementById('quiz' + qid.slice(1));
+  var allOptions = container.querySelectorAll('.quiz-option');
+  var feedback = document.getElementById(qid + 'Feedback');
+  var correctAnswer = quizAnswers[qid];
+
+  allOptions.forEach(function(opt) { opt.classList.remove('selected', 'correct', 'wrong'); });
+  el.classList.add('selected');
+
+  if (choice === correctAnswer) {
+    el.classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-green-600';
+    feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
+  } else {
+    el.classList.add('wrong');
+    allOptions[correctAnswer].classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-red-600';
+    feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
+  }
+  feedback.classList.remove('hidden');
+  renderAllKatex();
+}
+
+window.addEventListener('resize', function() {
+  expChart.resize(); varChart.resize();
+  corrLinearChart.resize(); corrNonLinearChart.resize();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+/* ==================== 共享侧边导航栏样式 ==================== */
+/* 供 index.html 与 chapter1-8.html 通过 <link rel="stylesheet" href="css/sidebar.css"> 引入 */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 256px;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 40;
+  background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 50%, #f8fafc 100%);
+  border-right: 1px solid #e2e8f0;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  margin: 2px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #475569;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sidebar-nav-item:hover {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.sidebar-nav-item.active {
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.sidebar-nav-item .chapter-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background-color: #e2e8f0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  margin-right: 10px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.sidebar-nav-item:hover .chapter-num {
+  background-color: #93c5fd;
+  color: #1e40af;
+}
+
+.sidebar-nav-item.active .chapter-num {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+/* 侧边栏自定义滚动条 */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ==================== 侧边栏折叠/展开 ==================== */
+
+/* 折叠/展开过渡动画 */
+.sidebar { transition: transform 0.3s ease; }
+.main-content { transition: margin-left 0.3s ease; }
+
+/* 侧边栏顶部“收起”按钮 */
+.sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.sidebar-toggle:hover {
+  background: #dbeafe;
+  color: #2563eb;
+  border-color: #93c5fd;
+}
+
+/* 侧边栏收起后，屏幕左上角的悬浮“展开”按钮 */
+.sidebar-reopen {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 50;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #2563eb;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: all 0.15s ease;
+}
+.sidebar-reopen:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* 折叠状态：侧边栏滑出屏幕，主内容区占满宽度，显示展开按钮 */
+body.sidebar-collapsed .sidebar { transform: translateX(-100%); }
+body.sidebar-collapsed .main-content { margin-left: 0; }
+body.sidebar-collapsed .sidebar-reopen { display: flex; }

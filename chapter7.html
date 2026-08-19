@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>参数估计 — 概率论与数理统计可视化平台</title>
+<!-- TailwindCSS CDN（与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#2563eb',
+        'primary-light': '#3b82f6',
+        'primary-dark': '#1d4ed8',
+        'primary-bg': '#eff6ff',
+      }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"></script>
+<script src="js/katex-setup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4/dist/echarts.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<link rel="stylesheet" href="css/sidebar.css">
+<style>
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8fafc; }
+.main-content { margin-left: 256px; min-height: 100vh; }
+.card {
+  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;
+  margin-bottom: 24px; transition: all 0.2s;
+}
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+.formula-panel {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 12px; overflow: hidden;
+}
+.formula-toggle {
+  display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer;
+  font-size: 14px; font-weight: 500; color: #475569; user-select: none;
+  transition: background 0.15s;
+}
+.formula-toggle:hover { background: #f1f5f9; }
+.formula-toggle .arrow { transition: transform 0.2s; font-size: 12px; }
+.formula-toggle.open .arrow { transform: rotate(90deg); }
+.formula-body { display: none; padding: 0 16px 16px 16px; }
+.formula-body.show { display: block; }
+.exam-tip {
+  background: #fef9c3; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px 16px; margin-top: 16px;
+}
+.quiz-option {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.15s; font-size: 14px;
+}
+.quiz-option:hover { border-color: #93c5fd; background: #eff6ff; }
+.quiz-option.selected { border-color: #2563eb; background: #eff6ff; }
+.quiz-option.correct { border-color: #16a34a; background: #f0fdf4; }
+.quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
+.slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
+.slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+<div id="sidebar-container"></div>
+<script src="js/sidebar.js"></script>
+
+<main class="main-content">
+
+  <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第7章</span>
+      <span class="text-xs text-slate-400">模块二 · 数理统计</span>
+    </div>
+    <h1 class="text-2xl font-bold text-slate-900 mb-2">参数估计</h1>
+    <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
+      点估计（矩估计、极大似然估计）；无偏性；区间估计、置信区间。
+      应试重点：置信区间含义；正态总体区间估计。
+    </p>
+  </section>
+
+  <!-- ===== 卡片1：点估计模拟 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">🎯 点估计模拟 — 有偏与无偏</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          点估计：用样本算出一个数值作为总体参数估计。<strong>无偏性</strong>：估计量的期望等于真实参数。
+          无偏是估计量期望等于真值，不是每一次估计都等于真值。
+        </p>
+      </div>
+
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">无偏性：</span><span class="katex-render" data-expr="E(\hat{\theta})=\theta"></span></div>
+            <div><span class="text-xs text-slate-400">样本均值是无偏估计：</span><span class="katex-render" data-expr="E(\bar{X})=\mu"></span></div>
+            <div><span class="text-xs text-slate-400">样本方差（n-1）是无偏估计：</span><span class="katex-render" data-expr="E(S^2)=\sigma^2"></span></div>
+            <div><span class="text-xs text-slate-400">极大似然估计：</span><span class="katex-render" data-expr="\hat{\theta}=\arg\max_{\theta}\prod_{i=1}^{n}f(x_i;\theta)"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 点估计散点图</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">估计量：</span>
+          <select id="peEstSelect" onchange="runPointEst()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="unbiased">无偏估计（样本均值）</option>
+            <option value="biased">有偏估计（第一个样本值）</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">重复次数：</span>
+          <input type="range" id="peSimSlider" min="20" max="200" value="50" step="10" oninput="document.getElementById('peSimVal').textContent=this.value;" class="slider-input w-32">
+          <span id="peSimVal" class="text-sm font-mono text-slate-700 w-10">50</span>
+        </div>
+        <button onclick="runPointEst()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 重新生成</button>
+        <button onclick="resetPointEst()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="pointEstChart" style="width:100%;height:340px;"></div>
+      <div class="text-center mt-2 text-sm text-slate-600">
+        真实参数 μ = <strong class="text-red-500">0</strong>（红色竖线） | 估计值均值 = <strong id="peMean" class="text-blue-600">—</strong>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">无偏是估计量<strong>期望</strong>等于真值，不是每一次估计都等于真值。有偏估计整体偏离真值。样本方差分母 n-1（无偏）vs n（有偏，MLE）。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片2：置信区间模拟 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📏 置信区间模拟（教学神器）</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          <strong>95%置信区间</strong>含义：大量重复抽样构造区间，大约95%区间包含真实总体参数。
+        </p>
+        <p class="text-sm text-red-500 mt-1 font-medium">⚠ 关键误区：不是参数95%落在某一个固定区间内，而是区间包含参数的概率。</p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 置信区间可视化</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">置信水平：</span>
+          <select id="ciLevelSelect" onchange="runCI()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="0.90">90%</option>
+            <option value="0.95" selected>95%</option>
+            <option value="0.99">99%</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">模拟组数：</span>
+          <input type="range" id="ciSimSlider" min="10" max="100" value="30" step="5" oninput="document.getElementById('ciSimVal').textContent=this.value;" class="slider-input w-32">
+          <span id="ciSimVal" class="text-sm font-mono text-slate-700 w-8">30</span>
+        </div>
+        <button onclick="runCI()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 重新生成</button>
+        <button onclick="resetCI()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="ciChart" style="width:100%;height:420px;"></div>
+      <div class="text-center mt-2 text-sm">
+        <span class="text-slate-600">覆盖率：</span>
+        <strong id="ciCoverage" class="text-blue-600 text-lg">—</strong>
+        <span class="text-slate-400 ml-2">（红色区间未包含真实参数 μ=0）</span>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">置信区间概念<strong>选择题高频坑</strong>。95%置信区间含义：100次抽样构造100个区间，约95个包含真值。置信水平越高，区间越宽。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片3：正态总体区间估计对比 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">⚖️ 正态总体区间估计对比</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          已知 σ 时使用 Z 分布构造置信区间；未知 σ 时使用 t 分布。t 分布尾部更厚，相同的置信水平下 t 区间更宽。
+        </p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ Z区间 vs t区间对比</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">样本量 n =</span>
+          <input type="range" id="ztNSlider" min="5" max="100" value="15" step="1" oninput="updateZT()" class="slider-input w-32">
+          <span id="ztNVal" class="text-sm font-mono text-slate-700 w-8">15</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">置信水平：</span>
+          <select id="ztLevelSelect" onchange="updateZT()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="0.90">90%</option>
+            <option value="0.95" selected>95%</option>
+            <option value="0.99">99%</option>
+          </select>
+        </div>
+        <button onclick="resetZT()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="ztChart" style="width:100%;height:320px;"></div>
+      <div class="grid grid-cols-2 gap-4 mt-3 text-sm">
+        <div class="bg-slate-50 rounded-lg p-3 text-center">
+          <div class="text-xs text-slate-400">Z区间（σ已知）</div>
+          <div id="ztZInterval" class="font-bold text-blue-600">—</div>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-3 text-center">
+          <div class="text-xs text-slate-400">t区间（σ未知）</div>
+          <div id="ztTInterval" class="font-bold text-blue-600">—</div>
+        </div>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">σ 已知用 Z 分布，σ 未知用 t 分布。t 区间比 Z 区间<strong>更宽</strong>（因为估计 σ 引入了额外不确定性）。n 很大时两者接近。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 底部自测题 ===== -->
+  <section class="max-w-5xl mx-auto px-10 pb-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">📝 自测题（单选）</h2>
+
+      <div class="mb-6" id="quiz1">
+        <p class="text-sm font-semibold text-slate-700 mb-3">1. 无偏估计的含义是什么？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q1', 0, this)">A. 每次估计值都等于真值</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 1, this)">B. 估计量的期望等于真值</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 2, this)">C. 估计量的方差很小</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">D. 样本量很大</div>
+        </div>
+        <div id="q1Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz2">
+        <p class="text-sm font-semibold text-slate-700 mb-3">2. 95%置信区间的正确含义是？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q2', 0, this)">A. 参数有95%概率落在该区间内</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 1, this)">B. 100次抽样约有95个区间包含真值</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 2, this)">C. 95%的样本数据落在该区间内</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 3, this)">D. 区间宽度是95%</div>
+        </div>
+        <div id="q2Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz3">
+        <p class="text-sm font-semibold text-slate-700 mb-3">3. 正态总体均值区间估计，σ未知时使用什么分布？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q3', 0, this)">A. Z分布（标准正态）</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 1, this)">B. t分布</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 2, this)">C. χ²分布</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 3, this)">D. F分布</div>
+        </div>
+        <div id="q3Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+function renderAllKatex() {
+  document.querySelectorAll('.katex-render').forEach(function(el) {
+    try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
+    catch(e) { el.textContent = el.getAttribute('data-expr'); }
+  });
+}
+renderAllKatex();
+
+function toggleFormula(toggle) {
+  toggle.classList.toggle('open');
+  var body = toggle.nextElementSibling;
+  body.classList.toggle('show');
+  if (body.classList.contains('show')) renderAllKatex();
+}
+
+function boxMuller() { var u1=Math.random(),u2=Math.random(); return Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2); }
+
+// ===== 卡片1：点估计 =====
+var pointEstChart = echarts.init(document.getElementById('pointEstChart'));
+
+function runPointEst() {
+  var estType = document.getElementById('peEstSelect').value;
+  var sims = parseInt(document.getElementById('peSimSlider').value);
+  var n = 20;
+  var trueMu = 0;
+  var estimates = [];
+
+  for (var s = 0; s < sims; s++) {
+    var samples = [];
+    for (var i = 0; i < n; i++) samples.push(boxMuller() + trueMu);
+
+    if (estType === 'unbiased') {
+      var mean = samples.reduce(function(a,b){return a+b;},0)/n;
+      estimates.push(mean);
+    } else {
+      estimates.push(samples[0]);
+    }
+  }
+
+  var avgEst = estimates.reduce(function(a,b){return a+b;},0)/sims;
+  document.getElementById('peMean').textContent = avgEst.toFixed(3);
+
+  var scatterData = estimates.map(function(v, i) { return [i+1, v]; });
+
+  pointEstChart.setOption({
+    tooltip: { trigger: 'item', formatter: function(p) { return '第'+p.data[0]+'次<br/>估计值='+p.data[1].toFixed(4); } },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'value', name: '抽样序号', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', name: '估计值', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'scatter', data: scatterData, symbolSize: 8,
+      itemStyle: { color: '#2563eb' },
+      markLine: { silent: true, symbol: 'none', lineStyle: { color: '#ef4444', type: 'solid', width: 2 }, label: { formatter: 'μ=0', fontSize: 11 }, data: [{ yAxis: trueMu }] }
+    }]
+  });
+}
+
+function resetPointEst() {
+  document.getElementById('peEstSelect').value = 'unbiased';
+  document.getElementById('peSimSlider').value = 50;
+  document.getElementById('peSimVal').textContent = '50';
+  runPointEst();
+}
+runPointEst();
+
+// ===== 卡片2：置信区间 =====
+var ciChart = echarts.init(document.getElementById('ciChart'));
+
+function tQuantile(alpha, df) {
+  // 近似t分位数
+  var z;
+  if (alpha >= 0.5) {
+    z = 0.85;
+  } else if (alpha > 0.1) {
+    z = 1.4;
+  } else if (alpha > 0.05) {
+    z = 1.75;
+  } else if (alpha > 0.025) {
+    z = 2.05;
+  } else if (alpha > 0.01) {
+    z = 2.45;
+  } else {
+    z = 2.8;
+  }
+  return z * (1 + (z*z+1)/(4*df) + (z*z*z+3*z)/(96*df*df));
+}
+
+function runCI() {
+  var level = parseFloat(document.getElementById('ciLevelSelect').value);
+  var sims = parseInt(document.getElementById('ciSimSlider').value);
+  var n = 30, trueMu = 0;
+  var alpha = 1 - level;
+
+  var intervals = [];
+  var covered = 0;
+
+  for (var s = 0; s < sims; s++) {
+    var samples = [];
+    for (var i = 0; i < n; i++) samples.push(boxMuller() + trueMu);
+    var mean = samples.reduce(function(a,b){return a+b;},0)/n;
+    var sd = Math.sqrt(samples.reduce(function(a,b){return a+Math.pow(b-mean,2);},0)/(n-1));
+    var se = sd / Math.sqrt(n);
+    var tVal = tQuantile(alpha/2, n-1);
+    var lo = mean - tVal*se, hi = mean + tVal*se;
+    intervals.push({ lo: lo, hi: hi, mean: mean });
+    if (lo <= trueMu && trueMu <= hi) covered++;
+  }
+
+  document.getElementById('ciCoverage').textContent = (covered/sims*100).toFixed(1) + '% (' + covered + '/' + sims + ')';
+
+  // 绘制水平线段
+  var series = [];
+  for (var i = 0; i < sims; i++) {
+    var color = (intervals[i].lo <= trueMu && trueMu <= intervals[i].hi) ? '#2563eb' : '#ef4444';
+    series.push({
+      type: 'line',
+      data: [[intervals[i].lo, i], [intervals[i].hi, i]],
+      symbol: 'none',
+      lineStyle: { color: color, width: 2.5 },
+      silent: true
+    });
+    series.push({
+      type: 'scatter',
+      data: [[intervals[i].mean, i]],
+      symbolSize: 5,
+      itemStyle: { color: color },
+      silent: true
+    });
+  }
+
+  // 添加真实参数线
+  series.push({
+    type: 'line',
+    data: [[trueMu, -1], [trueMu, sims]],
+    symbol: 'none',
+    lineStyle: { color: '#ef4444', type: 'solid', width: 2.5 },
+    silent: true,
+    z: 10
+  });
+
+  ciChart.setOption({
+    tooltip: { trigger: 'item', formatter: function(p) { if (p.seriesIndex < sims*2) return '区间'+Math.floor(p.seriesIndex/2+1)+': ['+p.data[0].toFixed(3)+', '+(p.data[1]||p.data[0]).toFixed(3)+']'; return ''; } },
+    grid: { left: 60, right: 30, top: 20, bottom: 35 },
+    xAxis: { type: 'value', name: 'μ', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', name: '抽样序号', min: -1, max: sims, axisLabel: { fontSize: 10 }, splitLine: { show: false } },
+    series: series
+  });
+}
+
+function resetCI() {
+  document.getElementById('ciLevelSelect').value = '0.95';
+  document.getElementById('ciSimSlider').value = 30;
+  document.getElementById('ciSimVal').textContent = '30';
+  runCI();
+}
+runCI();
+
+// ===== 卡片3：Z区间 vs t区间 =====
+var ztChart = echarts.init(document.getElementById('ztChart'));
+
+function updateZT() {
+  var n = parseInt(document.getElementById('ztNSlider').value);
+  var level = parseFloat(document.getElementById('ztLevelSelect').value);
+  document.getElementById('ztNVal').textContent = n;
+
+  var alpha = 1 - level;
+  // Z分位数近似
+  var zVal;
+  if (level === 0.90) zVal = 1.645;
+  else if (level === 0.95) zVal = 1.96;
+  else zVal = 2.576;
+
+  var tVal = zVal * (1 + (zVal*zVal+1)/(4*(n-1)));
+
+  var sampleMean = 0.5;
+  var sampleSE = 0.6 / Math.sqrt(n);
+
+  var zLo = sampleMean - zVal*sampleSE, zHi = sampleMean + zVal*sampleSE;
+  var tLo = sampleMean - tVal*sampleSE, tHi = sampleMean + tVal*sampleSE;
+
+  document.getElementById('ztZInterval').textContent = '[' + zLo.toFixed(3) + ', ' + zHi.toFixed(3) + ']';
+  document.getElementById('ztTInterval').textContent = '[' + tLo.toFixed(3) + ', ' + tHi.toFixed(3) + ']';
+
+  ztChart.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['Z区间', 't区间'], bottom: 0, textStyle: { fontSize: 11 } },
+    grid: { left: 60, right: 30, top: 20, bottom: 40 },
+    yAxis: { type: 'category', data: ['Z区间 (σ已知)', 't区间 (σ未知)'], axisLabel: { fontSize: 11 }, splitLine: { show: false } },
+    xAxis: { type: 'value', name: 'μ', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [
+      { name: 'Z区间', type: 'bar', data: [{ value: zHi - zLo, itemStyle: { color: '#2563eb' } }], barWidth: 30, barGap: '20%', stack: 'z', dataGroupId: 'z' },
+      { name: 'Z区间', type: 'bar', data: [{ value: zLo, itemStyle: { color: 'transparent' } }], barWidth: 30, stack: 'z', dataGroupId: 'z' },
+      { name: 't区间', type: 'bar', data: [{ value: tHi - tLo, itemStyle: { color: '#93c5fd' } }], barWidth: 30, barGap: '20%', stack: 't', dataGroupId: 't' },
+      { name: 't区间', type: 'bar', data: [{ value: tLo, itemStyle: { color: 'transparent' } }], barWidth: 30, stack: 't', dataGroupId: 't' }
+    ]
+  });
+}
+
+function resetZT() {
+  document.getElementById('ztNSlider').value = 15;
+  document.getElementById('ztLevelSelect').value = '0.95';
+  updateZT();
+}
+updateZT();
+
+// ===== 自测题 =====
+var quizAnswers = { q1: 1, q2: 1, q3: 1 };
+var quizFeedback = {
+  q1: { correct: '正确！无偏性指 E(θ̂)=θ，即估计量的期望等于真实参数，不是每次估计都等于真值。', wrong: '错误。无偏性指估计量的期望等于真值，而不是每次估计值都等于真值。正确答案是 B。' },
+  q2: { correct: '正确！95%置信区间的正确含义是：大量重复抽样构造区间，约95%包含真值。参数是固定常数，不是随机变量。', wrong: '错误。置信区间的正确含义是大量重复抽样约有95%的区间包含真值，而非参数落在区间内的概率。正确答案是 B。' },
+  q3: { correct: '正确！σ 未知时使用 t 分布，σ 已知时使用 Z 分布。', wrong: '错误。σ 未知时用 t 分布，σ 已知时用 Z 分布。正确答案是 B。' }
+};
+
+function selectQuiz(qid, choice, el) {
+  var container = document.getElementById('quiz' + qid.slice(1));
+  var allOptions = container.querySelectorAll('.quiz-option');
+  var feedback = document.getElementById(qid + 'Feedback');
+  var correctAnswer = quizAnswers[qid];
+
+  allOptions.forEach(function(opt) { opt.classList.remove('selected', 'correct', 'wrong'); });
+  el.classList.add('selected');
+
+  if (choice === correctAnswer) {
+    el.classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-green-600';
+    feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
+  } else {
+    el.classList.add('wrong');
+    allOptions[correctAnswer].classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-red-600';
+    feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
+  }
+  feedback.classList.remove('hidden');
+  renderAllKatex();
+}
+
+window.addEventListener('resize', function() { pointEstChart.resize(); ciChart.resize(); ztChart.resize(); });
+</script>
+
+</body>
+</html>

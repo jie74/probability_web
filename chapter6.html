@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>样本及抽样分布 — 概率论与数理统计可视化平台</title>
+<!-- TailwindCSS CDN（与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#2563eb',
+        'primary-light': '#3b82f6',
+        'primary-dark': '#1d4ed8',
+        'primary-bg': '#eff6ff',
+      }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"></script>
+<script src="js/katex-setup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4/dist/echarts.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<link rel="stylesheet" href="css/sidebar.css">
+<style>
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8fafc; }
+.main-content { margin-left: 256px; min-height: 100vh; }
+.card {
+  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;
+  margin-bottom: 24px; transition: all 0.2s;
+}
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+.formula-panel {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 12px; overflow: hidden;
+}
+.formula-toggle {
+  display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer;
+  font-size: 14px; font-weight: 500; color: #475569; user-select: none;
+  transition: background 0.15s;
+}
+.formula-toggle:hover { background: #f1f5f9; }
+.formula-toggle .arrow { transition: transform 0.2s; font-size: 12px; }
+.formula-toggle.open .arrow { transform: rotate(90deg); }
+.formula-body { display: none; padding: 0 16px 16px 16px; }
+.formula-body.show { display: block; }
+.exam-tip {
+  background: #fef9c3; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px 16px; margin-top: 16px;
+}
+.quiz-option {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.15s; font-size: 14px;
+}
+.quiz-option:hover { border-color: #93c5fd; background: #eff6ff; }
+.quiz-option.selected { border-color: #2563eb; background: #eff6ff; }
+.quiz-option.correct { border-color: #16a34a; background: #f0fdf4; }
+.quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
+.slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
+.slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+<div id="sidebar-container"></div>
+<script src="js/sidebar.js"></script>
+
+<main class="main-content">
+
+  <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第6章</span>
+      <span class="text-xs text-slate-400">模块二 · 数理统计</span>
+    </div>
+    <h1 class="text-2xl font-bold text-slate-900 mb-2">样本及抽样分布</h1>
+    <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
+      样本、统计量；样本均值、样本方差；三大抽样分布 \(\chi^2、t、F\)；分位数。
+      应试重点：三大分布形态、自由度；上 \(\alpha\) 分位数含义。
+    </p>
+  </section>
+
+  <!-- ===== 卡片1：样本生成器 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📋 样本生成器 — 总体 vs 样本</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          总体参数是常数；样本统计量是随机变量，抽样会发生变化。每次抽样得到的样本均值和样本方差都会不同，直观感受抽样的随机性。
+        </p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 抽样演示</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">总体：</span>
+          <select id="sampleDistSelect" onchange="resetSampling()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="normal">正态分布 N(0,1)</option>
+            <option value="uniform">均匀分布 U(0,1)</option>
+            <option value="exponential">指数分布 E(1)</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">样本量 n =</span>
+          <input type="range" id="sampleNSlider" min="5" max="200" value="30" step="5" oninput="document.getElementById('sampleNVal').textContent=this.value;" class="slider-input w-32">
+          <span id="sampleNVal" class="text-sm font-mono text-slate-700 w-8">30</span>
+        </div>
+        <button onclick="drawSample()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 抽取样本</button>
+        <button onclick="resetSampling()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="sampleChart" style="width:100%;height:320px;"></div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
+        <div class="bg-slate-50 rounded-lg p-3 text-center">
+          <div class="text-xs text-slate-400">样本均值 \(\bar{X}\)</div>
+          <div id="sampleMean" class="text-lg font-bold text-blue-600">—</div>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-3 text-center">
+          <div class="text-xs text-slate-400">样本方差 S²</div>
+          <div id="sampleVar" class="text-lg font-bold text-blue-600">—</div>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-3 text-center">
+          <div class="text-xs text-slate-400">总体 E(X)</div>
+          <div id="samplePopMean" class="text-lg font-bold text-slate-500">—</div>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-3 text-center">
+          <div class="text-xs text-slate-400">总体 D(X)</div>
+          <div id="samplePopVar" class="text-lg font-bold text-slate-500">—</div>
+        </div>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">总体参数是固定常数，样本统计量是随机变量。每次抽样结果不同，这就是抽样误差的来源。样本方差分母是 n-1（无偏估计）。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片2：三大抽样分布 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📊 三大抽样分布交互式曲线</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          \(\chi^2(n)\) 分布：n 个独立标准正态的平方和，恒右偏。<br>
+          \(t(n)\) 分布：自由度越小尾部越厚，n→∞ 趋近 N(0,1)。<br>
+          \(F(n_1,n_2)\) 分布：两个 χ² 变量之比，恒右偏。
+        </p>
+      </div>
+
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">χ²分布：</span><span class="katex-render" data-expr="\chi^2(n)=\sum_{i=1}^{n}Z_i^2,\; Z_i\sim N(0,1)"></span></div>
+            <div><span class="text-xs text-slate-400">t分布：</span><span class="katex-render" data-expr="t(n)=\frac{Z}{\sqrt{\chi^2(n)/n}},\; Z\sim N(0,1)"></span></div>
+            <div><span class="text-xs text-slate-400">F分布：</span><span class="katex-render" data-expr="F(n_1,n_2)=\frac{\chi^2(n_1)/n_1}{\chi^2(n_2)/n_2}"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 抽样分布曲线</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">分布：</span>
+          <select id="sampDistSelect" onchange="updateSampDist()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="chisq">χ² 分布</option>
+            <option value="t">t 分布</option>
+            <option value="f">F 分布</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2" id="sampDf1Group">
+          <span class="text-sm text-slate-600" id="sampDf1Label">自由度 n =</span>
+          <input type="range" id="sampDf1Slider" min="1" max="30" value="5" step="1" oninput="updateSampDist()" class="slider-input w-32">
+          <span id="sampDf1Val" class="text-sm font-mono text-slate-700 w-8">5</span>
+        </div>
+        <div class="flex items-center gap-2" id="sampDf2Group" style="display:none;">
+          <span class="text-sm text-slate-600">n₂ =</span>
+          <input type="range" id="sampDf2Slider" min="1" max="30" value="10" step="1" oninput="updateSampDist()" class="slider-input w-32">
+          <span id="sampDf2Val" class="text-sm font-mono text-slate-700 w-8">10</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">α =</span>
+          <input type="range" id="sampAlphaSlider" min="0.01" max="0.20" value="0.05" step="0.01" oninput="updateSampDist()" class="slider-input w-28">
+          <span id="sampAlphaVal" class="text-sm font-mono text-slate-700 w-10">0.05</span>
+        </div>
+        <button onclick="resetSampDist()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="sampDistChart" style="width:100%;height:380px;"></div>
+      <div class="text-center mt-2 text-sm text-slate-600">
+        上α分位数 ≈ <strong id="sampQuantile" class="text-blue-600">—</strong>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">分位数是后续参数估计、假设检验<strong>查表基础</strong>。χ² 分布自由度增大逐渐趋向正态；t 分布大自由度逼近标准正态；F 分布恒右偏。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片3：样本均值抽样分布模拟 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">🔄 样本均值抽样分布模拟</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          重复抽样，画出 \(\bar{X}\) 直方图，印证抽样分布结论：\(\bar{X} \sim N(\mu, \sigma^2/n)\)。
+          正态总体下，样本均值精确服从正态分布。
+        </p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 重复抽样直方图</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">重复抽样次数：</span>
+          <input type="range" id="repSimSlider" min="200" max="5000" value="1000" step="100" oninput="document.getElementById('repSimVal').textContent=this.value;" class="slider-input w-36">
+          <span id="repSimVal" class="text-sm font-mono text-slate-700 w-12">1000</span>
+        </div>
+        <button onclick="runRepSampling()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 开始模拟</button>
+        <button onclick="resetRepSampling()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="repChart" style="width:100%;height:340px;"></div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">正态总体下，\(\bar{X}\) 精确服从正态分布；非正态总体大样本下近似正态（CLT）。样本均值的方差是总体方差的 1/n，n 越大越集中。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 底部自测题 ===== -->
+  <section class="max-w-5xl mx-auto px-10 pb-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">📝 自测题（单选）</h2>
+
+      <div class="mb-6" id="quiz1">
+        <p class="text-sm font-semibold text-slate-700 mb-3">1. t 分布的自由度趋于无穷时，趋近于什么分布？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q1', 0, this)">A. χ² 分布</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 1, this)">B. F 分布</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 2, this)">C. N(0,1)</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">D. 均匀分布</div>
+        </div>
+        <div id="q1Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz2">
+        <p class="text-sm font-semibold text-slate-700 mb-3">2. 样本方差 \(S^2=\frac{1}{n-1}\sum(X_i-\bar{X})^2\) 分母是 n-1 的原因是什么？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q2', 0, this)">A. 为了计算方便</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 1, this)">B. 为了 S² 是总体方差的无偏估计</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 2, this)">C. 因为样本量少了1</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 3, this)">D. 历史习惯</div>
+        </div>
+        <div id="q2Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz3">
+        <p class="text-sm font-semibold text-slate-700 mb-3">3. χ² 分布的取值有什么特点？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q3', 0, this)">A. 可取任意实数</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 1, this)">B. 恒为非负，右偏</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 2, this)">C. 对称分布</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 3, this)">D. 取值在[-1,1]之间</div>
+        </div>
+        <div id="q3Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+function renderAllKatex() {
+  document.querySelectorAll('.katex-render').forEach(function(el) {
+    try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
+    catch(e) { el.textContent = el.getAttribute('data-expr'); }
+  });
+}
+renderAllKatex();
+
+function toggleFormula(toggle) {
+  toggle.classList.toggle('open');
+  var body = toggle.nextElementSibling;
+  body.classList.toggle('show');
+  if (body.classList.contains('show')) renderAllKatex();
+}
+
+// ===== 卡片1：样本生成器 =====
+var sampleChart = echarts.init(document.getElementById('sampleChart'));
+
+function normalPDF(x, mu, sigma) { return 1/(sigma*Math.sqrt(2*Math.PI)) * Math.exp(-0.5*Math.pow((x-mu)/sigma, 2)); }
+
+function boxMuller() { var u1=Math.random(),u2=Math.random(); return Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2); }
+
+function drawSample() {
+  var dist = document.getElementById('sampleDistSelect').value;
+  var n = parseInt(document.getElementById('sampleNSlider').value);
+
+  var popMean, popVar;
+  if (dist === 'normal') { popMean = 0; popVar = 1; }
+  else if (dist === 'uniform') { popMean = 0.5; popVar = 1/12; }
+  else { popMean = 1; popVar = 1; }
+
+  document.getElementById('samplePopMean').textContent = popMean.toFixed(3);
+  document.getElementById('samplePopVar').textContent = popVar.toFixed(3);
+
+  var samples = [];
+  for (var i = 0; i < n; i++) {
+    if (dist === 'normal') samples.push(boxMuller());
+    else if (dist === 'uniform') samples.push(Math.random());
+    else samples.push(-Math.log(Math.random()));
+  }
+
+  var mean = samples.reduce(function(a,b){return a+b;},0)/n;
+  var vari = samples.reduce(function(a,b){return a+(b-mean)*(b-mean);},0)/(n-1);
+
+  document.getElementById('sampleMean').textContent = mean.toFixed(4);
+  document.getElementById('sampleVar').textContent = vari.toFixed(4);
+
+  // 直方图
+  var bins = Math.max(8, Math.floor(3.5*Math.sqrt(n)));
+  var minV = Math.min.apply(null, samples), maxV = Math.max.apply(null, samples);
+  var binW = (maxV - minV) / bins;
+  var counts = new Array(bins).fill(0);
+  for (var i = 0; i < n; i++) {
+    var idx = Math.min(Math.floor((samples[i] - minV) / binW), bins - 1);
+    counts[idx]++;
+  }
+  var barData = [], barCats = [];
+  for (var i = 0; i < bins; i++) {
+    barCats.push((minV + (i+0.5)*binW).toFixed(2));
+    barData.push(counts[i]);
+  }
+
+  sampleChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'category', data: barCats, name: '样本值', axisLabel: { fontSize: 9, interval: Math.max(1,Math.floor(bins/6)) }, splitLine: { show: false } },
+    yAxis: { type: 'value', name: '频数', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'bar', data: barData, barWidth: '90%',
+      itemStyle: { color: '#2563eb', borderRadius: [3,3,0,0] },
+      markLine: { silent: true, symbol: 'none', lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 }, label: { formatter: 'x̄={c}', fontSize: 10 }, data: [{ xAxis: barCats.reduce(function(_,d,i,a){return Math.abs(parseFloat(d)-mean)<Math.abs(parseFloat(a[0])-mean)?i:0;},0) }] }
+    }]
+  });
+}
+
+function resetSampling() {
+  document.getElementById('sampleMean').textContent = '—';
+  document.getElementById('sampleVar').textContent = '—';
+  document.getElementById('samplePopMean').textContent = '—';
+  document.getElementById('samplePopVar').textContent = '—';
+  sampleChart.setOption({ series: [{ data: [] }] });
+}
+
+// ===== 卡片2：三大抽样分布 =====
+var sampDistChart = echarts.init(document.getElementById('sampDistChart'));
+
+function logGamma(x) {
+  // Stirling's approximation
+  if (x <= 0) return 0;
+  return 0.5*Math.log(2*Math.PI/x) + x*Math.log(x/Math.E) + Math.log(1 + 1/(12*x) + 1/(288*x*x));
+}
+
+// chi-squared PDF
+function chisqPDF(x, n) {
+  if (x <= 0) return 0;
+  return Math.exp((n/2-1)*Math.log(x) - x/2 - n/2*Math.log(2) - logGamma(n/2));
+}
+
+// t PDF
+function tPDF(x, n) {
+  return Math.exp(logGamma((n+1)/2) - logGamma(n/2) - 0.5*Math.log(n*Math.PI) - (n+1)/2*Math.log(1 + x*x/n));
+}
+
+// F PDF
+function fPDF(x, n1, n2) {
+  if (x <= 0) return 0;
+  return Math.exp(logGamma((n1+n2)/2) - logGamma(n1/2) - logGamma(n2/2) + n1/2*Math.log(n1/n2) + (n1/2-1)*Math.log(x) - (n1+n2)/2*Math.log(1 + n1*x/n2));
+}
+
+function updateSampDist() {
+  var dist = document.getElementById('sampDistSelect').value;
+  var df1 = parseInt(document.getElementById('sampDf1Slider').value);
+  var df2 = parseInt(document.getElementById('sampDf2Slider').value);
+  var alpha = parseFloat(document.getElementById('sampAlphaSlider').value);
+
+  document.getElementById('sampDf1Val').textContent = df1;
+  document.getElementById('sampDf2Val').textContent = df2;
+  document.getElementById('sampAlphaVal').textContent = alpha.toFixed(2);
+
+  if (dist === 'f') {
+    document.getElementById('sampDf1Label').textContent = 'n₁ =';
+    document.getElementById('sampDf2Group').style.display = 'flex';
+  } else {
+    document.getElementById('sampDf1Label').textContent = '自由度 n =';
+    document.getElementById('sampDf2Group').style.display = 'none';
+  }
+
+  var N = 300;
+  var xMin, xMax, pdfFunc;
+  if (dist === 'chisq') {
+    xMin = 0.001; xMax = Math.max(10, df1 + 4*Math.sqrt(2*df1));
+    pdfFunc = function(x) { return chisqPDF(x, df1); };
+  } else if (dist === 't') {
+    xMin = -5; xMax = 5;
+    pdfFunc = function(x) { return tPDF(x, df1); };
+  } else {
+    xMin = 0.001; xMax = 5;
+    pdfFunc = function(x) { return fPDF(x, df1, df2); };
+  }
+
+  var pdfData = [];
+  var step = (xMax - xMin) / N;
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    pdfData.push([x, pdfFunc(x)]);
+  }
+
+  // 找上α分位数
+  var tailArea = 0, quantile = xMax;
+  for (var i = N; i >= 0; i--) {
+    var x = xMin + i*step;
+    tailArea += pdfFunc(x) * step;
+    if (tailArea >= alpha) { quantile = x; break; }
+  }
+  document.getElementById('sampQuantile').textContent = quantile.toFixed(3);
+
+  // 尾部阴影
+  var shadeData = [];
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    if (x >= quantile) shadeData.push([x, pdfFunc(x)]);
+  }
+
+  var series = [{
+    type: 'line', data: pdfData, smooth: true, symbol: 'none',
+    lineStyle: { color: '#2563eb', width: 2.5 },
+    areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,0.18)'},{offset:1,color:'rgba(37,99,235,0.02)'}]) }
+  }];
+
+  if (shadeData.length > 0) {
+    shadeData.push([quantile, 0]);
+    series.push({
+      type: 'line', data: shadeData, smooth: false, symbol: 'none',
+      lineStyle: { color: 'transparent', width: 0 },
+      areaStyle: { color: 'rgba(239,68,68,0.35)' }, silent: true
+    });
+  }
+
+  series.push({
+    type: 'line', data: [[quantile, 0], [quantile, pdfFunc(quantile)]],
+    symbol: 'none', lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 },
+    label: { show: true, formatter: '{c}', fontSize: 10, position: 'top' }, silent: true
+  });
+
+  sampDistChart.setOption({
+    tooltip: { trigger: 'axis', formatter: function(p) { return 'x='+p[0].data[0].toFixed(4)+'<br/>f(x)='+p[0].data[1].toFixed(4); } },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'value', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: series
+  });
+}
+
+function resetSampDist() {
+  document.getElementById('sampDistSelect').value = 'chisq';
+  document.getElementById('sampDf1Slider').value = 5;
+  document.getElementById('sampDf2Slider').value = 10;
+  document.getElementById('sampAlphaSlider').value = 0.05;
+  updateSampDist();
+}
+updateSampDist();
+
+// ===== 卡片3：重复抽样 =====
+var repChart = echarts.init(document.getElementById('repChart'));
+
+function runRepSampling() {
+  var sims = parseInt(document.getElementById('repSimSlider').value);
+  var n = 30;
+  var means = [];
+  for (var s = 0; s < sims; s++) {
+    var sum = 0;
+    for (var i = 0; i < n; i++) sum += boxMuller();
+    means.push(sum / n);
+  }
+
+  var bins = Math.floor(3.5*Math.sqrt(sims));
+  var minM = Math.min.apply(null, means), maxM = Math.max.apply(null, means);
+  var binW = (maxM - minM) / bins;
+  var counts = new Array(bins).fill(0);
+  for (var i = 0; i < sims; i++) {
+    var idx = Math.min(Math.floor((means[i] - minM) / binW), bins - 1);
+    counts[idx]++;
+  }
+  var barData = [], barCats = [];
+  var cltSigma = 1/Math.sqrt(n);
+  for (var i = 0; i < bins; i++) {
+    var center = minM + (i+0.5)*binW;
+    barCats.push(center.toFixed(3));
+    barData.push({ value: counts[i]/sims/binW, itemStyle: { color: '#2563eb', borderRadius: [3,3,0,0] } });
+  }
+
+  var curveData = [];
+  for (var i = 0; i <= 150; i++) {
+    var x = minM - binW + i*(maxM-minM+2*binW)/150;
+    curveData.push([x, normalPDF(x, 0, cltSigma)]);
+  }
+
+  repChart.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['样本均值直方图', '理论正态 N(0,1/30)'], bottom: 0, textStyle: { fontSize: 11 } },
+    grid: { left: 50, right: 20, top: 20, bottom: 40 },
+    xAxis: { type: 'category', data: barCats, axisLabel: { fontSize: 9, interval: Math.max(1,Math.floor(bins/6)) }, splitLine: { show: false } },
+    yAxis: { type: 'value', name: '密度', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [
+      { name: '样本均值直方图', type: 'bar', data: barData, barWidth: '90%' },
+      { name: '理论正态 N(0,1/30)', type: 'line', data: curveData, smooth: true, symbol: 'none', lineStyle: { color: '#ef4444', width: 2.5 } }
+    ]
+  });
+}
+
+function resetRepSampling() {
+  repChart.setOption({ series: [{ data: [] }, { data: [] }] });
+}
+
+// ===== 自测题 =====
+var quizAnswers = { q1: 2, q2: 1, q3: 1 };
+var quizFeedback = {
+  q1: { correct: '正确！t 分布自由度趋于无穷时，趋近于标准正态分布 N(0,1)。', wrong: '错误。t 分布自由度趋于无穷时趋近于 N(0,1)，正确答案是 C。' },
+  q2: { correct: '正确！分母 n-1 是为了使 S² 成为总体方差的无偏估计，即 E(S²)=σ²。', wrong: '错误。分母用 n-1 是为了保证 S² 是总体方差的无偏估计。正确答案是 B。' },
+  q3: { correct: '正确！χ² 分布是标准正态平方和，恒为非负，右偏。', wrong: '错误。χ² 分布恒为非负（因为是平方和），右偏。正确答案是 B。' }
+};
+
+function selectQuiz(qid, choice, el) {
+  var container = document.getElementById('quiz' + qid.slice(1));
+  var allOptions = container.querySelectorAll('.quiz-option');
+  var feedback = document.getElementById(qid + 'Feedback');
+  var correctAnswer = quizAnswers[qid];
+
+  allOptions.forEach(function(opt) { opt.classList.remove('selected', 'correct', 'wrong'); });
+  el.classList.add('selected');
+
+  if (choice === correctAnswer) {
+    el.classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-green-600';
+    feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
+  } else {
+    el.classList.add('wrong');
+    allOptions[correctAnswer].classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-red-600';
+    feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
+  }
+  feedback.classList.remove('hidden');
+  renderAllKatex();
+}
+
+window.addEventListener('resize', function() { sampleChart.resize(); sampDistChart.resize(); repChart.resize(); });
+</script>
+
+</body>
+</html>

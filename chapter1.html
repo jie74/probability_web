@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>随机事件及其概率 — 概率论与数理统计可视化平台</title>
+<!-- TailwindCSS CDN（与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#2563eb',
+        'primary-light': '#3b82f6',
+        'primary-dark': '#1d4ed8',
+        'primary-bg': '#eff6ff',
+      }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"></script>
+<script src="js/katex-setup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4/dist/echarts.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<link rel="stylesheet" href="css/sidebar.css">
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8fafc; }
+
+  .main-content { margin-left: 256px; min-height: 100vh; }
+
+  .card {
+    background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;
+    margin-bottom: 24px; transition: all 0.2s;
+  }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+
+  .formula-panel {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 12px; overflow: hidden;
+  }
+  .formula-toggle {
+    display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer;
+    font-size: 14px; font-weight: 500; color: #475569; user-select: none;
+    transition: background 0.15s;
+  }
+  .formula-toggle:hover { background: #f1f5f9; }
+  .formula-toggle .arrow { transition: transform 0.2s; font-size: 12px; }
+  .formula-toggle.open .arrow { transform: rotate(90deg); }
+  .formula-body { display: none; padding: 0 16px 16px 16px; }
+  .formula-body.show { display: block; }
+
+  .exam-tip {
+    background: #fef9c3; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px 16px; margin-top: 16px;
+  }
+
+  .quiz-option {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px;
+    border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.15s; font-size: 14px;
+  }
+  .quiz-option:hover { border-color: #93c5fd; background: #eff6ff; }
+  .quiz-option.selected { border-color: #2563eb; background: #eff6ff; }
+  .quiz-option.correct { border-color: #16a34a; background: #f0fdf4; }
+  .quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
+
+  .slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
+  .slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+<div id="sidebar-container"></div>
+<script src="js/sidebar.js"></script>
+
+<!-- ==================== 主内容区域 ==================== -->
+<main class="main-content">
+
+  <!-- 章节标题 -->
+  <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第1章</span>
+      <span class="text-xs text-slate-400">模块一 · 概率论</span>
+    </div>
+    <h1 class="text-2xl font-bold text-slate-900 mb-2">随机事件及其概率</h1>
+    <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
+      核心：随机试验、样本空间、事件运算、概率公理、古典概型、条件概率、全概率公式、贝叶斯公式、独立与互斥。
+      应试重点：德摩根定律、加法公式、条件概率、全概率、贝叶斯；区分独立与互斥。
+    </p>
+  </section>
+
+  <!-- ===== 卡片1：韦恩图 — 事件的运算 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📊 韦恩图 — 事件的运算</h2>
+
+      <!-- 知识点 -->
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          随机事件可以做<strong>交、并、补、差</strong>运算；德摩根定律是事件运算的重要恒等式。
+          互斥：\(A \cap B = \varnothing\)，\(A\)、\(B\)不可能同时发生。
+        </p>
+        <p class="text-sm text-red-500 mt-1 font-medium">⚠ 重要误区：互斥 ≠ 相互独立。</p>
+      </div>
+
+      <!-- 折叠公式面板 -->
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">事件运算：</span><span class="katex-render" data-expr="A\cup B,\; A\cap B,\; \overline{A},\; A-B"></span></div>
+            <div><span class="text-xs text-slate-400">德摩根定律：</span><span class="katex-render" data-expr="\overline{A\cup B}=\overline{A}\cap\overline{B}"></span></div>
+            <div><span class="text-xs text-slate-400">德摩根定律：</span><span class="katex-render" data-expr="\overline{A\cap B}=\overline{A}\cup\overline{B}"></span></div>
+            <div><span class="text-xs text-slate-400">加法公式：</span><span class="katex-render" data-expr="P(A\cup B)=P(A)+P(B)-P(A\cap B)"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 可视化区域 -->
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 交互式韦恩图</h3>
+
+      <div class="flex flex-wrap gap-4 mb-4">
+        <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+          <input type="checkbox" id="vennUnion" onchange="drawVenn()" class="accent-blue-600 w-4 h-4"> \(A\cup B\)（并集）
+        </label>
+        <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+          <input type="checkbox" id="vennIntersection" onchange="drawVenn()" class="accent-blue-600 w-4 h-4"> \(A\cap B\)（交集）
+        </label>
+        <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+          <input type="checkbox" id="vennCompA" onchange="drawVenn()" class="accent-blue-600 w-4 h-4"> \(\overline{A}\)（A的补集）
+        </label>
+        <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+          <input type="checkbox" id="vennCompB" onchange="drawVenn()" class="accent-blue-600 w-4 h-4"> \(\overline{B}\)（B的补集）
+        </label>
+        <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+          <input type="checkbox" id="vennDeMorgan" onchange="drawVenn()" class="accent-blue-600 w-4 h-4"> \(\overline{A\cup B}\)（德摩根）
+        </label>
+      </div>
+      <div class="flex gap-3 mb-4">
+        <button id="vennDisjointBtn" onclick="toggleDisjoint()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">
+          🔀 互斥模式
+        </button>
+        <button onclick="resetVenn()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">
+          🔄 重置
+        </button>
+      </div>
+      <div class="bg-white rounded-lg border border-slate-200 flex justify-center">
+        <canvas id="vennCanvas" width="500" height="320" class="max-w-full"></canvas>
+      </div>
+
+      <!-- 应试提示 -->
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">德摩根定律填空选择高频考点；口诀：<strong>杠进去，并变交，交变并</strong>。互斥不等于独立，极易混淆。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片2：频率与概率｜抛硬币模拟 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">🪙 频率与概率 — 抛硬币模拟</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          <strong>频率</strong>：重复试验中事件发生的次数 / 总试验次数，随试验改变。<br>
+          <strong>概率</strong>：事件固有的理论值；当试验次数很大时，频率依概率收敛到概率。
+        </p>
+      </div>
+
+      <!-- 可视化区域 -->
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 抛硬币模拟器</h3>
+
+      <div class="flex flex-wrap items-center gap-5 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">试验次数 n =</span>
+          <input type="range" id="coinSlider" min="10" max="10000" value="100" step="10" oninput="updateCoinSlider()" class="slider-input w-40">
+          <span id="coinSliderVal" class="text-sm font-mono text-slate-700 w-14">100</span>
+        </div>
+        <button onclick="startCoinSim()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 开始模拟</button>
+        <button onclick="resetCoin()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div class="flex items-center gap-4 mb-4 text-sm">
+        <span class="text-slate-600">当前正面次数：<strong id="coinHeads" class="text-blue-600">0</strong></span>
+        <span class="text-slate-600">正面频率：<strong id="coinFreq" class="text-blue-600">—</strong></span>
+        <span class="text-slate-400">理论概率：0.5</span>
+      </div>
+
+      <div id="coinChart" style="width:100%;height:320px;"></div>
+
+      <!-- 应试提示 -->
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">频率是实验结果，概率是理论常数，<strong>不要混淆概念</strong>。n 较小时频率剧烈震荡，n 增大逐渐稳定在理论值附近。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片3：条件概率、贝叶斯（疾病检测案例） ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">🏥 条件概率与贝叶斯公式 — 疾病检测案例</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          <strong>条件概率</strong>：在 \(A\) 发生前提下 \(B\) 发生的概率。<br>
+          <strong>贝叶斯公式</strong>：由先验概率求后验概率。很多人直觉高估后验概率，面积可视化帮助纠正直觉错误。
+        </p>
+      </div>
+
+      <!-- 折叠公式面板 -->
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">条件概率：</span><span class="katex-render" data-expr="P(B|A)=\frac{P(AB)}{P(A)},\; P(A)>0"></span></div>
+            <div><span class="text-xs text-slate-400">全概率公式：</span><span class="katex-render" data-expr="P(B)=\sum_{i}P(A_i)P(B|A_i)"></span></div>
+            <div><span class="text-xs text-slate-400">贝叶斯公式：</span><span class="katex-render" data-expr="P(A_j|B)=\frac{P(A_j)P(B|A_j)}{\sum_i P(A_i)P(B|A_i)}"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 可视化区域 -->
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 疾病检测概率可视化</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="text-xs text-slate-500 block mb-1">先验概率 \(P(\text{患病})\)</label>
+          <input type="range" id="priorSlider" min="0.001" max="0.3" value="0.01" step="0.001" oninput="updateBayes()" class="slider-input w-full">
+          <span id="priorVal" class="text-sm font-mono text-blue-600">0.010</span>
+        </div>
+        <div>
+          <label class="text-xs text-slate-500 block mb-1">真阳性率 \(P(\text{阳性}|\text{患病})\)</label>
+          <input type="range" id="tprSlider" min="0.5" max="1" value="0.95" step="0.01" oninput="updateBayes()" class="slider-input w-full">
+          <span id="tprVal" class="text-sm font-mono text-blue-600">0.95</span>
+        </div>
+        <div>
+          <label class="text-xs text-slate-500 block mb-1">假阳性率 \(P(\text{阳性}|\text{健康})\)</label>
+          <input type="range" id="fprSlider" min="0.001" max="0.3" value="0.05" step="0.001" oninput="updateBayes()" class="slider-input w-full">
+          <span id="fprVal" class="text-sm font-mono text-blue-600">0.050</span>
+        </div>
+      </div>
+
+      <div class="mb-4 flex gap-3">
+        <button onclick="resetBayes()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div class="bg-white rounded-lg border border-slate-200 p-4 mb-3">
+        <div class="text-center mb-2">
+          <span class="text-sm font-semibold text-slate-700">
+            后验概率 \(P(\text{患病}|\text{阳性}) = \) <span id="posteriorVal" class="text-lg font-bold text-blue-600">—</span>
+          </span>
+        </div>
+        <canvas id="bayesCanvas" width="500" height="200" class="max-w-full mx-auto block"></canvas>
+        <div class="flex justify-center gap-6 mt-3 text-xs text-slate-500">
+          <span>■ 真阳性（患病且阳性）</span>
+          <span>■ 假阴性（患病但阴性）</span>
+          <span>■ 假阳性（健康但阳性）</span>
+          <span>■ 真阴性（健康且阴性）</span>
+        </div>
+      </div>
+
+      <!-- 应试提示 -->
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">全概率、贝叶斯为<strong>考试大题考点</strong>；注意条件概率分母不能丢。很多人直觉认为检测阳性 ≈ 一定患病，实际上当先验概率很低时，后验概率可能仍然很低。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 底部自测题 ===== -->
+  <section class="max-w-5xl mx-auto px-10 pb-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">📝 自测题（单选）</h2>
+
+      <!-- 第1题 -->
+      <div class="mb-6" id="quiz1">
+        <p class="text-sm font-semibold text-slate-700 mb-3">1. \(\overline{A \cup B} = \) ？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q1', 0, this)">A. \(\overline{A} \cup \overline{B}\)</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 1, this)">B. \(\overline{A} \cap \overline{B}\)</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 2, this)">C. \(A \cap B\)</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">D. \(A \cup B\)</div>
+        </div>
+        <div id="q1Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <!-- 第2题 -->
+      <div class="mb-6" id="quiz2">
+        <p class="text-sm font-semibold text-slate-700 mb-3">2. \(A\)、\(B\) 互斥，则 \(A\)、\(B\) 是否一定独立？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q2', 0, this)">A. 一定独立</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 1, this)">B. 一定不独立</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 2, this)">C. 不一定，当且仅当其中一个概率为0时才独立</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 3, this)">D. 互斥就是独立的一种特殊情况</div>
+        </div>
+        <div id="q2Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <!-- 第3题 -->
+      <div class="mb-6" id="quiz3">
+        <p class="text-sm font-semibold text-slate-700 mb-3">3. 条件概率 \(P(B|A)\) 的分母是什么？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q3', 0, this)">A. \(P(B)\)</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 1, this)">B. \(P(AB)\)</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 2, this)">C. \(P(A)\)</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 3, this)">D. \(P(A)+P(B)\)</div>
+        </div>
+        <div id="q3Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ==================== 脚本 ==================== -->
+<script>
+// ===== KaTeX 渲染 =====
+function renderAllKatex() {
+  document.querySelectorAll('.katex-render').forEach(function(el) {
+    try {
+      katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false });
+    } catch(e) { el.textContent = el.getAttribute('data-expr'); }
+  });
+}
+renderAllKatex();
+
+// ===== 公式折叠面板 =====
+function toggleFormula(toggle) {
+  toggle.classList.toggle('open');
+  var body = toggle.nextElementSibling;
+  body.classList.toggle('show');
+  if (body.classList.contains('show')) {
+    renderAllKatex();
+  }
+}
+
+// ===== 卡片1：韦恩图 =====
+var vennCanvas = document.getElementById('vennCanvas');
+var vennCtx = vennCanvas.getContext('2d');
+var isDisjoint = false;
+
+function drawVenn() {
+  var ctx = vennCtx;
+  var W = vennCanvas.width, H = vennCanvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  var cx1, cx2, cy, r;
+  if (isDisjoint) {
+    cx1 = 160; cx2 = 340; cy = 160; r = 90;
+  } else {
+    cx1 = 190; cx2 = 310; cy = 160; r = 100;
+  }
+
+  var showUnion = document.getElementById('vennUnion').checked;
+  var showInter = document.getElementById('vennIntersection').checked;
+  var showCompA = document.getElementById('vennCompA').checked;
+  var showCompB = document.getElementById('vennCompB').checked;
+  var showDeMorgan = document.getElementById('vennDeMorgan').checked;
+  var anySelected = showUnion || showInter || showCompA || showCompB || showDeMorgan;
+
+  // 绘制背景矩形（补集区域）
+  if (showCompA || showCompB || showDeMorgan) {
+    ctx.fillStyle = 'rgba(37,99,235,0.18)';
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // 绘制高亮区域
+  if (showUnion) {
+    ctx.fillStyle = 'rgba(37,99,235,0.25)';
+    ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx2, cy, r, 0, Math.PI*2); ctx.fill();
+  }
+
+  if (showInter && !isDisjoint) {
+    ctx.fillStyle = 'rgba(239,68,68,0.35)';
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.clip();
+    ctx.beginPath(); ctx.arc(cx2, cy, r, 0, Math.PI*2); ctx.clip();
+    ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
+  // 绘制圆圈
+  ctx.strokeStyle = '#2563eb';
+  ctx.lineWidth = 2.5;
+  ctx.fillStyle = 'rgba(37,99,235,0.06)';
+  ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx2, cy, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+  // 标签
+  ctx.fillStyle = '#1e40af';
+  ctx.font = 'bold 16px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('A', cx1 - r*0.65, cy - r*0.15);
+  ctx.fillText('B', cx2 + r*0.65, cy - r*0.15);
+
+  // 如果选中互斥，绘制分隔线
+  if (isDisjoint) {
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([5, 3]);
+    ctx.beginPath(); ctx.moveTo((cx1+cx2)/2, cy - r - 10); ctx.lineTo((cx1+cx2)/2, cy + r + 10); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+drawVenn();
+
+function toggleDisjoint() {
+  isDisjoint = !isDisjoint;
+  var btn = document.getElementById('vennDisjointBtn');
+  if (isDisjoint) {
+    btn.textContent = '🔗 相交模式';
+    btn.style.borderColor = '#2563eb';
+    btn.style.color = '#2563eb';
+  } else {
+    btn.textContent = '🔀 互斥模式';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  }
+  drawVenn();
+}
+
+function resetVenn() {
+  isDisjoint = false;
+  document.getElementById('vennDisjointBtn').textContent = '🔀 互斥模式';
+  document.getElementById('vennDisjointBtn').style.borderColor = '';
+  document.getElementById('vennDisjointBtn').style.color = '';
+  document.getElementById('vennUnion').checked = false;
+  document.getElementById('vennIntersection').checked = false;
+  document.getElementById('vennCompA').checked = false;
+  document.getElementById('vennCompB').checked = false;
+  document.getElementById('vennDeMorgan').checked = false;
+  drawVenn();
+}
+
+// ===== 卡片2：抛硬币模拟 =====
+var coinChart = echarts.init(document.getElementById('coinChart'));
+var coinData = [];
+var coinN = 100;
+
+function simulateCoin(n) {
+  var heads = 0;
+  var data = [];
+  for (var i = 1; i <= n; i++) {
+    if (Math.random() < 0.5) heads++;
+    if (i % Math.max(1, Math.floor(n/200)) === 0 || i === n) {
+      data.push([i, heads / i]);
+    }
+  }
+  return { data: data, heads: heads, freq: heads / n };
+}
+
+function updateCoinChart(n) {
+  var result = simulateCoin(n);
+  coinData = result.data;
+  document.getElementById('coinHeads').textContent = result.heads;
+  document.getElementById('coinFreq').textContent = result.freq.toFixed(4);
+
+  coinChart.setOption({
+    tooltip: { trigger: 'axis', formatter: function(p) { return 'n=' + p[0].data[0] + '<br/>频率=' + p[0].data[1].toFixed(4); } },
+    grid: { left: 55, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'value', name: '试验次数 n', nameLocation: 'center', nameGap: 25, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', name: '正面频率', min: 0, max: 1, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'line', data: coinData, smooth: false, symbol: 'none',
+      lineStyle: { color: '#2563eb', width: 1.5 },
+      markLine: { silent: true, symbol: 'none', lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 }, label: { fontSize: 11, formatter: 'p=0.5' }, data: [{ yAxis: 0.5 }] }
+    }]
+  });
+}
+
+function updateCoinSlider() {
+  coinN = parseInt(document.getElementById('coinSlider').value);
+  document.getElementById('coinSliderVal').textContent = coinN;
+}
+
+function startCoinSim() {
+  updateCoinChart(coinN);
+}
+
+function resetCoin() {
+  document.getElementById('coinSlider').value = 100;
+  coinN = 100;
+  document.getElementById('coinSliderVal').textContent = '100';
+  document.getElementById('coinHeads').textContent = '0';
+  document.getElementById('coinFreq').textContent = '—';
+  coinChart.setOption({ series: [{ data: [] }] });
+}
+
+updateCoinSlider();
+startCoinSim();
+
+// ===== 卡片3：贝叶斯面积图 =====
+var bayesCanvas = document.getElementById('bayesCanvas');
+var bayesCtx = bayesCanvas.getContext('2d');
+
+function updateBayes() {
+  var prior = parseFloat(document.getElementById('priorSlider').value);
+  var tpr = parseFloat(document.getElementById('tprSlider').value);
+  var fpr = parseFloat(document.getElementById('fprSlider').value);
+
+  document.getElementById('priorVal').textContent = prior.toFixed(3);
+  document.getElementById('tprVal').textContent = tpr.toFixed(2);
+  document.getElementById('fprVal').textContent = fpr.toFixed(3);
+
+  // 计算后验概率
+  var pPosGivenDisease = tpr;  // P(+|D)
+  var pPosGivenHealthy = fpr;  // P(+|H)
+  var pPos = prior * pPosGivenDisease + (1 - prior) * pPosGivenHealthy;
+  var posterior = (prior * pPosGivenDisease) / pPos;
+
+  document.getElementById('posteriorVal').textContent = (posterior * 100).toFixed(2) + '%';
+
+  // 绘制面积图
+  var ctx = bayesCtx;
+  var W = bayesCanvas.width, H = bayesCanvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  var totalW = W - 60;
+  var leftX = 30;
+  var barH = H - 70;
+
+  // 患病部分宽度
+  var diseaseW = totalW * prior;
+  // 健康部分宽度
+  var healthyW = totalW - diseaseW;
+
+  // 患病列：真阳性（上）、假阴性（下）
+  var tpHeight = barH * tpr;
+  var fnHeight = barH - tpHeight;
+
+  // 健康列：假阳性（上）、真阴性（下）
+  var fpHeight = barH * fpr;
+  var tnHeight = barH - fpHeight;
+
+  // 真阳性（蓝色）
+  ctx.fillStyle = '#3b82f6';
+  ctx.fillRect(leftX, 20, diseaseW, tpHeight);
+  // 假阴性（浅蓝）
+  ctx.fillStyle = '#93c5fd';
+  ctx.fillRect(leftX, 20 + tpHeight, diseaseW, fnHeight);
+
+  // 假阳性（红色）
+  ctx.fillStyle = '#ef4444';
+  ctx.fillRect(leftX + diseaseW, 20, healthyW, fpHeight);
+  // 真阴性（浅绿）
+  ctx.fillStyle = '#86efac';
+  ctx.fillRect(leftX + diseaseW, 20 + fpHeight, healthyW, tnHeight);
+
+  // 边框
+  ctx.strokeStyle = '#1e293b';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(leftX, 20, diseaseW, barH);
+  ctx.strokeRect(leftX + diseaseW, 20, healthyW, barH);
+
+  // 标签
+  ctx.fillStyle = '#1e293b';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('患病 (' + (prior*100).toFixed(1) + '%)', leftX + diseaseW/2, 15);
+  ctx.fillText('健康 (' + ((1-prior)*100).toFixed(1) + '%)', leftX + diseaseW + healthyW/2, 15);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 11px sans-serif';
+  if (tpHeight > 15) ctx.fillText('真阳性', leftX + diseaseW/2, 20 + tpHeight/2);
+  if (fpHeight > 15) ctx.fillText('假阳性', leftX + diseaseW + healthyW/2, 20 + fpHeight/2);
+  ctx.fillStyle = '#1e293b';
+  if (fnHeight > 15) ctx.fillText('假阴性', leftX + diseaseW/2, 20 + tpHeight + fnHeight/2);
+  if (tnHeight > 15) {
+    ctx.fillStyle = '#065f46';
+    ctx.fillText('真阴性', leftX + diseaseW + healthyW/2, 20 + fpHeight + tnHeight/2);
+  }
+}
+
+function resetBayes() {
+  document.getElementById('priorSlider').value = 0.01;
+  document.getElementById('tprSlider').value = 0.95;
+  document.getElementById('fprSlider').value = 0.05;
+  updateBayes();
+}
+
+updateBayes();
+
+// ===== 自测题 =====
+var quizAnswers = { q1: 1, q2: 2, q3: 2 };
+var quizFeedback = {
+  q1: { correct: '正确！根据德摩根定律：\(\overline{A \cup B} = \overline{A} \cap \overline{B}\)。口诀：杠进去，并变交。', wrong: '错误。根据德摩根定律：\(\overline{A \cup B} = \overline{A} \cap \overline{B}\)，正确答案是 B。' },
+  q2: { correct: '正确！互斥与独立是完全不同的概念。若 A、B 互斥且概率均不为零，则 P(AB)=0 ≠ P(A)P(B)，一定不独立。只有当至少一个概率为 0 时，两者才同时成立。', wrong: '错误。互斥与独立是完全不同的概念。若 P(A)>0, P(B)>0，互斥意味着 P(AB)=0，而独立要求 P(AB)=P(A)P(B)>0，两者矛盾。正确答案是 C。' },
+  q3: { correct: '正确！条件概率的定义：\(P(B|A) = \frac{P(AB)}{P(A)}\)，分母是 P(A)。', wrong: '错误。条件概率的定义：\(P(B|A) = \frac{P(AB)}{P(A)}\)，分母是 P(A)，正确答案是 C。' }
+};
+
+function selectQuiz(qid, choice, el) {
+  var container = document.getElementById('quiz' + qid.slice(1));
+  var allOptions = container.querySelectorAll('.quiz-option');
+  var feedback = document.getElementById(qid + 'Feedback');
+  var correctAnswer = quizAnswers[qid];
+
+  // 移除所有选中状态
+  allOptions.forEach(function(opt) {
+    opt.classList.remove('selected', 'correct', 'wrong');
+  });
+
+  el.classList.add('selected');
+
+  if (choice === correctAnswer) {
+    el.classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-green-600';
+    feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
+  } else {
+    el.classList.add('wrong');
+    allOptions[correctAnswer].classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-red-600';
+    feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
+  }
+  feedback.classList.remove('hidden');
+  renderAllKatex();
+}
+
+// ===== 窗口大小调整 =====
+window.addEventListener('resize', function() {
+  coinChart.resize();
+  drawVenn();
+  updateBayes();
+});
+</script>
+
+</body>
+</html>

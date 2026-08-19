@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一维随机变量及其分布 — 概率论与数理统计可视化平台</title>
+<!-- TailwindCSS CDN（与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#2563eb',
+        'primary-light': '#3b82f6',
+        'primary-dark': '#1d4ed8',
+        'primary-bg': '#eff6ff',
+      }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"></script>
+<script src="js/katex-setup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4/dist/echarts.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<link rel="stylesheet" href="css/sidebar.css">
+<style>
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8fafc; }
+.main-content { margin-left: 256px; min-height: 100vh; }
+.card {
+  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;
+  margin-bottom: 24px; transition: all 0.2s;
+}
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+.formula-panel {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 12px; overflow: hidden;
+}
+.formula-toggle {
+  display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer;
+  font-size: 14px; font-weight: 500; color: #475569; user-select: none;
+  transition: background 0.15s;
+}
+.formula-toggle:hover { background: #f1f5f9; }
+.formula-toggle .arrow { transition: transform 0.2s; font-size: 12px; }
+.formula-toggle.open .arrow { transform: rotate(90deg); }
+.formula-body { display: none; padding: 0 16px 16px 16px; }
+.formula-body.show { display: block; }
+.exam-tip {
+  background: #fef9c3; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px 16px; margin-top: 16px;
+}
+.quiz-option {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.15s; font-size: 14px;
+}
+.quiz-option:hover { border-color: #93c5fd; background: #eff6ff; }
+.quiz-option.selected { border-color: #2563eb; background: #eff6ff; }
+.quiz-option.correct { border-color: #16a34a; background: #f0fdf4; }
+.quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
+.slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
+.slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 侧边导航栏 ==================== -->
+<!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+<div id="sidebar-container"></div>
+<script src="js/sidebar.js"></script>
+
+<!-- ==================== 主内容区域 ==================== -->
+<main class="main-content">
+
+  <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第2章</span>
+      <span class="text-xs text-slate-400">模块一 · 概率论</span>
+    </div>
+    <h1 class="text-2xl font-bold text-slate-900 mb-2">一维随机变量及其分布</h1>
+    <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
+      核心：离散/连续随机变量；分布律、概率密度、分布函数F(x)；六大常用分布。
+      应试重点：分布函数性质；6大分布记号、期望方差；正态标准化；连续变量概率等于密度下面积。
+    </p>
+  </section>
+
+  <!-- ===== 卡片1：离散分布交互式 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📊 离散分布交互式（0-1、二项、泊松、几何）</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          离散随机变量取有限/可列无穷个值；<strong>分布律</strong>描述各个取值的概率。
+          常用离散分布：0-1分布 \(B(1,p)\)、二项分布 \(B(n,p)\)、泊松分布 \(P(\lambda)\)、几何分布 \(G(p)\)。
+        </p>
+      </div>
+
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">分布律：</span><span class="katex-render" data-expr="P(X=x_k)=p_k,\quad \sum p_k =1"></span></div>
+            <div><span class="text-xs text-slate-400">二项分布：</span><span class="katex-render" data-expr="P(X=k)=C_n^k p^k(1-p)^{n-k},\; E(X)=np,\; D(X)=np(1-p)"></span></div>
+            <div><span class="text-xs text-slate-400">泊松分布：</span><span class="katex-render" data-expr="P(X=k)=\frac{\lambda^k}{k!}e^{-\lambda},\; E(X)=\lambda,\; D(X)=\lambda"></span></div>
+            <div><span class="text-xs text-slate-400">几何分布：</span><span class="katex-render" data-expr="P(X=k)=(1-p)^{k-1}p,\; E(X)=\frac{1}{p},\; D(X)=\frac{1-p}{p^2}"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 交互式分布律图</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">分布：</span>
+          <select id="distSelect" onchange="updateDiscrete()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="binomial">二项分布 B(n,p)</option>
+            <option value="poisson">泊松分布 P(λ)</option>
+            <option value="geometric">几何分布 G(p)</option>
+            <option value="bernoulli">0-1分布 B(1,p)</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2" id="paramNGroup">
+          <span class="text-sm text-slate-600">n =</span>
+          <input type="range" id="paramNSlider" min="1" max="50" value="10" step="1" oninput="updateDiscrete()" class="slider-input w-36">
+          <span id="paramNVal" class="text-sm font-mono text-slate-700 w-8">10</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600" id="paramPLabel">p =</span>
+          <input type="range" id="paramPSlider" min="0.05" max="0.95" value="0.5" step="0.05" oninput="updateDiscrete()" class="slider-input w-36">
+          <span id="paramPVal" class="text-sm font-mono text-slate-700 w-10">0.50</span>
+        </div>
+        <button onclick="resetDiscrete()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="discreteChart" style="width:100%;height:340px;"></div>
+      <div class="flex items-center gap-6 mt-3 text-sm">
+        <span class="text-slate-600">E(X) = <strong id="discreteEX" class="text-blue-600">5.00</strong></span>
+        <span class="text-slate-600">D(X) = <strong id="discreteDX" class="text-blue-600">2.50</strong></span>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">二项、泊松期望方差<strong>直接背</strong>，考试不要现场推导。二项分布 n 很大 p 很小时可用泊松近似（λ=np）。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片2：连续分布 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📈 连续分布（均匀、指数、正态）密度与分布函数</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          连续随机变量用<strong>概率密度 \(f(x)\)</strong>描述；概率是曲线下面积；<strong>分布函数</strong> \(F(x)=P(X\le x)\)。
+          常用连续分布：均匀分布 \(U(a,b)\)、指数分布 \(E(\lambda)\)、正态分布 \(N(\mu,\sigma^2)\)。
+        </p>
+      </div>
+
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">分布函数：</span><span class="katex-render" data-expr="F(x)=P(X\le x),\quad P(a< X \le b)=\int_{a}^{b} f(x)dx"></span></div>
+            <div><span class="text-xs text-slate-400">均匀分布：</span><span class="katex-render" data-expr="f(x)=\frac{1}{b-a},\;x\in[a,b],\; E(X)=\frac{a+b}{2},\; D(X)=\frac{(b-a)^2}{12}"></span></div>
+            <div><span class="text-xs text-slate-400">指数分布：</span><span class="katex-render" data-expr="f(x)=\lambda e^{-\lambda x},\;x\ge 0,\; E(X)=\frac{1}{\lambda},\; D(X)=\frac{1}{\lambda^2}"></span></div>
+            <div><span class="text-xs text-slate-400">正态分布：</span><span class="katex-render" data-expr="f(x)=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-\mu)^2}{2\sigma^2}},\; E(X)=\mu,\; D(X)=\sigma^2"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 概率密度与分布函数</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">分布：</span>
+          <select id="contDistSelect" onchange="updateContinuous()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="normal">正态分布 N(μ,σ²)</option>
+            <option value="uniform">均匀分布 U(a,b)</option>
+            <option value="exponential">指数分布 E(λ)</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2" id="contParam1Group">
+          <span class="text-sm text-slate-600" id="contParam1Label">μ =</span>
+          <input type="range" id="contParam1Slider" min="-3" max="3" value="0" step="0.1" oninput="updateContinuous()" class="slider-input w-36">
+          <span id="contParam1Val" class="text-sm font-mono text-slate-700 w-10">0.0</span>
+        </div>
+        <div class="flex items-center gap-2" id="contParam2Group">
+          <span class="text-sm text-slate-600" id="contParam2Label">σ =</span>
+          <input type="range" id="contParam2Slider" min="0.3" max="3" value="1" step="0.1" oninput="updateContinuous()" class="slider-input w-36">
+          <span id="contParam2Val" class="text-sm font-mono text-slate-700 w-10">1.0</span>
+        </div>
+        <button onclick="resetContinuous()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div class="flex items-center gap-4 mb-4 text-sm">
+        <span class="text-slate-600">点击X轴选取 x₀：<strong id="contX0Val" class="text-blue-600">—</strong></span>
+        <span class="text-slate-600">P(X ≤ x₀) = <strong id="contProbVal" class="text-blue-600">—</strong></span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div class="text-xs text-slate-400 mb-1 text-center">概率密度 f(x) — 阴影面积 = P(X ≤ x₀)</div>
+          <div id="contPDFChart" style="width:100%;height:300px;"></div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 mb-1 text-center">分布函数 F(x) = P(X ≤ x)</div>
+          <div id="contCDFChart" style="width:100%;height:300px;"></div>
+        </div>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">连续型随机变量<strong>单点概率 \(P(X=x_0)=0\)</strong>，这是与离散型的本质区别。概率等于密度曲线下面积，不是密度值本身。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片3：正态分布标准化 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">🔔 正态分布标准化</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          任意正态分布可以变换为<strong>标准正态分布</strong> \(Z \sim N(0,1)\)，然后查表计算概率。
+          标准化变换：\(Z = \frac{X - \mu}{\sigma}\)。
+        </p>
+      </div>
+
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">标准化变换：</span><span class="katex-render" data-expr="Z=\frac{X-\mu}{\sigma}\sim N(0,1)"></span></div>
+            <div><span class="text-xs text-slate-400">概率计算：</span><span class="katex-render" data-expr="P(X\le x)=P\left(Z\le\frac{x-\mu}{\sigma}\right)=\Phi\left(\frac{x-\mu}{\sigma}\right)"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 标准化演示</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">μ =</span>
+          <input type="range" id="normMuSlider" min="-3" max="3" value="0" step="0.1" oninput="updateStandardize()" class="slider-input w-36">
+          <span id="normMuVal" class="text-sm font-mono text-slate-700 w-10">0.0</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">σ =</span>
+          <input type="range" id="normSigmaSlider" min="0.3" max="3" value="1" step="0.1" oninput="updateStandardize()" class="slider-input w-36">
+          <span id="normSigmaVal" class="text-sm font-mono text-slate-700 w-10">1.0</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">X =</span>
+          <input type="range" id="normXSlider" min="-5" max="5" value="1" step="0.1" oninput="updateStandardize()" class="slider-input w-36">
+          <span id="normXVal" class="text-sm font-mono text-slate-700 w-10">1.0</span>
+        </div>
+        <button onclick="resetStandardize()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div class="text-center mb-3 text-sm">
+        <span class="text-slate-600">Z = (X - μ) / σ = </span>
+        <strong id="normZVal" class="text-lg text-blue-600">1.00</strong>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div class="text-xs text-slate-400 mb-1 text-center">原分布 N(μ, σ²)</div>
+          <div id="normOrigChart" style="width:100%;height:300px;"></div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 mb-1 text-center">标准正态 N(0,1)</div>
+          <div id="normStdChart" style="width:100%;height:300px;"></div>
+        </div>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">正态标准化<strong>期末考试必考</strong>。记住：先标准化再查表，\(\Phi(-z)=1-\Phi(z)\)。常用分位点 \(z_{0.025}=1.96\) 要牢记。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片4：分布函数性质演示 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📐 分布函数性质演示</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          F(x) 单调不减；\(0\le F(x)\le1\)；\(F(-\infty)=0,\;F(+\infty)=1\)；离散型 F 是阶梯函数，连续型 F 平滑。
+        </p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 分布函数对比</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">类型：</span>
+          <select id="ftypeSelect" onchange="updateFType()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="discrete">离散型（二项分布）</option>
+            <option value="continuous">连续型（正态分布）</option>
+          </select>
+        </div>
+        <button onclick="resetFType()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="ftypeChart" style="width:100%;height:340px;"></div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">分布函数四条性质（单调不减、有界、右连续、极限0/1）<strong>选择题高频考点</strong>。离散型分布函数是阶梯函数，跳跃高度等于该点概率。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 底部自测题 ===== -->
+  <section class="max-w-5xl mx-auto px-10 pb-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">📝 自测题（单选）</h2>
+
+      <div class="mb-6" id="quiz1">
+        <p class="text-sm font-semibold text-slate-700 mb-3">1. 设 X ~ B(n,p)，则 D(X) = ？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q1', 0, this)">A. np</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 1, this)">B. np(1-p)</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 2, this)">C. p(1-p)</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">D. n²p(1-p)</div>
+        </div>
+        <div id="q1Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz2">
+        <p class="text-sm font-semibold text-slate-700 mb-3">2. 连续型随机变量，\(P(X=x_0)\) 等于？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q2', 0, this)">A. f(x₀)</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 1, this)">B. F(x₀)</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 2, this)">C. 0</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 3, this)">D. 1</div>
+        </div>
+        <div id="q2Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz3">
+        <p class="text-sm font-semibold text-slate-700 mb-3">3. 若 X ~ N(μ, σ²)，则 \(\frac{X-\mu}{\sigma}\) 服从什么分布？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q3', 0, this)">A. N(μ, σ²)</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 1, this)">B. N(0, σ²)</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 2, this)">C. N(0, 1)</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 3, this)">D. N(μ, 1)</div>
+        </div>
+        <div id="q3Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ===== KaTeX 渲染 =====
+function renderAllKatex() {
+  document.querySelectorAll('.katex-render').forEach(function(el) {
+    try {
+      katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false });
+    } catch(e) { el.textContent = el.getAttribute('data-expr'); }
+  });
+}
+renderAllKatex();
+
+function toggleFormula(toggle) {
+  toggle.classList.toggle('open');
+  var body = toggle.nextElementSibling;
+  body.classList.toggle('show');
+  if (body.classList.contains('show')) renderAllKatex();
+}
+
+// ===== 卡片1：离散分布 =====
+var discreteChart = echarts.init(document.getElementById('discreteChart'));
+
+function getDiscreteData() {
+  var dist = document.getElementById('distSelect').value;
+  var p = parseFloat(document.getElementById('paramPSlider').value);
+  var n = parseInt(document.getElementById('paramNSlider').value);
+  var data = [];
+  var ex, dx;
+
+  if (dist === 'bernoulli') {
+    data = [{value: 0, prob: 1-p}, {value: 1, prob: p}];
+    ex = p; dx = p*(1-p);
+  } else if (dist === 'binomial') {
+    for (var k = 0; k <= n; k++) {
+      var prob = binomialPMF(k, n, p);
+      if (prob > 0.0001 || k <= 5 || k >= n-5) data.push({value: k, prob: prob});
+    }
+    ex = n*p; dx = n*p*(1-p);
+  } else if (dist === 'poisson') {
+    var lam = p * 10; // λ = p*10 映射到0~9.5
+    var maxK = Math.max(5, Math.ceil(lam + 4*Math.sqrt(lam)));
+    for (var k = 0; k <= maxK; k++) {
+      var prob = Math.exp(-lam + k*Math.log(lam) - logFactorial(k));
+      data.push({value: k, prob: prob});
+    }
+    ex = lam; dx = lam;
+  } else if (dist === 'geometric') {
+    var maxK = Math.ceil(3/p);
+    for (var k = 1; k <= maxK; k++) {
+      var prob = Math.pow(1-p, k-1) * p;
+      data.push({value: k, prob: prob});
+    }
+    ex = 1/p; dx = (1-p)/(p*p);
+  }
+
+  return {data: data, ex: ex, dx: dx};
+}
+
+function logFactorial(n) {
+  if (n <= 1) return 0;
+  var s = 0;
+  for (var i = 2; i <= n; i++) s += Math.log(i);
+  return s;
+}
+
+function binomialPMF(k, n, p) {
+  if (k < 0 || k > n) return 0;
+  var logC = 0;
+  for (var i = 1; i <= k; i++) logC += Math.log(n - k + i) - Math.log(i);
+  return Math.exp(logC + k*Math.log(p) + (n-k)*Math.log(1-p));
+}
+
+function updateDiscrete() {
+  var dist = document.getElementById('distSelect').value;
+  var p = parseFloat(document.getElementById('paramPSlider').value);
+
+  // 更新参数显示
+  document.getElementById('paramPVal').textContent = p.toFixed(2);
+
+  if (dist === 'poisson') {
+    document.getElementById('paramNGroup').style.display = 'none';
+    document.getElementById('paramPLabel').textContent = 'λ =';
+    var lam = p * 10;
+    document.getElementById('paramPVal').textContent = lam.toFixed(2);
+  } else if (dist === 'bernoulli') {
+    document.getElementById('paramNGroup').style.display = 'none';
+    document.getElementById('paramPLabel').textContent = 'p =';
+  } else {
+    document.getElementById('paramNGroup').style.display = 'flex';
+    document.getElementById('paramPLabel').textContent = 'p =';
+    var n = parseInt(document.getElementById('paramNSlider').value);
+    document.getElementById('paramNVal').textContent = n;
+  }
+
+  var result = getDiscreteData();
+  document.getElementById('discreteEX').textContent = result.ex.toFixed(2);
+  document.getElementById('discreteDX').textContent = result.dx.toFixed(2);
+
+  var xData = result.data.map(function(d) { return d.value; });
+  var yData = result.data.map(function(d) { return d.prob; });
+
+  discreteChart.setOption({
+    tooltip: { trigger: 'axis', formatter: function(p) { return 'X=' + p[0].data[0] + '<br/>P=' + p[0].data[1].toFixed(4); } },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'category', data: xData, axisLabel: { fontSize: 11 }, splitLine: { show: false } },
+    yAxis: { type: 'value', name: 'P(X=k)', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'bar', data: yData, barWidth: '60%',
+      itemStyle: { color: '#2563eb', borderRadius: [4, 4, 0, 0] }
+    }]
+  });
+}
+
+function resetDiscrete() {
+  document.getElementById('distSelect').value = 'binomial';
+  document.getElementById('paramNSlider').value = 10;
+  document.getElementById('paramPSlider').value = 0.5;
+  updateDiscrete();
+}
+updateDiscrete();
+
+document.getElementById('paramNSlider').addEventListener('input', function() {
+  document.getElementById('paramNVal').textContent = this.value;
+  updateDiscrete();
+});
+
+// ===== 卡片2：连续分布 =====
+var contPDFChart = echarts.init(document.getElementById('contPDFChart'));
+var contCDFChart = echarts.init(document.getElementById('contCDFChart'));
+var contX0 = null;
+
+function normalPDF(x, mu, sigma) {
+  return 1/(sigma*Math.sqrt(2*Math.PI)) * Math.exp(-0.5*Math.pow((x-mu)/sigma, 2));
+}
+
+function normalCDF(x, mu, sigma) {
+  return 0.5 * (1 + erf((x-mu)/(sigma*Math.sqrt(2))));
+}
+
+function erf(x) {
+  var sign = x >= 0 ? 1 : -1;
+  x = Math.abs(x);
+  var a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429;
+  var p = 0.3275911;
+  var t = 1/(1 + p*x);
+  var y = 1 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*Math.exp(-x*x);
+  return sign*y;
+}
+
+function uniformPDF(x, a, b) { return (x >= a && x <= b) ? 1/(b-a) : 0; }
+function uniformCDF(x, a, b) { if (x < a) return 0; if (x > b) return 1; return (x-a)/(b-a); }
+
+function expPDF(x, lam) { return x >= 0 ? lam*Math.exp(-lam*x) : 0; }
+function expCDF(x, lam) { return x >= 0 ? 1 - Math.exp(-lam*x) : 0; }
+
+function getContRange() {
+  var dist = document.getElementById('contDistSelect').value;
+  if (dist === 'normal') {
+    var mu = parseFloat(document.getElementById('contParam1Slider').value);
+    var sigma = parseFloat(document.getElementById('contParam2Slider').value);
+    return {xMin: mu-4*sigma, xMax: mu+4*sigma};
+  } else if (dist === 'uniform') {
+    var a = parseFloat(document.getElementById('contParam1Slider').value);
+    var b = parseFloat(document.getElementById('contParam2Slider').value);
+    return {xMin: a-0.5, xMax: b+0.5};
+  } else {
+    var lam = parseFloat(document.getElementById('contParam1Slider').value);
+    return {xMin: 0, xMax: 5/lam};
+  }
+}
+
+function updateContinuous() {
+  var dist = document.getElementById('contDistSelect').value;
+
+  if (dist === 'normal') {
+    document.getElementById('contParam1Label').textContent = 'μ =';
+    document.getElementById('contParam2Label').textContent = 'σ =';
+    document.getElementById('contParam2Group').style.display = 'flex';
+    document.getElementById('contParam1Slider').min = -3; document.getElementById('contParam1Slider').max = 3; document.getElementById('contParam1Slider').step = 0.1;
+    document.getElementById('contParam2Slider').min = 0.3; document.getElementById('contParam2Slider').max = 3; document.getElementById('contParam2Slider').step = 0.1;
+  } else if (dist === 'uniform') {
+    document.getElementById('contParam1Label').textContent = 'a =';
+    document.getElementById('contParam2Label').textContent = 'b =';
+    document.getElementById('contParam2Group').style.display = 'flex';
+    document.getElementById('contParam1Slider').min = -3; document.getElementById('contParam1Slider').max = 1; document.getElementById('contParam1Slider').step = 0.1;
+    document.getElementById('contParam2Slider').min = 1; document.getElementById('contParam2Slider').max = 5; document.getElementById('contParam2Slider').step = 0.1;
+  } else {
+    document.getElementById('contParam1Label').textContent = 'λ =';
+    document.getElementById('contParam2Group').style.display = 'none';
+    document.getElementById('contParam1Slider').min = 0.3; document.getElementById('contParam1Slider').max = 3; document.getElementById('contParam1Slider').step = 0.1;
+  }
+
+  var p1 = parseFloat(document.getElementById('contParam1Slider').value);
+  document.getElementById('contParam1Val').textContent = p1.toFixed(1);
+  var p2 = parseFloat(document.getElementById('contParam2Slider').value);
+  document.getElementById('contParam2Val').textContent = p2.toFixed(1);
+
+  contX0 = null;
+  document.getElementById('contX0Val').textContent = '—';
+  document.getElementById('contProbVal').textContent = '—';
+  drawContinuous();
+}
+
+function drawContinuous() {
+  var dist = document.getElementById('contDistSelect').value;
+  var p1 = parseFloat(document.getElementById('contParam1Slider').value);
+  var p2 = parseFloat(document.getElementById('contParam2Slider').value);
+  var range = getContRange();
+  var N = 200;
+  var pdfData = [], cdfData = [];
+
+  var pdfFunc, cdfFunc;
+  if (dist === 'normal') { pdfFunc = function(x){return normalPDF(x,p1,p2);}; cdfFunc = function(x){return normalCDF(x,p1,p2);}; }
+  else if (dist === 'uniform') { pdfFunc = function(x){return uniformPDF(x,p1,p2);}; cdfFunc = function(x){return uniformCDF(x,p1,p2);}; }
+  else { pdfFunc = function(x){return expPDF(x,p1);}; cdfFunc = function(x){return expCDF(x,p1);}; }
+
+  var step = (range.xMax - range.xMin) / N;
+  for (var i = 0; i <= N; i++) {
+    var x = range.xMin + i*step;
+    pdfData.push([x, pdfFunc(x)]);
+    cdfData.push([x, cdfFunc(x)]);
+  }
+
+  var pdfSeries = [{
+    type: 'line', data: pdfData, smooth: true, symbol: 'none',
+    lineStyle: { color: '#2563eb', width: 2 },
+    areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,0.25)'},{offset:1,color:'rgba(37,99,235,0.02)'}]) }
+  }];
+
+  // 添加阴影面积
+  if (contX0 !== null) {
+    var shadeData = [];
+    for (var i = 0; i <= N; i++) {
+      var x = range.xMin + i*step;
+      if (x <= contX0) shadeData.push([x, pdfFunc(x)]);
+    }
+    if (shadeData.length > 0) {
+      shadeData.push([contX0, 0]);
+      shadeData.push([range.xMin, 0]);
+      pdfSeries.push({
+        type: 'line', data: shadeData, smooth: false, symbol: 'none',
+        lineStyle: { color: 'transparent', width: 0 },
+        areaStyle: { color: 'rgba(37,99,235,0.35)' },
+        silent: true
+      });
+    }
+  }
+
+  contPDFChart.setOption({
+    tooltip: { trigger: 'axis', formatter: function(p) { return 'x='+p[0].data[0].toFixed(3)+'<br/>f(x)='+p[0].data[1].toFixed(4); } },
+    grid: { left: 45, right: 15, top: 15, bottom: 30 },
+    xAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: pdfSeries
+  });
+
+  contCDFChart.setOption({
+    tooltip: { trigger: 'axis', formatter: function(p) { return 'x='+p[0].data[0].toFixed(3)+'<br/>F(x)='+p[0].data[1].toFixed(4); } },
+    grid: { left: 45, right: 15, top: 15, bottom: 30 },
+    xAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', min: 0, max: 1, axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'line', data: cdfData, smooth: true, symbol: 'none',
+      lineStyle: { color: '#2563eb', width: 2 }
+    }]
+  });
+
+  if (contX0 !== null) {
+    var prob = cdfFunc(contX0);
+    document.getElementById('contProbVal').textContent = prob.toFixed(4);
+  }
+}
+
+contPDFChart.on('click', function(params) {
+  if (params.data) {
+    contX0 = params.data[0];
+    document.getElementById('contX0Val').textContent = contX0.toFixed(3);
+    drawContinuous();
+  }
+});
+
+function resetContinuous() {
+  document.getElementById('contDistSelect').value = 'normal';
+  document.getElementById('contParam1Slider').value = 0;
+  document.getElementById('contParam2Slider').value = 1;
+  contX0 = null;
+  updateContinuous();
+}
+
+document.getElementById('contParam1Slider').addEventListener('input', function() {
+  document.getElementById('contParam1Val').textContent = parseFloat(this.value).toFixed(1);
+  updateContinuous();
+});
+document.getElementById('contParam2Slider').addEventListener('input', function() {
+  document.getElementById('contParam2Val').textContent = parseFloat(this.value).toFixed(1);
+  updateContinuous();
+});
+
+updateContinuous();
+
+// ===== 卡片3：正态标准化 =====
+var normOrigChart = echarts.init(document.getElementById('normOrigChart'));
+var normStdChart = echarts.init(document.getElementById('normStdChart'));
+
+function updateStandardize() {
+  var mu = parseFloat(document.getElementById('normMuSlider').value);
+  var sigma = parseFloat(document.getElementById('normSigmaSlider').value);
+  var xVal = parseFloat(document.getElementById('normXSlider').value);
+
+  document.getElementById('normMuVal').textContent = mu.toFixed(1);
+  document.getElementById('normSigmaVal').textContent = sigma.toFixed(1);
+  document.getElementById('normXVal').textContent = xVal.toFixed(1);
+
+  var z = (xVal - mu) / sigma;
+  document.getElementById('normZVal').textContent = z.toFixed(2);
+
+  var xMin = mu - 4*sigma, xMax = mu + 4*sigma;
+  var N = 200;
+  var origData = [], stdData = [];
+  var step = (xMax - xMin) / N;
+  var zMin = -4, zMax = 4, zStep = (zMax - zMin) / N;
+
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    origData.push([x, normalPDF(x, mu, sigma)]);
+  }
+  for (var i = 0; i <= N; i++) {
+    var zi = zMin + i*zStep;
+    stdData.push([zi, normalPDF(zi, 0, 1)]);
+  }
+
+  // 原分布阴影到xVal
+  var origShade = [];
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    if (x <= xVal) origShade.push([x, normalPDF(x, mu, sigma)]);
+  }
+
+  // 标准正态阴影到z
+  var stdShade = [];
+  for (var i = 0; i <= N; i++) {
+    var zi = zMin + i*zStep;
+    if (zi <= z) stdShade.push([zi, normalPDF(zi, 0, 1)]);
+  }
+
+  var makeSeries = function(lineData, shadeData, markX) {
+    var series = [{
+      type: 'line', data: lineData, smooth: true, symbol: 'none',
+      lineStyle: { color: '#2563eb', width: 2 },
+      areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,0.15)'},{offset:1,color:'rgba(37,99,235,0.02)'}]) }
+    }];
+    if (shadeData.length > 0) {
+      shadeData.push([markX, 0]);
+      shadeData.push([shadeData[0][0], 0]);
+      series.push({
+        type: 'line', data: shadeData, smooth: false, symbol: 'none',
+        lineStyle: { color: 'transparent', width: 0 },
+        areaStyle: { color: 'rgba(37,99,235,0.35)' }, silent: true
+      });
+    }
+    series.push({
+      type: 'line', data: [[markX, 0], [markX, Math.max.apply(null, lineData.map(function(d){return d[1];}))]],
+      symbol: 'none', lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 }, silent: true
+    });
+    return series;
+  };
+
+  normOrigChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 45, right: 15, top: 15, bottom: 30 },
+    xAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: makeSeries(origData, origShade, xVal)
+  });
+
+  normStdChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 45, right: 15, top: 15, bottom: 30 },
+    xAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: makeSeries(stdData, stdShade, z)
+  });
+}
+
+function resetStandardize() {
+  document.getElementById('normMuSlider').value = 0;
+  document.getElementById('normSigmaSlider').value = 1;
+  document.getElementById('normXSlider').value = 1;
+  updateStandardize();
+}
+updateStandardize();
+
+document.getElementById('normMuSlider').addEventListener('input', updateStandardize);
+document.getElementById('normSigmaSlider').addEventListener('input', updateStandardize);
+document.getElementById('normXSlider').addEventListener('input', updateStandardize);
+
+// ===== 卡片4：分布函数性质 =====
+var ftypeChart = echarts.init(document.getElementById('ftypeChart'));
+
+function updateFType() {
+  var type = document.getElementById('ftypeSelect').value;
+  var N = 200;
+  var data = [];
+
+  if (type === 'discrete') {
+    var n = 10, p = 0.4;
+    var cum = 0;
+    var prevX = -1;
+    for (var k = 0; k <= n; k++) {
+      var prob = binomialPMF(k, n, p);
+      data.push([k-0.001, cum]);
+      cum += prob;
+      data.push([k, cum]);
+      data.push([k+0.001, cum]);
+    }
+    data.push([n+1, 1]);
+    data.push([n+3, 1]);
+  } else {
+    var mu = 0, sigma = 1;
+    for (var i = 0; i <= N; i++) {
+      var x = -4 + i*8/N;
+      data.push([x, normalCDF(x, mu, sigma)]);
+    }
+  }
+
+  ftypeChart.setOption({
+    tooltip: { trigger: 'axis', formatter: function(p) { return 'x='+p[0].data[0].toFixed(3)+'<br/>F(x)='+p[0].data[1].toFixed(4); } },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'value', name: 'x', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', name: 'F(x)', min: 0, max: 1.05, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [{
+      type: 'line', data: data, smooth: type === 'continuous', symbol: 'none', step: type === 'discrete' ? 'end' : false,
+      lineStyle: { color: '#2563eb', width: 2.5 },
+      markLine: { silent: true, symbol: 'none', lineStyle: { color: '#94a3b8', type: 'dashed', width: 1 },
+        data: [{yAxis: 0, label: {formatter:'F(-∞)=0', fontSize:10}}, {yAxis: 1, label: {formatter:'F(+∞)=1', fontSize:10}}] }
+    }]
+  });
+}
+
+function resetFType() {
+  document.getElementById('ftypeSelect').value = 'discrete';
+  updateFType();
+}
+updateFType();
+
+// ===== 自测题 =====
+var quizAnswers = { q1: 1, q2: 2, q3: 2 };
+var quizFeedback = {
+  q1: { correct: '正确！二项分布 B(n,p) 的方差 D(X)=np(1-p)。', wrong: '错误。二项分布 D(X)=np(1-p)，正确答案是 B。' },
+  q2: { correct: '正确！连续型随机变量单点概率恒为 0，这是与离散型的本质区别。', wrong: '错误。连续型随机变量单点概率 P(X=x₀)=0，正确答案是 C。' },
+  q3: { correct: '正确！标准化变换 \(Z=\frac{X-\mu}{\sigma}\sim N(0,1)\)。', wrong: '错误。标准化后服从标准正态分布 N(0,1)，正确答案是 C。' }
+};
+
+function selectQuiz(qid, choice, el) {
+  var container = document.getElementById('quiz' + qid.slice(1));
+  var allOptions = container.querySelectorAll('.quiz-option');
+  var feedback = document.getElementById(qid + 'Feedback');
+  var correctAnswer = quizAnswers[qid];
+
+  allOptions.forEach(function(opt) { opt.classList.remove('selected', 'correct', 'wrong'); });
+  el.classList.add('selected');
+
+  if (choice === correctAnswer) {
+    el.classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-green-600';
+    feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
+  } else {
+    el.classList.add('wrong');
+    allOptions[correctAnswer].classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-red-600';
+    feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
+  }
+  feedback.classList.remove('hidden');
+  renderAllKatex();
+}
+
+window.addEventListener('resize', function() {
+  discreteChart.resize();
+  contPDFChart.resize();
+  contCDFChart.resize();
+  normOrigChart.resize();
+  normStdChart.resize();
+  ftypeChart.resize();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>假设检验 — 概率论与数理统计可视化平台</title>
+<!-- TailwindCSS CDN（与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#2563eb',
+        'primary-light': '#3b82f6',
+        'primary-dark': '#1d4ed8',
+        'primary-bg': '#eff6ff',
+      }
+    }
+  }
+}
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"></script>
+<script src="js/katex-setup.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4/dist/echarts.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<link rel="stylesheet" href="css/sidebar.css">
+<style>
+html { scroll-behavior: smooth; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8fafc; }
+.main-content { margin-left: 256px; min-height: 100vh; }
+.card {
+  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;
+  margin-bottom: 24px; transition: all 0.2s;
+}
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+.formula-panel {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 12px; overflow: hidden;
+}
+.formula-toggle {
+  display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer;
+  font-size: 14px; font-weight: 500; color: #475569; user-select: none;
+  transition: background 0.15s;
+}
+.formula-toggle:hover { background: #f1f5f9; }
+.formula-toggle .arrow { transition: transform 0.2s; font-size: 12px; }
+.formula-toggle.open .arrow { transform: rotate(90deg); }
+.formula-body { display: none; padding: 0 16px 16px 16px; }
+.formula-body.show { display: block; }
+.exam-tip {
+  background: #fef9c3; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px 16px; margin-top: 16px;
+}
+.quiz-option {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.15s; font-size: 14px;
+}
+.quiz-option:hover { border-color: #93c5fd; background: #eff6ff; }
+.quiz-option.selected { border-color: #2563eb; background: #eff6ff; }
+.quiz-option.correct { border-color: #16a34a; background: #f0fdf4; }
+.quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
+.slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
+.slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+<div id="sidebar-container"></div>
+<script src="js/sidebar.js"></script>
+
+<main class="main-content">
+
+  <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第8章</span>
+      <span class="text-xs text-slate-400">模块二 · 数理统计</span>
+    </div>
+    <h1 class="text-2xl font-bold text-slate-900 mb-2">假设检验</h1>
+    <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
+      原假设 \(H_0\)，备择假设 \(H_1\)；显著性水平 \(\alpha\)；拒绝域；p-value；两类错误。
+      应试重点：拒绝域、p值与 \(\alpha\) 比较；一类错误二类错误；单侧双侧检验。
+    </p>
+  </section>
+
+  <!-- ===== 卡片1：拒绝域可视化 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">🚫 拒绝域可视化</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          给定显著性水平 \(\alpha\)，分布尾部为<strong>拒绝域</strong>；统计量落入拒绝域，则拒绝原假设 \(H_0\)。
+          检验统计量落在拒绝域外不意味着 \(H_0\) 成立，只能说没有足够证据拒绝。
+        </p>
+      </div>
+
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">拒绝域：</span><span class="katex-render" data-expr="W=\{|T|>z_{\alpha/2}\}\;\text{（双侧）}"></span></div>
+            <div><span class="text-xs text-slate-400">p-value：</span><span class="katex-render" data-expr="p=P(|T|\ge|t_{\text{obs}}|\mid H_0)"></span></div>
+            <div><span class="text-xs text-slate-400">决策：</span><span class="katex-render" data-expr="p<\alpha\Rightarrow\text{拒绝}H_0"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 拒绝域演示</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">检验类型：</span>
+          <select id="rejTypeSelect" onchange="updateRejection()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+            <option value="two-sided">双侧检验</option>
+            <option value="left-sided">左侧检验</option>
+            <option value="right-sided">右侧检验</option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">α =</span>
+          <input type="range" id="rejAlphaSlider" min="0.01" max="0.15" value="0.05" step="0.01" oninput="updateRejection()" class="slider-input w-28">
+          <span id="rejAlphaVal" class="text-sm font-mono text-slate-700 w-10">0.05</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">观测统计量 =</span>
+          <input type="range" id="rejStatSlider" min="-3" max="3" value="1.5" step="0.05" oninput="updateRejection()" class="slider-input w-32">
+          <span id="rejStatVal" class="text-sm font-mono text-slate-700 w-10">1.50</span>
+        </div>
+        <button onclick="resetRejection()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="rejectionChart" style="width:100%;height:340px;"></div>
+      <div class="text-center mt-2">
+        <span id="rejConclusion" class="text-sm font-bold px-4 py-1 rounded-full">—</span>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">拒绝域位置取决于备择假设 \(H_1\)。双侧检验拒绝域在两侧；左侧检验在左侧；右侧检验在右侧。<strong>不拒绝 \(H_0\) ≠ \(H_0\) 成立</strong>。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片2：P-value可视化 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📊 P-value 可视化</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          <strong>p值</strong>：原假设成立时，观测到当前以及更极端样本的概率。若 \(p < \alpha\)，拒绝 \(H_0\)。
+          p值越小，拒绝 \(H_0\) 的证据越强。
+        </p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ P值面积演示</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">α =</span>
+          <input type="range" id="pvAlphaSlider" min="0.01" max="0.15" value="0.05" step="0.01" oninput="updatePValue()" class="slider-input w-28">
+          <span id="pvAlphaVal" class="text-sm font-mono text-slate-700 w-10">0.05</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">观测值 |z| =</span>
+          <input type="range" id="pvZSlider" min="0" max="3" value="1.8" step="0.05" oninput="updatePValue()" class="slider-input w-32">
+          <span id="pvZVal" class="text-sm font-mono text-slate-700 w-10">1.80</span>
+        </div>
+        <button onclick="resetPValue()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="pvalueChart" style="width:100%;height:340px;"></div>
+      <div class="text-center mt-2 text-sm">
+        <span class="text-slate-600">p-value = </span>
+        <strong id="pvResult" class="text-blue-600 text-lg">—</strong>
+        <span class="text-slate-600 ml-2">vs α = </span>
+        <strong id="pvAlphaDisp" class="text-red-500">0.05</strong>
+        <span class="text-slate-600 ml-2">→ </span>
+        <strong id="pvDecision" class="text-lg">—</strong>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">p值 < α 拒绝 \(H_0\)。p值越小证据越强。p值不是 \(H_0\) 成立的概率！这是常见误解。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片3：两类错误模拟 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">⚠️ 两类错误模拟</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          <strong>第一类错误（弃真）</strong>：\(H_0\) 为真，拒绝 \(H_0\)；概率 = \(\alpha\)。<br>
+          <strong>第二类错误（取伪）</strong>：\(H_1\) 为真，接受 \(H_0\)；概率 = \(\beta\)。<br>
+          二者不能同时减小（样本量固定时）。
+        </p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 两类错误模拟</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">α =</span>
+          <input type="range" id="errAlphaSlider" min="0.01" max="0.20" value="0.05" step="0.01" oninput="updateErrors()" class="slider-input w-28">
+          <span id="errAlphaVal" class="text-sm font-mono text-slate-700 w-10">0.05</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">真实 μ₁ =</span>
+          <input type="range" id="errMuSlider" min="0.2" max="2" value="0.8" step="0.1" oninput="updateErrors()" class="slider-input w-28">
+          <span id="errMuVal" class="text-sm font-mono text-slate-700 w-8">0.8</span>
+        </div>
+        <button onclick="resetErrors()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="errorsChart" style="width:100%;height:340px;"></div>
+      <div class="grid grid-cols-2 gap-4 mt-3 text-sm">
+        <div class="bg-red-50 rounded-lg p-3 text-center border border-red-200">
+          <div class="text-xs text-red-500">第一类错误 α（弃真）</div>
+          <div id="errType1" class="text-lg font-bold text-red-600">—</div>
+        </div>
+        <div class="bg-orange-50 rounded-lg p-3 text-center border border-orange-200">
+          <div class="text-xs text-orange-500">第二类错误 β（取伪）</div>
+          <div id="errType2" class="text-lg font-bold text-orange-600">—</div>
+        </div>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">样本量固定时，α 减小 → β 增大，<strong>二者不能同时减小</strong>。增大样本量可以同时降低两类错误。一类错误是"冤枉好人"，二类错误是"放过坏人"。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片4：单侧 vs 双侧一键切换 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">🔄 单侧检验 vs 双侧检验对比</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          双侧检验：\(H_1: \mu \neq \mu_0\)，拒绝域在两侧，每侧 \(\alpha/2\)。<br>
+          单侧检验：\(H_1: \mu > \mu_0\)（右侧）或 \(H_1: \mu < \mu_0\)（左侧），拒绝域在一侧，面积 \(\alpha\)。
+        </p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 直观对比</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">α =</span>
+          <input type="range" id="sideAlphaSlider" min="0.01" max="0.15" value="0.05" step="0.01" oninput="updateSideBySide()" class="slider-input w-28">
+          <span id="sideAlphaVal" class="text-sm font-mono text-slate-700 w-10">0.05</span>
+        </div>
+        <button onclick="resetSideBySide()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <div class="text-xs text-slate-400 mb-1 text-center">双侧检验：\(H_1: \mu \neq \mu_0\)</div>
+          <div id="sideTwoChart" style="width:100%;height:300px;"></div>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400 mb-1 text-center">右侧检验：\(H_1: \mu > \mu_0\)</div>
+          <div id="sideRightChart" style="width:100%;height:300px;"></div>
+        </div>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">单侧检验比双侧检验<strong>更容易拒绝 \(H_0\)</strong>（相同 α 下临界值更小）。选择单侧还是双侧必须在看数据之前决定，不能根据数据结果临时选择。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 底部自测题 ===== -->
+  <section class="max-w-5xl mx-auto px-10 pb-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">📝 自测题（单选）</h2>
+
+      <div class="mb-6" id="quiz1">
+        <p class="text-sm font-semibold text-slate-700 mb-3">1. 第一类错误（弃真）的概率等于什么？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q1', 0, this)">A. β</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 1, this)">B. α（显著性水平）</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 2, this)">C. 1-β</div>
+          <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">D. p-value</div>
+        </div>
+        <div id="q1Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz2">
+        <p class="text-sm font-semibold text-slate-700 mb-3">2. 若 p-value < α，应该怎么做？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q2', 0, this)">A. 接受 H₀</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 1, this)">B. 拒绝 H₀</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 2, this)">C. 无法判断</div>
+          <div class="quiz-option" onclick="selectQuiz('q2', 3, this)">D. 增大样本量</div>
+        </div>
+        <div id="q2Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+
+      <div class="mb-6" id="quiz3">
+        <p class="text-sm font-semibold text-slate-700 mb-3">3. 样本量固定时，减小 α 会导致什么？</p>
+        <div class="space-y-2">
+          <div class="quiz-option" onclick="selectQuiz('q3', 0, this)">A. β 也减小</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 1, this)">B. β 增大</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 2, this)">C. β 不变</div>
+          <div class="quiz-option" onclick="selectQuiz('q3', 3, this)">D. 无法确定</div>
+        </div>
+        <div id="q3Feedback" class="text-sm mt-2 hidden"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+function renderAllKatex() {
+  document.querySelectorAll('.katex-render').forEach(function(el) {
+    try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
+    catch(e) { el.textContent = el.getAttribute('data-expr'); }
+  });
+}
+renderAllKatex();
+
+function toggleFormula(toggle) {
+  toggle.classList.toggle('open');
+  var body = toggle.nextElementSibling;
+  body.classList.toggle('show');
+  if (body.classList.contains('show')) renderAllKatex();
+}
+
+function normalPDF(x, mu, sigma) { return 1/(sigma*Math.sqrt(2*Math.PI)) * Math.exp(-0.5*Math.pow((x-mu)/sigma, 2)); }
+
+function normalCDF(x) {
+  var a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  var sign=x>=0?1:-1; x=Math.abs(x);
+  var t=1/(1+p*x);
+  return 0.5*(1+sign*(1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x)));
+}
+
+// ===== 卡片1：拒绝域 =====
+var rejectionChart = echarts.init(document.getElementById('rejectionChart'));
+
+function updateRejection() {
+  var type = document.getElementById('rejTypeSelect').value;
+  var alpha = parseFloat(document.getElementById('rejAlphaSlider').value);
+  var stat = parseFloat(document.getElementById('rejStatSlider').value);
+
+  document.getElementById('rejAlphaVal').textContent = alpha.toFixed(2);
+  document.getElementById('rejStatVal').textContent = stat.toFixed(2);
+
+  var N = 300, xMin = -4, xMax = 4;
+  var pdfData = [];
+  var step = (xMax - xMin) / N;
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    pdfData.push([x, normalPDF(x, 0, 1)]);
+  }
+
+  var series = [{
+    type: 'line', data: pdfData, smooth: true, symbol: 'none',
+    lineStyle: { color: '#2563eb', width: 2.5 },
+    areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,0.15)'},{offset:1,color:'rgba(37,99,235,0.02)'}]) }
+  }];
+
+  var rejected = false;
+  var critLeft, critRight;
+
+  if (type === 'two-sided') {
+    var tailProb = alpha/2;
+    // 找临界值: normalCDF(-z) = alpha/2
+    var z = 0;
+    for (z = 0; z < 5; z += 0.001) { if (normalCDF(-z) < tailProb) break; }
+    critLeft = -z; critRight = z;
+    rejected = stat < critLeft || stat > critRight;
+
+    for (var side = 0; side < 2; side++) {
+      var shadeData = [];
+      var crit = side === 0 ? critLeft : critRight;
+      for (var i = 0; i <= N; i++) {
+        var x = xMin + i*step;
+        if (side === 0 ? x <= crit : x >= crit) shadeData.push([x, normalPDF(x, 0, 1)]);
+      }
+      shadeData.push([crit, 0]);
+      series.push({
+        type: 'line', data: shadeData, smooth: false, symbol: 'none',
+        lineStyle: { color: 'transparent', width: 0 },
+        areaStyle: { color: 'rgba(239,68,68,0.35)' }, silent: true
+      });
+    }
+    series.push(
+      { type: 'line', data: [[critLeft,0],[critLeft,normalPDF(critLeft,0,1)]], symbol:'none', lineStyle:{color:'#ef4444',type:'dashed',width:1.5}, silent:true },
+      { type: 'line', data: [[critRight,0],[critRight,normalPDF(critRight,0,1)]], symbol:'none', lineStyle:{color:'#ef4444',type:'dashed',width:1.5}, silent:true }
+    );
+  } else if (type === 'left-sided') {
+    var z = 0;
+    for (z = 0; z < 5; z += 0.001) { if (normalCDF(-z) < alpha) break; }
+    critLeft = -z;
+    rejected = stat < critLeft;
+
+    var shadeData = [];
+    for (var i = 0; i <= N; i++) {
+      var x = xMin + i*step;
+      if (x <= critLeft) shadeData.push([x, normalPDF(x, 0, 1)]);
+    }
+    shadeData.push([critLeft, 0]);
+    series.push({
+      type: 'line', data: shadeData, smooth: false, symbol: 'none',
+      lineStyle: { color: 'transparent', width: 0 },
+      areaStyle: { color: 'rgba(239,68,68,0.35)' }, silent: true
+    });
+    series.push(
+      { type: 'line', data: [[critLeft,0],[critLeft,normalPDF(critLeft,0,1)]], symbol:'none', lineStyle:{color:'#ef4444',type:'dashed',width:1.5}, silent:true }
+    );
+  } else {
+    var z = 0;
+    for (z = 0; z < 5; z += 0.001) { if (1-normalCDF(z) < alpha) break; }
+    critRight = z;
+    rejected = stat > critRight;
+
+    var shadeData = [];
+    for (var i = 0; i <= N; i++) {
+      var x = xMin + i*step;
+      if (x >= critRight) shadeData.push([x, normalPDF(x, 0, 1)]);
+    }
+    shadeData.push([critRight, 0]);
+    series.push({
+      type: 'line', data: shadeData, smooth: false, symbol: 'none',
+      lineStyle: { color: 'transparent', width: 0 },
+      areaStyle: { color: 'rgba(239,68,68,0.35)' }, silent: true
+    });
+    series.push(
+      { type: 'line', data: [[critRight,0],[critRight,normalPDF(critRight,0,1)]], symbol:'none', lineStyle:{color:'#ef4444',type:'dashed',width:1.5}, silent:true }
+    );
+  }
+
+  // 观测统计量标记
+  series.push({
+    type: 'scatter', data: [[stat, 0]], symbolSize: 12,
+    itemStyle: { color: rejected ? '#ef4444' : '#16a34a' },
+    symbol: 'diamond', silent: true
+  });
+
+  rejectionChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'value', name: '检验统计量', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: series
+  });
+
+  var conclEl = document.getElementById('rejConclusion');
+  if (rejected) {
+    conclEl.textContent = '✕ 拒绝 H₀（统计量落入拒绝域）';
+    conclEl.className = 'text-sm font-bold px-4 py-1 rounded-full bg-red-100 text-red-700';
+  } else {
+    conclEl.textContent = '✓ 不拒绝 H₀（统计量未落入拒绝域）';
+    conclEl.className = 'text-sm font-bold px-4 py-1 rounded-full bg-green-100 text-green-700';
+  }
+}
+
+function resetRejection() {
+  document.getElementById('rejTypeSelect').value = 'two-sided';
+  document.getElementById('rejAlphaSlider').value = 0.05;
+  document.getElementById('rejStatSlider').value = 1.5;
+  updateRejection();
+}
+updateRejection();
+
+// ===== 卡片2：P-value =====
+var pvalueChart = echarts.init(document.getElementById('pvalueChart'));
+
+function updatePValue() {
+  var alpha = parseFloat(document.getElementById('pvAlphaSlider').value);
+  var zObs = parseFloat(document.getElementById('pvZSlider').value);
+
+  document.getElementById('pvAlphaVal').textContent = alpha.toFixed(2);
+  document.getElementById('pvZVal').textContent = zObs.toFixed(2);
+
+  var pVal = 2 * (1 - normalCDF(zObs));
+  document.getElementById('pvResult').textContent = pVal.toFixed(4);
+  document.getElementById('pvAlphaDisp').textContent = alpha.toFixed(2);
+  var decision = document.getElementById('pvDecision');
+  if (pVal < alpha) {
+    decision.textContent = '拒绝 H₀';
+    decision.className = 'text-lg text-red-600 font-bold';
+  } else {
+    decision.textContent = '不拒绝 H₀';
+    decision.className = 'text-lg text-green-600 font-bold';
+  }
+
+  var N = 300, xMin = -4, xMax = 4;
+  var pdfData = [];
+  var step = (xMax - xMin) / N;
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    pdfData.push([x, normalPDF(x, 0, 1)]);
+  }
+
+  var series = [{
+    type: 'line', data: pdfData, smooth: true, symbol: 'none',
+    lineStyle: { color: '#2563eb', width: 2.5 },
+    areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,0.15)'},{offset:1,color:'rgba(37,99,235,0.02)'}]) }
+  }];
+
+  // p值尾部阴影（双侧）
+  for (var side = 0; side < 2; side++) {
+    var shadeData = [];
+    var crit = side === 0 ? -zObs : zObs;
+    for (var i = 0; i <= N; i++) {
+      var x = xMin + i*step;
+      if (side === 0 ? x <= crit : x >= crit) shadeData.push([x, normalPDF(x, 0, 1)]);
+    }
+    shadeData.push([crit, 0]);
+    series.push({
+      type: 'line', data: shadeData, smooth: false, symbol: 'none',
+      lineStyle: { color: 'transparent', width: 0 },
+      areaStyle: { color: 'rgba(245,158,11,0.4)' }, silent: true
+    });
+  }
+
+  series.push(
+    { type: 'scatter', data: [[zObs, 0]], symbolSize: 10, itemStyle: { color: '#f59e0b' }, symbol: 'diamond', silent: true },
+    { type: 'scatter', data: [[-zObs, 0]], symbolSize: 10, itemStyle: { color: '#f59e0b' }, symbol: 'diamond', silent: true }
+  );
+
+  pvalueChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    xAxis: { type: 'value', name: 'Z', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: series
+  });
+}
+
+function resetPValue() {
+  document.getElementById('pvAlphaSlider').value = 0.05;
+  document.getElementById('pvZSlider').value = 1.8;
+  updatePValue();
+}
+updatePValue();
+
+// ===== 卡片3：两类错误 =====
+var errorsChart = echarts.init(document.getElementById('errorsChart'));
+
+function updateErrors() {
+  var alpha = parseFloat(document.getElementById('errAlphaSlider').value);
+  var mu1 = parseFloat(document.getElementById('errMuSlider').value);
+
+  document.getElementById('errAlphaVal').textContent = alpha.toFixed(2);
+  document.getElementById('errMuVal').textContent = mu1.toFixed(1);
+
+  // H0: mu=0, H1: mu=mu1
+  // 临界值 z_crit
+  var zCrit = 0;
+  for (zCrit = 0; zCrit < 5; zCrit += 0.001) { if (1-normalCDF(zCrit) < alpha) break; }
+
+  var beta = normalCDF(zCrit - mu1); // 在H1下，检验统计量小于临界值的概率
+  document.getElementById('errType1').textContent = (alpha*100).toFixed(1) + '%';
+  document.getElementById('errType2').textContent = (beta*100).toFixed(1) + '%';
+
+  var N = 300;
+  var xMin = -3, xMax = mu1 + 4;
+  var step = (xMax - xMin) / N;
+
+  var h0Data = [], h1Data = [];
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    h0Data.push([x, normalPDF(x, 0, 1)]);
+    h1Data.push([x, normalPDF(x, mu1, 1)]);
+  }
+
+  // α区域 (H0下右尾)
+  var alphaShade = [];
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    if (x >= zCrit) alphaShade.push([x, normalPDF(x, 0, 1)]);
+  }
+  alphaShade.push([zCrit, 0]);
+
+  // β区域 (H1下左尾)
+  var betaShade = [];
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    if (x <= zCrit) betaShade.push([x, normalPDF(x, mu1, 1)]);
+  }
+  betaShade.push([zCrit, 0]);
+
+  errorsChart.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['H₀分布 N(0,1)', 'H₁分布 N(μ₁,1)'], bottom: 0, textStyle: { fontSize: 11 } },
+    grid: { left: 50, right: 20, top: 20, bottom: 40 },
+    xAxis: { type: 'value', name: '检验统计量', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: [
+      { name: 'H₀分布 N(0,1)', type: 'line', data: h0Data, smooth: true, symbol: 'none', lineStyle: { color: '#2563eb', width: 2 } },
+      { name: 'H₁分布 N(μ₁,1)', type: 'line', data: h1Data, smooth: true, symbol: 'none', lineStyle: { color: '#ef4444', width: 2 } },
+      { type: 'line', data: alphaShade, smooth: false, symbol: 'none', lineStyle: { color: 'transparent', width: 0 }, areaStyle: { color: 'rgba(37,99,235,0.3)' }, silent: true },
+      { type: 'line', data: betaShade, smooth: false, symbol: 'none', lineStyle: { color: 'transparent', width: 0 }, areaStyle: { color: 'rgba(239,68,68,0.3)' }, silent: true },
+      { type: 'line', data: [[zCrit,0],[zCrit,0.4]], symbol: 'none', lineStyle: { color: '#1e293b', type: 'dashed', width: 1.5 }, label: { show: true, formatter: '临界值', fontSize: 10 }, silent: true }
+    ]
+  });
+}
+
+function resetErrors() {
+  document.getElementById('errAlphaSlider').value = 0.05;
+  document.getElementById('errMuSlider').value = 0.8;
+  updateErrors();
+}
+updateErrors();
+
+// ===== 卡片4：单侧 vs 双侧 =====
+var sideTwoChart = echarts.init(document.getElementById('sideTwoChart'));
+var sideRightChart = echarts.init(document.getElementById('sideRightChart'));
+
+function updateSideBySide() {
+  var alpha = parseFloat(document.getElementById('sideAlphaSlider').value);
+  document.getElementById('sideAlphaVal').textContent = alpha.toFixed(2);
+
+  var N = 300, xMin = -4, xMax = 4;
+  var pdfData = [];
+  var step = (xMax - xMin) / N;
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    pdfData.push([x, normalPDF(x, 0, 1)]);
+  }
+
+  // 双侧临界值
+  var zTwo = 0;
+  for (zTwo = 0; zTwo < 5; zTwo += 0.001) { if (normalCDF(-zTwo) < alpha/2) break; }
+
+  var twoSeries = [{ type: 'line', data: pdfData, smooth: true, symbol: 'none', lineStyle: { color: '#2563eb', width: 2.5 } }];
+  for (var side = 0; side < 2; side++) {
+    var crit = side === 0 ? -zTwo : zTwo;
+    var shadeData = [];
+    for (var i = 0; i <= N; i++) {
+      var x = xMin + i*step;
+      if (side === 0 ? x <= crit : x >= crit) shadeData.push([x, normalPDF(x, 0, 1)]);
+    }
+    shadeData.push([crit, 0]);
+    twoSeries.push({ type: 'line', data: shadeData, smooth: false, symbol: 'none', lineStyle: { color: 'transparent', width: 0 }, areaStyle: { color: 'rgba(239,68,68,0.35)' }, silent: true });
+  }
+
+  sideTwoChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 45, right: 15, top: 15, bottom: 30 },
+    xAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: twoSeries
+  });
+
+  // 右侧临界值
+  var zRight = 0;
+  for (zRight = 0; zRight < 5; zRight += 0.001) { if (1-normalCDF(zRight) < alpha) break; }
+
+  var rightSeries = [{ type: 'line', data: pdfData, smooth: true, symbol: 'none', lineStyle: { color: '#2563eb', width: 2.5 } }];
+  var shadeData = [];
+  for (var i = 0; i <= N; i++) {
+    var x = xMin + i*step;
+    if (x >= zRight) shadeData.push([x, normalPDF(x, 0, 1)]);
+  }
+  shadeData.push([zRight, 0]);
+  rightSeries.push({ type: 'line', data: shadeData, smooth: false, symbol: 'none', lineStyle: { color: 'transparent', width: 0 }, areaStyle: { color: 'rgba(239,68,68,0.35)' }, silent: true });
+
+  sideRightChart.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: 45, right: 15, top: 15, bottom: 30 },
+    xAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    series: rightSeries
+  });
+}
+
+function resetSideBySide() {
+  document.getElementById('sideAlphaSlider').value = 0.05;
+  updateSideBySide();
+}
+updateSideBySide();
+
+// ===== 自测题 =====
+var quizAnswers = { q1: 1, q2: 1, q3: 1 };
+var quizFeedback = {
+  q1: { correct: '正确！第一类错误（弃真）的概率就是显著性水平 α。', wrong: '错误。第一类错误（弃真）的概率等于显著性水平 α，正确答案是 B。' },
+  q2: { correct: '正确！p-value < α 时拒绝 H₀，这是假设检验的基本决策规则。', wrong: '错误。p-value < α 时拒绝 H₀，正确答案是 B。' },
+  q3: { correct: '正确！样本量固定时，α 减小会导致 β 增大，二者不能同时减小。', wrong: '错误。样本量固定时，α 减小 → β 增大，二者此消彼长。正确答案是 B。' }
+};
+
+function selectQuiz(qid, choice, el) {
+  var container = document.getElementById('quiz' + qid.slice(1));
+  var allOptions = container.querySelectorAll('.quiz-option');
+  var feedback = document.getElementById(qid + 'Feedback');
+  var correctAnswer = quizAnswers[qid];
+
+  allOptions.forEach(function(opt) { opt.classList.remove('selected', 'correct', 'wrong'); });
+  el.classList.add('selected');
+
+  if (choice === correctAnswer) {
+    el.classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-green-600';
+    feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
+  } else {
+    el.classList.add('wrong');
+    allOptions[correctAnswer].classList.add('correct');
+    feedback.className = 'text-sm mt-2 text-red-600';
+    feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
+  }
+  feedback.classList.remove('hidden');
+  renderAllKatex();
+}
+
+window.addEventListener('resize', function() {
+  rejectionChart.resize(); pvalueChart.resize(); errorsChart.resize();
+  sideTwoChart.resize(); sideRightChart.resize();
+});
+</script>
+
+</body>
+</html>

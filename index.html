@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>概率论与数理统计交互式可视化平台</title>
+
+<!-- TailwindCSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#2563eb',
+        'primary-light': '#3b82f6',
+        'primary-dark': '#1d4ed8',
+        'primary-bg': '#eff6ff',
+      }
+    }
+  }
+}
+</script>
+
+<!-- KaTeX CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<!-- KaTeX JS -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<!-- ECharts CDN -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+
+<!-- Plotly.js CDN -->
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+
+<!-- 共享侧边栏样式 -->
+<link rel="stylesheet" href="css/sidebar.css">
+
+<style>
+  /* 全局样式 */
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+
+  /* 主内容区域 */
+  .main-content {
+    margin-left: 256px;
+    min-height: 100vh;
+  }
+
+  /* 卡片样式 */
+  .chapter-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+  }
+
+  .chapter-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.12);
+    border-color: #93c5fd;
+  }
+
+  .chapter-card .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  /* 模块卡片 */
+  .module-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 28px;
+    transition: all 0.3s ease;
+  }
+
+  .module-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border-color: #bfdbfe;
+  }
+
+  /* 黄色提示框 */
+  .exam-tip {
+    background: #fef9c3;
+    border-left: 4px solid #eab308;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+
+  /* KaTeX 公式样式微调 */
+  .katex { font-size: 1.05em; }
+
+  /* 图表容器 */
+  .chart-container {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+  }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+<div id="sidebar-container"></div>
+<script src="js/sidebar.js"></script>
+
+<!-- ==================== 主内容区域 ==================== -->
+<main class="main-content">
+
+  <!-- ===== Hero 区域 ===== -->
+  <section class="relative overflow-hidden bg-gradient-to-br from-primary-bg via-white to-blue-50">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-blue-200 rounded-full opacity-20 blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-300 rounded-full opacity-15 blur-3xl translate-y-1/2 -translate-x-1/4"></div>
+
+    <div class="relative max-w-5xl mx-auto px-10 py-16">
+      <div class="mb-4">
+        <span class="inline-block px-3 py-1 text-xs font-semibold text-primary bg-primary-bg rounded-full border border-blue-200">
+          交互式学习 · 可视化探索
+        </span>
+      </div>
+      <h1 class="text-3xl font-bold text-slate-900 mb-4 leading-tight">
+        概率论与数理统计<br><span class="text-primary">交互式可视化平台</span>
+      </h1>
+      <p class="text-slate-600 text-base max-w-2xl leading-relaxed mb-6">
+        本平台将概率论与数理统计的核心概念转化为交互式可视化图形，帮助你直观理解抽象理论。
+        通过动态图表、参数调节和实时反馈，让统计学习不再枯燥。
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="#chapters" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary-dark transition-colors no-underline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          开始学习
+        </a>
+        <a href="#usage" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-700 rounded-lg font-medium text-sm border border-slate-300 hover:border-primary hover:text-primary transition-colors no-underline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          使用说明
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 课程介绍 ===== -->
+  <section class="max-w-5xl mx-auto px-10 py-12">
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-slate-900 mb-2">课程介绍</h2>
+      <div class="w-12 h-1 bg-primary rounded-full"></div>
+    </div>
+    <div class="bg-white rounded-xl border border-slate-200 p-8">
+      <p class="text-slate-600 leading-relaxed mb-4">
+        概率论与数理统计是研究随机现象统计规律性的数学学科，是高等院校理工科、经管类专业的核心基础课程。
+        本课程分为<strong class="text-slate-800">概率论</strong>与<strong class="text-slate-800">数理统计</strong>两大模块。
+      </p>
+      <p class="text-slate-600 leading-relaxed">
+        概率论部分（第1-5章）研究随机事件的数量规律，包括古典概型、随机变量、分布函数、数字特征以及极限定理；
+        数理统计部分（第6-8章）以概率论为基础，研究如何用样本数据推断总体特征，包括抽样分布、参数估计和假设检验。
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== 两大模块 ===== -->
+  <section class="max-w-5xl mx-auto px-10 pb-8">
+    <div class="grid grid-cols-2 gap-6">
+      <!-- 概率论模块 -->
+      <div class="module-card">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800">模块一：概率论</h3>
+        </div>
+        <p class="text-sm text-slate-500 leading-relaxed mb-4">
+          研究随机现象的统计规律性，涵盖事件与概率、随机变量分布、多维分布、数字特征及极限定理。
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 text-xs bg-blue-50 text-blue-700 rounded-full border border-blue-200">第1-5章</span>
+          <span class="px-3 py-1 text-xs bg-blue-50 text-blue-700 rounded-full border border-blue-200">古典概型</span>
+          <span class="px-3 py-1 text-xs bg-blue-50 text-blue-700 rounded-full border border-blue-200">随机变量</span>
+          <span class="px-3 py-1 text-xs bg-blue-50 text-blue-700 rounded-full border border-blue-200">大数定律</span>
+        </div>
+      </div>
+
+      <!-- 数理统计模块 -->
+      <div class="module-card">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-800">模块二：数理统计</h3>
+        </div>
+        <p class="text-sm text-slate-500 leading-relaxed mb-4">
+          基于样本数据推断总体特征，涵盖抽样分布、参数估计方法和假设检验理论。
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1 text-xs bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">第6-8章</span>
+          <span class="px-3 py-1 text-xs bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">抽样分布</span>
+          <span class="px-3 py-1 text-xs bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">参数估计</span>
+          <span class="px-3 py-1 text-xs bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">假设检验</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 8个章节卡片 ===== -->
+  <section id="chapters" class="max-w-5xl mx-auto px-10 py-8">
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-slate-900 mb-2">课程章节</h2>
+      <p class="text-sm text-slate-500">点击任意章节卡片即可进入对应的交互式学习页面</p>
+      <div class="w-12 h-1 bg-primary rounded-full mt-2"></div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-5">
+
+      <!-- 第1章 -->
+      <a href="chapter1.html" class="chapter-card">
+        <div class="card-icon bg-blue-100 text-blue-600">🎲</div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-bold text-primary bg-primary-bg px-2 py-0.5 rounded">第1章</span>
+          <span class="text-xs text-slate-400">模块一 · 概率论</span>
+        </div>
+        <h3 class="text-base font-bold text-slate-800 mb-2">随机事件与概率</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-3">
+          随机试验、样本空间、事件的运算与关系、古典概型、几何概型、条件概率、全概率公式与贝叶斯公式。
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">条件概率</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">贝叶斯公式</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">全概率</span>
+        </div>
+      </a>
+
+      <!-- 第2章 -->
+      <a href="chapter2.html" class="chapter-card">
+        <div class="card-icon bg-indigo-100 text-indigo-600">📊</div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-bold text-primary bg-primary-bg px-2 py-0.5 rounded">第2章</span>
+          <span class="text-xs text-slate-400">模块一 · 概率论</span>
+        </div>
+        <h3 class="text-base font-bold text-slate-800 mb-2">随机变量及其分布</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-3">
+          离散型与连续型随机变量、分布函数、常见分布（二项、泊松、均匀、指数、正态）、随机变量函数的分布。
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">正态分布</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">二项分布</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">泊松分布</span>
+        </div>
+      </a>
+
+      <!-- 第3章 -->
+      <a href="chapter3.html" class="chapter-card">
+        <div class="card-icon bg-violet-100 text-violet-600">🔗</div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-bold text-primary bg-primary-bg px-2 py-0.5 rounded">第3章</span>
+          <span class="text-xs text-slate-400">模块一 · 概率论</span>
+        </div>
+        <h3 class="text-base font-bold text-slate-800 mb-2">多维随机变量及其分布</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-3">
+          联合分布、边缘分布、条件分布、随机变量的独立性、二维随机变量函数的分布、协方差与相关系数。
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">联合分布</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">独立性</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">相关系数</span>
+        </div>
+      </a>
+
+      <!-- 第4章 -->
+      <a href="chapter4.html" class="chapter-card">
+        <div class="card-icon bg-cyan-100 text-cyan-600">📐</div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-bold text-primary bg-primary-bg px-2 py-0.5 rounded">第4章</span>
+          <span class="text-xs text-slate-400">模块一 · 概率论</span>
+        </div>
+        <h3 class="text-base font-bold text-slate-800 mb-2">随机变量的数字特征</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-3">
+          数学期望、方差、标准差、协方差、相关系数、矩、切比雪夫不等式、条件期望。
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">期望</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">方差</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">切比雪夫</span>
+        </div>
+      </a>
+
+      <!-- 第5章 -->
+      <a href="chapter5.html" class="chapter-card">
+        <div class="card-icon bg-teal-100 text-teal-600">♾️</div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-bold text-primary bg-primary-bg px-2 py-0.5 rounded">第5章</span>
+          <span class="text-xs text-slate-400">模块一 · 概率论</span>
+        </div>
+        <h3 class="text-base font-bold text-slate-800 mb-2">大数定律与中心极限定理</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-3">
+          切比雪夫大数定律、伯努利大数定律、辛钦大数定律、独立同分布中心极限定理、棣莫弗-拉普拉斯定理。
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">大数定律</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">中心极限定理</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">收敛</span>
+        </div>
+      </a>
+
+      <!-- 第6章 -->
+      <a href="chapter6.html" class="chapter-card">
+        <div class="card-icon bg-emerald-100 text-emerald-600">📋</div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">第6章</span>
+          <span class="text-xs text-slate-400">模块二 · 数理统计</span>
+        </div>
+        <h3 class="text-base font-bold text-slate-800 mb-2">样本与抽样分布</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-3">
+          总体与样本、统计量、抽样分布、χ²分布、t分布、F分布、正态总体的样本均值与样本方差的分布。
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">χ²分布</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">t分布</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">F分布</span>
+        </div>
+      </a>
+
+      <!-- 第7章 -->
+      <a href="chapter7.html" class="chapter-card">
+        <div class="card-icon bg-green-100 text-green-600">🎯</div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">第7章</span>
+          <span class="text-xs text-slate-400">模块二 · 数理统计</span>
+        </div>
+        <h3 class="text-base font-bold text-slate-800 mb-2">参数估计</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-3">
+          点估计（矩估计法、极大似然估计法）、估计量的评价标准（无偏性、有效性、一致性）、区间估计。
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">极大似然</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">矩估计</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">置信区间</span>
+        </div>
+      </a>
+
+      <!-- 第8章 -->
+      <a href="chapter8.html" class="chapter-card">
+        <div class="card-icon bg-lime-100 text-lime-600">✅</div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">第8章</span>
+          <span class="text-xs text-slate-400">模块二 · 数理统计</span>
+        </div>
+        <h3 class="text-base font-bold text-slate-800 mb-2">假设检验</h3>
+        <p class="text-sm text-slate-500 leading-relaxed mb-3">
+          假设检验的基本思想、两类错误、显著性检验、单个正态总体均值与方差的检验、两个正态总体的检验。
+        </p>
+        <div class="flex flex-wrap gap-1.5">
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">显著性检验</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">两类错误</span>
+          <span class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded">p值</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ===== 核心公式展示 ===== -->
+  <section class="max-w-5xl mx-auto px-10 py-8">
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-slate-900 mb-2">核心公式速览</h2>
+      <div class="w-12 h-1 bg-primary rounded-full"></div>
+    </div>
+    <div class="grid grid-cols-2 gap-5">
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-xs text-slate-400 mb-3 uppercase tracking-wider font-semibold">贝叶斯公式</div>
+        <div class="katex-formula text-center" data-expr="P(B_i|A)=\frac{P(B_i)P(A|B_i)}{\sum_{j=1}^{n}P(B_j)P(A|B_j)}"></div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-xs text-slate-400 mb-3 uppercase tracking-wider font-semibold">正态分布密度函数</div>
+        <div class="katex-formula text-center" data-expr="f(x)=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-\mu)^2}{2\sigma^2}}"></div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-xs text-slate-400 mb-3 uppercase tracking-wider font-semibold">中心极限定理</div>
+        <div class="katex-formula text-center" data-expr="\frac{\sum_{i=1}^{n}X_i-n\mu}{\sqrt{n}\sigma}\xrightarrow{d}N(0,1)"></div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="text-xs text-slate-400 mb-3 uppercase tracking-wider font-semibold">极大似然估计</div>
+        <div class="katex-formula text-center" data-expr="\hat{\theta}=\arg\max_{\theta}\prod_{i=1}^{n}f(x_i;\theta)"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 示例图表区域 ===== -->
+  <section class="max-w-5xl mx-auto px-10 py-8">
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-slate-900 mb-2">交互式可视化预览</h2>
+      <p class="text-sm text-slate-500">拖动滑块，直观感受参数变化对分布的影响</p>
+      <div class="w-12 h-1 bg-primary rounded-full mt-2"></div>
+    </div>
+
+    <!-- 正态分布交互图 -->
+    <div class="chart-container mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-semibold text-slate-800">正态分布 <span class="katex-inline" data-expr="N(\mu,\sigma^2)"></span> — 参数调节演示</h3>
+        <span class="text-xs text-slate-400">拖动滑块改变参数</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-6 mb-4">
+        <div class="flex items-center gap-2">
+          <label class="text-sm font-medium text-slate-600 w-8">μ =</label>
+          <input type="range" id="muSlider" min="-3" max="3" step="0.1" value="0"
+            class="w-32 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary">
+          <span id="muValue" class="text-sm font-mono text-slate-700 w-10">0.0</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-sm font-medium text-slate-600 w-8">σ =</label>
+          <input type="range" id="sigmaSlider" min="0.3" max="3" step="0.1" value="1"
+            class="w-32 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary">
+          <span id="sigmaValue" class="text-sm font-mono text-slate-700 w-10">1.0</span>
+        </div>
+        <button id="resetBtn" class="px-3 py-1 text-xs bg-slate-100 text-slate-600 rounded-md border border-slate-300 hover:bg-slate-200 transition-colors">
+          重置
+        </button>
+      </div>
+
+      <div id="normalChart" style="width:100%;height:320px;"></div>
+    </div>
+
+    <!-- 二项分布交互图 -->
+    <div class="chart-container">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-semibold text-slate-800">二项分布 <span class="katex-inline" data-expr="B(n,p)"></span> — 与正态近似对比</h3>
+        <span class="text-xs text-slate-400">拖动滑块改变参数</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-6 mb-4">
+        <div class="flex items-center gap-2">
+          <label class="text-sm font-medium text-slate-600 w-8">n =</label>
+          <input type="range" id="nSlider" min="5" max="50" step="1" value="20"
+            class="w-32 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary">
+          <span id="nValue" class="text-sm font-mono text-slate-700 w-10">20</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <label class="text-sm font-medium text-slate-600 w-8">p =</label>
+          <input type="range" id="pSlider" min="0.05" max="0.95" step="0.05" value="0.5"
+            class="w-32 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary">
+          <span id="pValue" class="text-sm font-mono text-slate-700 w-10">0.50</span>
+        </div>
+        <button id="resetBinomBtn" class="px-3 py-1 text-xs bg-slate-100 text-slate-600 rounded-md border border-slate-300 hover:bg-slate-200 transition-colors">
+          重置
+        </button>
+      </div>
+
+      <div id="binomChart" style="width:100%;height:320px;"></div>
+    </div>
+  </section>
+
+  <!-- ===== 应试重点提示 ===== -->
+  <section class="max-w-5xl mx-auto px-10 py-8">
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-slate-900 mb-2">应试重点提示</h2>
+      <div class="w-12 h-1 bg-primary rounded-full"></div>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="exam-tip">
+        <div class="flex items-start gap-2">
+          <span class="text-lg flex-shrink-0">💡</span>
+          <div>
+            <h4 class="text-sm font-bold text-yellow-800 mb-1">全概率与贝叶斯公式</h4>
+            <p class="text-xs text-yellow-700 leading-relaxed">每年必考题型，注意区分"执果索因"（贝叶斯）与"执因求果"（全概率）。计算时务必先写出完备事件组。</p>
+          </div>
+        </div>
+      </div>
+      <div class="exam-tip">
+        <div class="flex items-start gap-2">
+          <span class="text-lg flex-shrink-0">💡</span>
+          <div>
+            <h4 class="text-sm font-bold text-yellow-800 mb-1">正态分布标准化</h4>
+            <p class="text-xs text-yellow-700 leading-relaxed">将一般正态分布转为标准正态分布是解题关键：<span class="katex-inline" data-expr="Z=\frac{X-\mu}{\sigma}\sim N(0,1)"></span>，务必记住常用分位点。</p>
+          </div>
+        </div>
+      </div>
+      <div class="exam-tip">
+        <div class="flex items-start gap-2">
+          <span class="text-lg flex-shrink-0">💡</span>
+          <div>
+            <h4 class="text-sm font-bold text-yellow-800 mb-1">极大似然估计步骤</h4>
+            <p class="text-xs text-yellow-700 leading-relaxed">写似然函数 → 取对数 → 求导 → 解方程。注意离散型与连续型的区别，以及多参数情形。</p>
+          </div>
+        </div>
+      </div>
+      <div class="exam-tip">
+        <div class="flex items-start gap-2">
+          <span class="text-lg flex-shrink-0">💡</span>
+          <div>
+            <h4 class="text-sm font-bold text-yellow-800 mb-1">假设检验拒绝域</h4>
+            <p class="text-xs text-yellow-700 leading-relaxed">根据备择假设确定单侧/双侧检验，正确写出拒绝域。注意两类错误的含义及概率关系。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 使用说明 ===== -->
+  <section id="usage" class="max-w-5xl mx-auto px-10 py-8">
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-slate-900 mb-2">网站使用说明</h2>
+      <div class="w-12 h-1 bg-primary rounded-full"></div>
+    </div>
+    <div class="bg-white rounded-xl border border-slate-200 p-8">
+      <div class="grid grid-cols-3 gap-6">
+        <div class="text-center">
+          <div class="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mx-auto mb-3">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </div>
+          <h4 class="text-sm font-semibold text-slate-800 mb-1">1. 选择章节</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">通过左侧导航栏或首页章节卡片，点击进入对应章节的学习页面。</p>
+        </div>
+        <div class="text-center">
+          <div class="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mx-auto mb-3">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <h4 class="text-sm font-semibold text-slate-800 mb-1">2. 交互探索</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">拖动页面上的滑块调节参数，实时观察分布图形和统计量的变化。</p>
+        </div>
+        <div class="text-center">
+          <div class="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center mx-auto mb-3">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+          <h4 class="text-sm font-semibold text-slate-800 mb-1">3. 理解理论</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">结合公式推导与可视化图表，加深对概率统计核心概念的理解。</p>
+        </div>
+      </div>
+
+      <div class="mt-8 p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <h4 class="text-sm font-semibold text-slate-800 mb-2">技术说明</h4>
+        <ul class="text-xs text-slate-500 space-y-1.5 leading-relaxed">
+          <li>• 本网站为纯静态HTML页面，所有资源通过CDN加载，无需安装任何依赖。</li>
+          <li>• 数学公式使用 <strong>KaTeX</strong> 渲染，加载速度快，显示清晰。</li>
+          <li>• 2D图表使用 <strong>ECharts</strong> 绘制，3D曲面和等高线使用 <strong>Plotly.js</strong> 绘制。</li>
+          <li>• 页面样式基于 <strong>TailwindCSS</strong> 构建，PC端优先设计。</li>
+          <li>• 所有交互图表均支持参数调节，数值变化实时反映在图形上。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 页脚 ===== -->
+  <footer class="max-w-5xl mx-auto px-10 py-8 border-t border-slate-200 mt-8">
+    <div class="flex items-center justify-between">
+      <div class="text-xs text-slate-400">
+        概率论与数理统计交互式可视化平台 &copy; 2026 — 仅供教学使用
+      </div>
+      <div class="flex items-center gap-4 text-xs text-slate-400">
+        <span>KaTeX</span>
+        <span>·</span>
+        <span>ECharts</span>
+        <span>·</span>
+        <span>Plotly.js</span>
+        <span>·</span>
+        <span>TailwindCSS</span>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<!-- ==================== 脚本 ==================== -->
+<script>
+// ===== KaTeX 自动渲染 =====
+document.addEventListener('DOMContentLoaded', function() {
+  // 渲染块级公式
+  document.querySelectorAll('.katex-formula').forEach(function(el) {
+    try {
+      katex.render(el.getAttribute('data-expr'), el, {
+        displayMode: true,
+        throwOnError: false
+      });
+    } catch(e) {
+      el.textContent = el.getAttribute('data-expr');
+    }
+  });
+
+  // 渲染行内公式
+  document.querySelectorAll('.katex-inline').forEach(function(el) {
+    try {
+      katex.render(el.getAttribute('data-expr'), el, {
+        displayMode: false,
+        throwOnError: false
+      });
+    } catch(e) {
+      el.textContent = el.getAttribute('data-expr');
+    }
+  });
+});
+
+// ===== 正态分布图表 =====
+(function() {
+  var chartDom = document.getElementById('normalChart');
+  if (!chartDom) return;
+  var myChart = echarts.init(chartDom);
+
+  function normalPDF(x, mu, sigma) {
+    var coeff = 1 / (sigma * Math.sqrt(2 * Math.PI));
+    var exp = -0.5 * Math.pow((x - mu) / sigma, 2);
+    return coeff * Math.exp(exp);
+  }
+
+  function generateData(mu, sigma) {
+    var xMin = mu - 4 * sigma;
+    var xMax = mu + 4 * sigma;
+    var data = [];
+    var step = (xMax - xMin) / 200;
+    for (var x = xMin; x <= xMax; x += step) {
+      data.push([x, normalPDF(x, mu, sigma)]);
+    }
+    return data;
+  }
+
+  var mu = 0, sigma = 1;
+  var option = {
+    tooltip: {
+      trigger: 'axis',
+      formatter: function(params) {
+        var p = params[0].data;
+        return 'x = ' + p[0].toFixed(3) + '<br/>f(x) = ' + p[1].toFixed(4);
+      }
+    },
+    grid: { left: 50, right: 20, top: 20, bottom: 40 },
+    xAxis: {
+      type: 'value',
+      axisLabel: { fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f1f5f9' } }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: { fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f1f5f9' } }
+    },
+    series: [{
+      name: '正态分布',
+      type: 'line',
+      data: generateData(mu, sigma),
+      smooth: true,
+      symbol: 'none',
+      lineStyle: { color: '#2563eb', width: 2.5 },
+      areaStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: 'rgba(37, 99, 235, 0.3)' },
+          { offset: 1, color: 'rgba(37, 99, 235, 0.02)' }
+        ])
+      },
+      markLine: {
+        silent: true,
+        symbol: 'none',
+        lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 },
+        label: { fontSize: 11, formatter: 'μ = {c}' },
+        data: [{ xAxis: mu }]
+      }
+    }]
+  };
+  myChart.setOption(option);
+
+  function updateChart() {
+    myChart.setOption({
+      series: [{
+        data: generateData(mu, sigma),
+        markLine: { data: [{ xAxis: mu }] }
+      }]
+    });
+  }
+
+  document.getElementById('muSlider').addEventListener('input', function() {
+    mu = parseFloat(this.value);
+    document.getElementById('muValue').textContent = mu.toFixed(1);
+    updateChart();
+  });
+  document.getElementById('sigmaSlider').addEventListener('input', function() {
+    sigma = parseFloat(this.value);
+    document.getElementById('sigmaValue').textContent = sigma.toFixed(1);
+    updateChart();
+  });
+  document.getElementById('resetBtn').addEventListener('click', function() {
+    mu = 0; sigma = 1;
+    document.getElementById('muSlider').value = 0;
+    document.getElementById('sigmaSlider').value = 1;
+    document.getElementById('muValue').textContent = '0.0';
+    document.getElementById('sigmaValue').textContent = '1.0';
+    updateChart();
+  });
+
+  window.addEventListener('resize', function() { myChart.resize(); });
+})();
+
+// ===== 二项分布图表 =====
+(function() {
+  var chartDom = document.getElementById('binomChart');
+  if (!chartDom) return;
+  var myChart = echarts.init(chartDom);
+
+  function binomialPMF(k, n, p) {
+    if (k < 0 || k > n) return 0;
+    var logComb = 0;
+    for (var i = 1; i <= k; i++) logComb += Math.log(n - k + i) - Math.log(i);
+    return Math.exp(logComb + k * Math.log(p) + (n - k) * Math.log(1 - p));
+  }
+
+  function normalApprox(x, n, p) {
+    var mu = n * p;
+    var sigma = Math.sqrt(n * p * (1 - p));
+    if (sigma < 1e-10) return 0;
+    return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2));
+  }
+
+  function generateData(n, p) {
+    var barData = [];
+    var lineData = [];
+    var xMin = Math.max(0, Math.floor(n * p - 4 * Math.sqrt(n * p * (1 - p))));
+    var xMax = Math.min(n, Math.ceil(n * p + 4 * Math.sqrt(n * p * (1 - p))));
+    for (var k = xMin; k <= xMax; k++) {
+      barData.push({ value: binomialPMF(k, n, p), itemStyle: { color: '#2563eb', borderRadius: [4, 4, 0, 0] } });
+    }
+    var step = (xMax - xMin) / 100;
+    for (var x = xMin; x <= xMax; x += step) {
+      lineData.push([x, normalApprox(x, n, p)]);
+    }
+    return { barData: barData, lineData: lineData, xMin: xMin, xMax: xMax };
+  }
+
+  var n = 20, p = 0.5;
+  var d = generateData(n, p);
+
+  var option = {
+    tooltip: { trigger: 'axis' },
+    legend: {
+      data: ['二项分布概率', '正态近似'],
+      bottom: 0,
+      textStyle: { fontSize: 11 }
+    },
+    grid: { left: 50, right: 20, top: 20, bottom: 40 },
+    xAxis: {
+      type: 'category',
+      data: (function() {
+        var arr = [];
+        for (var i = d.xMin; i <= d.xMax; i++) arr.push(i);
+        return arr;
+      })(),
+      axisLabel: { fontSize: 11 },
+      splitLine: { show: false }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: { fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f1f5f9' } }
+    },
+    series: [
+      {
+        name: '二项分布概率',
+        type: 'bar',
+        data: d.barData,
+        barWidth: '60%',
+        itemStyle: { borderRadius: [4, 4, 0, 0] }
+      },
+      {
+        name: '正态近似',
+        type: 'line',
+        data: d.lineData,
+        smooth: true,
+        symbol: 'none',
+        lineStyle: { color: '#ef4444', width: 2, type: 'dashed' }
+      }
+    ]
+  };
+  myChart.setOption(option);
+
+  function updateChart() {
+    d = generateData(n, p);
+    var cats = [];
+    for (var i = d.xMin; i <= d.xMax; i++) cats.push(i);
+    myChart.setOption({
+      xAxis: { data: cats },
+      series: [
+        { name: '二项分布概率', data: d.barData },
+        { name: '正态近似', data: d.lineData }
+      ]
+    });
+  }
+
+  document.getElementById('nSlider').addEventListener('input', function() {
+    n = parseInt(this.value);
+    document.getElementById('nValue').textContent = n;
+    updateChart();
+  });
+  document.getElementById('pSlider').addEventListener('input', function() {
+    p = parseFloat(this.value);
+    document.getElementById('pValue').textContent = p.toFixed(2);
+    updateChart();
+  });
+  document.getElementById('resetBinomBtn').addEventListener('click', function() {
+    n = 20; p = 0.5;
+    document.getElementById('nSlider').value = 20;
+    document.getElementById('pSlider').value = 0.5;
+    document.getElementById('nValue').textContent = '20';
+    document.getElementById('pValue').textContent = '0.50';
+    updateChart();
+  });
+
+  window.addEventListener('resize', function() { myChart.resize(); });
+})();
+
+</script>
+
+</body>
+</html>
