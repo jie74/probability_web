@@ -109,6 +109,47 @@ tailwind.config = {
     border: 1px solid #e2e8f0;
     padding: 20px;
   }
+
+  /* 移动端适配 */
+  @media (max-width: 767px) {
+    .main-content { margin-left: 0 !important; }
+    section { padding-left: 16px !important; padding-right: 16px !important; }
+    .chart-container { padding: 12px; }
+    h1 { font-size: 1.5rem !important; }
+    h2 { font-size: 1.1rem !important; }
+    h3 { font-size: 0.95rem !important; }
+    p { font-size: 0.85rem !important; }
+
+    /* Hero 区域 */
+    .px-10.py-16 { padding: 28px 16px !important; }
+    .px-10.py-12 { padding: 24px 16px !important; }
+    .px-10.py-8 { padding: 20px 16px !important; }
+    .px-10.pb-8 { padding: 0 16px 20px !important; }
+    .p-8 { padding: 16px !important; }
+
+    /* 网格布局降为单列 */
+    .grid-cols-2 { grid-template-columns: 1fr !important; }
+    .grid-cols-3 { grid-template-columns: 1fr !important; }
+    .gap-6 { gap: 12px !important; }
+    .gap-5 { gap: 10px !important; }
+    .gap-4 { gap: 8px !important; }
+
+    /* 图表高度 */
+    #normalChart, #binomChart { height: 240px !important; }
+
+    /* 模块卡片 */
+    .module-card { padding: 16px; }
+
+    /* 章节卡片 */
+    .chapter-card { padding: 16px; }
+
+    /* 页脚 */
+    footer .flex.items-center.justify-between {
+      flex-direction: column;
+      gap: 8px;
+      text-align: center;
+    }
+  }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800">

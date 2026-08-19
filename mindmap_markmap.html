@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>概率论思维导图</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-view@0.15.4/dist/browser/index.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      align-items: center;
+      background: #f5f7fa;
+      display: flex;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      justify-content: center;
+    }
+
+    .container {
+      background: #fff;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+      height: 95vh;
+      padding: 20px;
+      position: relative;
+      width: 95%;
+    }
+
+    .container h2 {
+      color: #2d3748;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    #mindmap {
+      background: #fff;
+      height: calc(100% - 50px);
+      position: relative;
+      width: 100%;
+      z-index: 0;
+    }
+
+    .mindmap-controls {
+      display: flex;
+      gap: 6px;
+      position: absolute;
+      right: 20px;
+      top: 16px;
+      z-index: 1;
+    }
+
+    .mindmap-controls button {
+      background: #fff;
+      border: 1px solid #cbd5e0;
+      border-radius: 4px;
+      color: #2d3748;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      line-height: 1;
+      padding: 8px 10px;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .mindmap-controls button:hover,
+    .mindmap-controls button:focus-visible {
+      background: #ebf8ff;
+      border-color: #3182ce;
+      outline: none;
+    }
+
+    .markmap-node text {
+      fill: #2d3748;
+      font-size: 14px;
+    }
+
+    .markmap-node[data-depth="0"] text {
+      fill: #1a202c;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .markmap-node[data-depth="1"] text {
+      fill: #2b6cb0;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .error {
+      background: #fff5f5;
+      border-radius: 8px;
+      color: #c53030;
+      margin-top: 20px;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h2>概率论思维导图</h2>
+    <div class="mindmap-controls" aria-label="Mind map expansion controls">
+      <button type="button" data-expand-level="0">全部收起</button>
+      <button type="button" data-expand-level="1">展开到 1 级</button>
+      <button type="button" data-expand-level="2">展开到 2 级</button>
+      <button type="button" data-expand-level="3">展开到 3 级</button>
+    </div>
+    <svg id="mindmap"></svg>
+  </main>
+
+  <script src="js/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="js/markmap-lib.js"></script>
+  <script src="js/markmap-view.js"></script>
+  <script src="js/katex-setup.js"></script>
+  <script>
+    (async function renderMindmap() {
+      const markdownPath = './概率论思维导图.md';
+
+      try {
+        const response = await fetch(markdownPath);
+        if (!response.ok) {
+          throw new Error(`无法读取 ${markdownPath}（HTTP ${response.status}）`);
+        }
+
+        const { Transformer, Markmap } = window.markmap || {};
+        if (!Transformer || !Markmap) {
+          throw new Error('Markmap 脚本未正确加载');
+        }
+
+        const markdown = await response.text();
+        const transformer = new Transformer();
+        const getRoot = () => transformer.transform(markdown).root;
+        const mindmap = Markmap.create(
+          '#mindmap',
+          { initialExpandLevel: 1 },
+          getRoot()
+        );
+
+        document.querySelectorAll('[data-expand-level]').forEach((button) => {
+          button.addEventListener('click', () => {
+            const level = Number(button.dataset.expandLevel);
+            mindmap.setData(getRoot(), { initialExpandLevel: level });
+            mindmap.fit();
+          });
+        });
+        console.log('思维导图渲染成功');
+      } catch (error) {
+        console.error('思维导图渲染失败:', error);
+        document.querySelector('.container').insertAdjacentHTML(
+          'beforeend',
+          `<div class="error"><strong>思维导图加载失败</strong><br>${error.message}</div>`
+        );
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -125,3 +125,72 @@
 body.sidebar-collapsed .sidebar { transform: translateX(-100%); }
 body.sidebar-collapsed .main-content { margin-left: 0; }
 body.sidebar-collapsed .sidebar-reopen { display: flex; }
+
+/* ==================== 移动端适配 ==================== */
+@media (max-width: 767px) {
+  /* 移动端侧边栏默认隐藏（覆盖层模式） */
+  .sidebar {
+    transform: translateX(-100%);
+    width: 280px;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    z-index: 50;
+  }
+
+  /* 移动端主内容区始终占满宽度 */
+  .main-content {
+    margin-left: 0 !important;
+  }
+
+  /* 移动端始终显示汉堡菜单按钮 */
+  .sidebar-reopen {
+    display: flex !important;
+  }
+
+  /* 移动端侧边栏打开时，显示遮罩层 */
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  /* 侧边栏遮罩层 */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 45;
+    transition: opacity 0.3s ease;
+  }
+  body.sidebar-open .sidebar-overlay {
+    display: block;
+  }
+
+  /* 移动端折叠状态（桌面端）不适用，用 sidebar-open 替代 */
+  body.sidebar-collapsed .sidebar { transform: translateX(-100%); }
+  body.sidebar-collapsed .sidebar-reopen { display: flex !important; }
+  body.sidebar-open .sidebar-reopen { display: none !important; }
+}
+
+/* 平板端（768px-1023px）：侧边栏默认折叠 */
+@media (min-width: 768px) and (max-width: 1023px) {
+  body:not(.sidebar-open) .sidebar {
+    transform: translateX(-100%);
+  }
+  body:not(.sidebar-open) .main-content {
+    margin-left: 0;
+  }
+  body:not(.sidebar-open) .sidebar-reopen {
+    display: flex;
+  }
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+  body.sidebar-open .main-content {
+    margin-left: 256px;
+  }
+  body.sidebar-open .sidebar-reopen {
+    display: none;
+  }
+  .sidebar-open .sidebar-overlay {
+    display: none;
+  }
+}

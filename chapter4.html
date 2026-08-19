@@ -62,6 +62,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
 .quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
 .slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
 .slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+
+/* 移动端适配 */
+@media (max-width: 767px) {
+  .main-content { margin-left: 0 !important; }
+  section { padding-left: 16px !important; padding-right: 16px !important; }
+  .card { padding: 16px; }
+  h1 { font-size: 1.35rem !important; }
+  h2 { font-size: 1.05rem !important; }
+  .slider-input { width: 100% !important; max-width: 200px; }
+  .flex-wrap.items-center.gap-4 { gap: 8px !important; }
+  button { font-size: 0.8rem !important; padding: 6px 12px !important; }
+}
 </style>
 </head>
 <body>
@@ -330,34 +342,72 @@ function toggleFormula(toggle) {
 // ===== 卡片1：期望 =====
 var expChart = echarts.init(document.getElementById('expChart'));
 
+// 切换分布时更新滑块标签和范围
+document.getElementById('expDistSelect').addEventListener('change', function() {
+  var dist = this.value;
+  var slider = document.getElementById('expParamSlider');
+  var group = document.getElementById('expParamGroup');
+  var label = group.querySelector('span');
+
+  if (dist === 'binomial') {
+    label.textContent = 'p =';
+    slider.min = 0.1; slider.max = 0.9; slider.value = 0.5; slider.step = 0.05;
+    group.style.display = '';
+  } else if (dist === 'poisson') {
+    label.textContent = 'λ =';
+    slider.min = 0.5; slider.max = 10; slider.value = 4; slider.step = 0.5;
+    group.style.display = '';
+  } else {
+    // 非对称分布：偏度参数
+    label.textContent = '偏度 =';
+    slider.min = 0; slider.max = 1; slider.value = 0.5; slider.step = 0.05;
+    group.style.display = '';
+  }
+  updateExpectation();
+});
+
 function updateExpectation() {
   var dist = document.getElementById('expDistSelect').value;
-  var p = parseFloat(document.getElementById('expParamSlider').value);
-  document.getElementById('expParamVal').textContent = p.toFixed(2);
+  var paramVal = parseFloat(document.getElementById('expParamSlider').value);
+  document.getElementById('expParamVal').textContent = paramVal.toFixed(2);
 
   var data = [], ex = 0;
   if (dist === 'binomial') {
-    var n = 10;
+    var n = 10, p = paramVal;
     for (var k = 0; k <= n; k++) {
       var prob = binomialPMF(k, n, p);
       data.push({value: k, prob: prob});
       ex += k * prob;
     }
   } else if (dist === 'poisson') {
-    var lam = 4;
+    var lam = paramVal;
     var maxK = Math.ceil(lam + 4*Math.sqrt(lam));
+    if (maxK < 10) maxK = 10;
     for (var k = 0; k <= maxK; k++) {
       var prob = Math.exp(-lam + k*Math.log(lam) - logFactorial(k));
       data.push({value: k, prob: prob});
       ex += k * prob;
     }
   } else {
-    // 非对称分布
+    // 非对称分布：偏度参数控制左右偏
+    var w = paramVal; // 0=左偏, 1=右偏
     var vals = [0, 1, 2, 3, 5, 8];
-    var probs = [0.05, 0.15, 0.25, 0.20, 0.25, 0.10];
+    // 左偏分布（概率集中在右侧高值）
+    var leftProbs = [0.02, 0.08, 0.15, 0.15, 0.25, 0.35];
+    // 右偏分布（概率集中在左侧低值）
+    var rightProbs = [0.35, 0.25, 0.15, 0.15, 0.08, 0.02];
+    var probs = [];
     for (var i = 0; i < vals.length; i++) {
-      data.push({value: vals[i], prob: probs[i]});
-      ex += vals[i] * probs[i];
+      var prob = leftProbs[i] * (1 - w) + rightProbs[i] * w;
+      probs.push(prob);
+    }
+    // 归一化
+    var sum = 0;
+    for (var i = 0; i < probs.length; i++) sum += probs[i];
+    for (var i = 0; i < vals.length; i++) {
+      var prob = probs[i] / sum;
+      data.push({value: vals[i], prob: prob});
+      ex += vals[i] * prob;
     }
   }
 
@@ -365,6 +415,14 @@ function updateExpectation() {
 
   var xData = data.map(function(d) { return d.value; });
   var yData = data.map(function(d) { return d.prob; });
+
+  // 找到期望值最接近的 x 轴索引，用于 markLine 定位
+  var closestIdx = 0;
+  var minDiff = Infinity;
+  for (var i = 0; i < data.length; i++) {
+    var diff = Math.abs(data[i].value - ex);
+    if (diff < minDiff) { minDiff = diff; closestIdx = i; }
+  }
 
   expChart.setOption({
     tooltip: { trigger: 'axis', formatter: function(p) { return 'X='+p[0].data[0]+'<br/>P='+p[0].data[1].toFixed(4); } },
@@ -378,7 +436,7 @@ function updateExpectation() {
         silent: true, symbol: 'none',
         lineStyle: { color: '#ef4444', type: 'dashed', width: 2 },
         label: { fontSize: 11, formatter: 'E(X)={c}', position: 'start' },
-        data: [{ xAxis: data.reduce(function(_, d, i, arr) { return Math.abs(d.value - ex) < Math.abs(arr[0].value - ex) ? i : 0; }, 0) }]
+        data: [{ xAxis: closestIdx }]
       }
     }]
   });
@@ -388,8 +446,21 @@ function logFactorial(n) { if (n <= 1) return 0; var s = 0; for (var i = 2; i <=
 function binomialPMF(k, n, p) { if (k < 0 || k > n) return 0; var logC = 0; for (var i = 1; i <= k; i++) logC += Math.log(n - k + i) - Math.log(i); return Math.exp(logC + k*Math.log(p) + (n-k)*Math.log(1-p)); }
 
 function resetExpectation() {
-  document.getElementById('expDistSelect').value = 'binomial';
-  document.getElementById('expParamSlider').value = 0.5;
+  var dist = document.getElementById('expDistSelect').value;
+  var slider = document.getElementById('expParamSlider');
+  var group = document.getElementById('expParamGroup');
+  var label = group.querySelector('span');
+  if (dist === 'binomial') {
+    label.textContent = 'p =';
+    slider.min = 0.1; slider.max = 0.9; slider.value = 0.5; slider.step = 0.05;
+  } else if (dist === 'poisson') {
+    label.textContent = 'λ =';
+    slider.min = 0.5; slider.max = 10; slider.value = 4; slider.step = 0.5;
+  } else { // asymmetric
+    label.textContent = '偏度 =';
+    slider.min = 0; slider.max = 1; slider.value = 0.5; slider.step = 0.05;
+  }
+  group.style.display = '';
   updateExpectation();
 }
 updateExpectation();

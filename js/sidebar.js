@@ -41,9 +41,13 @@
     '    <a href="chapter3.html" class="sidebar-nav-item"><span class="chapter-num">3</span><span>二维随机变量及其分布</span></a>' +
     '    <a href="chapter4.html" class="sidebar-nav-item"><span class="chapter-num">4</span><span>随机变量的数字特征</span></a>' +
     '    <a href="chapter5.html" class="sidebar-nav-item"><span class="chapter-num">5</span><span>大数定律及中心极限定理</span></a>' +
-    '    <a href="chapter6.html" class="sidebar-nav-item"><span class="chapter-num">6</span><span>样本及抽样分布</span></a>' +
-    '    <a href="chapter7.html" class="sidebar-nav-item"><span class="chapter-num">7</span><span>参数估计</span></a>' +
-    '    <a href="chapter8.html" class="sidebar-nav-item"><span class="chapter-num">8</span><span>假设检验</span></a>' +
+    '<a href="chapter6.html" class="sidebar-nav-item"><span class="chapter-num">6</span><span>样本及抽样分布</span></a>' +
+    '<a href="chapter7.html" class="sidebar-nav-item"><span class="chapter-num">7</span><span>参数估计</span></a>' +
+    '<a href="chapter8.html" class="sidebar-nav-item"><span class="chapter-num">8</span><span>假设检验</span></a>' +
+    '    <div class="px-5 mt-4 mb-2">' +
+    '      <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">学习工具</span>' +
+    '    </div>' +
+    '    <a href="mindmap_markmap.html" class="sidebar-nav-item"><span class="chapter-num">🧠</span><span>思维导图</span></a>' +
     '  </nav>' +
     '  <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200">' +
     '    <div class="text-xs text-slate-400 text-center">' +
@@ -69,7 +73,21 @@
 
   // ==================== 侧边栏折叠/展开 ====================
   var COLLAPSED_CLASS = 'sidebar-collapsed';
+  var OPEN_CLASS = 'sidebar-open';
   var STORAGE_KEY = 'prob-sidebar-collapsed';
+  var MOBILE_BP = 768; // 与 CSS 中 767px 保持一致
+
+  function isMobile() {
+    return window.innerWidth < MOBILE_BP;
+  }
+
+  // 创建遮罩层（移动端点击遮罩关闭侧边栏）
+  var overlay = document.createElement('div');
+  overlay.className = 'sidebar-overlay';
+  overlay.addEventListener('click', function () {
+    setSidebarOpen(false);
+  });
+  document.body.appendChild(overlay);
 
   // 创建悬浮展开按钮（侧边栏收起后显示在屏幕左上角）
   var reopenBtn = document.createElement('button');
@@ -83,30 +101,109 @@
     '</svg>';
   document.body.appendChild(reopenBtn);
 
-  // 切换折叠状态
-  function setSidebarCollapsed(collapsed) {
-    if (collapsed) {
-      document.body.classList.add(COLLAPSED_CLASS);
-    } else {
+  // 打开/关闭侧边栏（移动端：覆盖层模式；桌面端：推挤模式）
+  function setSidebarOpen(open) {
+    if (open) {
+      document.body.classList.add(OPEN_CLASS);
       document.body.classList.remove(COLLAPSED_CLASS);
+    } else {
+      document.body.classList.remove(OPEN_CLASS);
+      if (!isMobile()) {
+        document.body.classList.add(COLLAPSED_CLASS);
+      }
     }
-    try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch (e) {}
-    // 折叠/展开会改变主内容区宽度，通知页面图表重绘
+    try { localStorage.setItem(STORAGE_KEY, open ? '0' : '1'); } catch (e) {}
     try { window.dispatchEvent(new Event('resize')); } catch (e) {}
   }
 
-  // 绑定侧边栏顶部的“收起”按钮
+  // 桌面端折叠/展开（推挤模式）
+  function setSidebarCollapsed(collapsed) {
+    if (collapsed) {
+      document.body.classList.add(COLLAPSED_CLASS);
+      document.body.classList.remove(OPEN_CLASS);
+    } else {
+      document.body.classList.remove(COLLAPSED_CLASS);
+      document.body.classList.remove(OPEN_CLASS);
+    }
+    try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch (e) {}
+    try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+  }
+
+  // 绑定侧边栏顶部的"收起"按钮
   var collapseBtn = document.getElementById('sidebarCollapseBtn');
   if (collapseBtn) {
-    collapseBtn.addEventListener('click', function () { setSidebarCollapsed(true); });
+    collapseBtn.addEventListener('click', function () {
+      setSidebarCollapsed(true);
+    });
   }
-  // 绑定悬浮“展开”按钮
-  reopenBtn.addEventListener('click', function () { setSidebarCollapsed(false); });
-
-  // 恢复上次的折叠状态
-  try {
-    if (localStorage.getItem(STORAGE_KEY) === '1') {
-      document.body.classList.add(COLLAPSED_CLASS);
+  // 绑定悬浮"展开"按钮
+  reopenBtn.addEventListener('click', function () {
+    if (isMobile()) {
+      setSidebarOpen(true);
+    } else {
+      setSidebarCollapsed(false);
     }
-  } catch (e) {}
+  });
+
+  // 移动端：点击侧边栏内的导航链接后自动关闭侧边栏
+  var sidebar = document.getElementById('globalSidebar');
+  if (sidebar) {
+    sidebar.addEventListener('click', function (e) {
+      if (isMobile() && e.target.closest('.sidebar-nav-item')) {
+        // 延迟关闭，让链接跳转先触发
+        setTimeout(function () { setSidebarOpen(false); }, 150);
+      }
+    });
+  }
+
+  // 窗口大小变化时，自动适配模式
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      if (!isMobile()) {
+        // 切回桌面端：移除移动端 open 状态
+        document.body.classList.remove(OPEN_CLASS);
+        // 恢复上次的桌面端折叠状态
+        try {
+          if (localStorage.getItem(STORAGE_KEY) === '1') {
+            document.body.classList.add(COLLAPSED_CLASS);
+          } else {
+            document.body.classList.remove(COLLAPSED_CLASS);
+          }
+        } catch (e) {}
+      } else {
+        // 切到移动端：移除桌面端折叠状态
+        document.body.classList.remove(COLLAPSED_CLASS);
+      }
+    }, 200);
+  });
+
+  // 触摸滑动关闭（移动端向右滑动关闭侧边栏）
+  var touchStartX = 0;
+  if (sidebar) {
+    sidebar.addEventListener('touchstart', function (e) {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+    sidebar.addEventListener('touchmove', function (e) {
+      if (!isMobile()) return;
+      var dx = e.touches[0].clientX - touchStartX;
+      if (dx < -40) {
+        setSidebarOpen(false);
+      }
+    }, { passive: true });
+  }
+
+  // 初始状态：移动端默认隐藏侧边栏
+  if (isMobile()) {
+    document.body.classList.remove(COLLAPSED_CLASS);
+    document.body.classList.remove(OPEN_CLASS);
+  } else {
+    // 桌面端恢复上次的折叠状态
+    try {
+      if (localStorage.getItem(STORAGE_KEY) === '1') {
+        document.body.classList.add(COLLAPSED_CLASS);
+      }
+    } catch (e) {}
+  }
 })();

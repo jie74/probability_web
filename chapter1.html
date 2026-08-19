@@ -68,6 +68,18 @@ tailwind.config = {
 
   .slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
   .slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+
+  /* 移动端适配 */
+  @media (max-width: 767px) {
+    .main-content { margin-left: 0 !important; }
+    section { padding-left: 16px !important; padding-right: 16px !important; }
+    .card { padding: 16px; }
+    h1 { font-size: 1.35rem !important; }
+    h2 { font-size: 1.05rem !important; }
+    .slider-input { width: 100% !important; max-width: 200px; }
+    .flex-wrap.items-center.gap-4 { gap: 8px !important; }
+    button { font-size: 0.8rem !important; padding: 6px 12px !important; }
+  }
 </style>
 </head>
 <body>
@@ -127,19 +139,19 @@ tailwind.config = {
 
       <div class="flex flex-wrap gap-4 mb-4">
         <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
-          <input type="checkbox" id="vennUnion" onchange="drawVenn()" class="accent-blue-600 w-4 h-4"> \(A\cup B\)（并集）
+          <input type="checkbox" id="vennUnion" class="accent-blue-600 w-4 h-4"> \(A\cup B\)（并集）
         </label>
         <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
-          <input type="checkbox" id="vennIntersection" onchange="drawVenn()" class="accent-blue-600 w-4 h-4"> \(A\cap B\)（交集）
+          <input type="checkbox" id="vennIntersection" class="accent-blue-600 w-4 h-4"> \(A\cap B\)（交集）
         </label>
         <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
-          <input type="checkbox" id="vennCompA" onchange="drawVenn()" class="accent-blue-600 w-4 h-4"> \(\overline{A}\)（A的补集）
+          <input type="checkbox" id="vennCompA" class="accent-blue-600 w-4 h-4"> \(\overline{A}\)（A的补集）
         </label>
         <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
-          <input type="checkbox" id="vennCompB" onchange="drawVenn()" class="accent-blue-600 w-4 h-4"> \(\overline{B}\)（B的补集）
+          <input type="checkbox" id="vennCompB" class="accent-blue-600 w-4 h-4"> \(\overline{B}\)（B的补集）
         </label>
         <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
-          <input type="checkbox" id="vennDeMorgan" onchange="drawVenn()" class="accent-blue-600 w-4 h-4"> \(\overline{A\cup B}\)（德摩根）
+          <input type="checkbox" id="vennDeMorgan" class="accent-blue-600 w-4 h-4"> \(\overline{A\cup B}\)（德摩根）
         </label>
       </div>
       <div class="flex gap-3 mb-4">
@@ -270,6 +282,78 @@ tailwind.config = {
           <span>■ 真阴性（健康且阴性）</span>
         </div>
       </div>
+      <!-- 后验概率公式与计算过程 -->
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>🧮 后验概率公式与计算过程（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div>
+              <span class="text-xs text-slate-400">贝叶斯公式：</span>
+              <span class="katex-render" data-expr="P(\text{患病}|\text{阳性})=\frac{P(\text{阳性}|\text{患病})P(\text{患病})}{P(\text{阳性}|\text{患病})P(\text{患病})+P(\text{阳性}|\text{健康})(1-P(\text{患病}))}"></span>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400">代入当前数值计算：</span>
+              <span id="bayesCalcLatex" class="katex-render" data-expr=""></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+      // 更新贝叶斯公式的动态计算显示
+      (function() {
+        function renderBayesCalc() {
+          var prior = parseFloat(document.getElementById('priorSlider').value);
+          var tpr = parseFloat(document.getElementById('tprSlider').value);
+          var fpr = parseFloat(document.getElementById('fprSlider').value);
+
+          var pAB = prior * tpr;
+          var pNotA = 1 - prior;
+          var pDenom = pAB + fpr * pNotA;
+          var posterior = pDenom > 0 ? pAB / pDenom : 0;
+
+          // 构建完整的 LaTeX 推导式（包含事件定义、已知条件、贝叶斯公式）
+          var latex = '\\text{设：A：患病；}\\ \\overline{A}\\text{：健康，}\\ B\\text{：检测阳性} \\\\' +
+              'P(A)=' + prior.toFixed(2) + ',\\ P(B|A)=' + tpr.toFixed(2) + ',\\ P(B|\\overline{A})=' + fpr.toFixed(2) + ' \\\\' +
+              '\\boldsymbol{P(A|B)=\\dfrac{P(B|A)P(A)}{P(B|A)P(A)+P(B|\\overline A)P(\\overline A)}} \\\\' +
+              '=\\frac{' + tpr.toFixed(2) + '\\times ' + prior.toFixed(3) +
+              '}{' + tpr.toFixed(2) + '\\times ' + prior.toFixed(3) +
+              '\\,+\\,' + fpr.toFixed(3) + '\\times ' + pNotA.toFixed(3) +
+              '} \\\\' +
+              '=\\frac{' + pAB.toFixed(4) +
+              '}{' + pDenom.toFixed(4) +
+              '} \\approx ' + (posterior * 100).toFixed(2) + '\\%';
+
+          var el = document.getElementById('bayesCalcLatex');
+          if (el) {
+            el.setAttribute('data-expr', latex);
+            try {
+              katex.render(latex, el, { displayMode: false, throwOnError: false });
+            } catch(e) {
+              el.textContent = latex;
+            }
+          }
+        }
+
+        // 初始渲染
+        renderBayesCalc();
+
+        // 监听三个滑块变化，实时更新公式中的数值
+        ['priorSlider', 'tprSlider', 'fprSlider'].forEach(function(id) {
+          var el = document.getElementById(id);
+          if (el) el.addEventListener('input', renderBayesCalc);
+        });
+
+        // 扩展原有的 updateBayes 函数，使其在更新图表时同步更新公式显示
+        var origUpdateBayes = window.updateBayes;
+        window.updateBayes = function() {
+          if (origUpdateBayes) origUpdateBayes();
+          renderBayesCalc();
+        };
+      })();
+      </script>
 
       <!-- 应试提示 -->
       <div class="exam-tip">
@@ -351,6 +435,27 @@ var vennCanvas = document.getElementById('vennCanvas');
 var vennCtx = vennCanvas.getContext('2d');
 var isDisjoint = false;
 
+// 复选框互斥：一次只能选中一个
+var vennCheckboxes = [
+  document.getElementById('vennUnion'),
+  document.getElementById('vennIntersection'),
+  document.getElementById('vennCompA'),
+  document.getElementById('vennCompB'),
+  document.getElementById('vennDeMorgan')
+];
+
+vennCheckboxes.forEach(function(cb) {
+  cb.addEventListener('change', function() {
+    if (this.checked) {
+      // 取消其他所有复选框
+      vennCheckboxes.forEach(function(other) {
+        if (other !== cb) other.checked = false;
+      });
+    }
+    drawVenn();
+  });
+});
+
 function drawVenn() {
   var ctx = vennCtx;
   var W = vennCanvas.width, H = vennCanvas.height;
@@ -368,22 +473,21 @@ function drawVenn() {
   var showCompA = document.getElementById('vennCompA').checked;
   var showCompB = document.getElementById('vennCompB').checked;
   var showDeMorgan = document.getElementById('vennDeMorgan').checked;
-  var anySelected = showUnion || showInter || showCompA || showCompB || showDeMorgan;
 
-  // 绘制背景矩形（补集区域）
-  if (showCompA || showCompB || showDeMorgan) {
-    ctx.fillStyle = 'rgba(37,99,235,0.18)';
-    ctx.fillRect(0, 0, W, H);
-  }
+  var highlightColor = 'rgba(37,99,235,0.25)';
+  var bgColor = '#ffffff';
 
-  // 绘制高亮区域
+  // ===== 绘制高亮区域 =====
+
   if (showUnion) {
-    ctx.fillStyle = 'rgba(37,99,235,0.25)';
+    // A ∪ B：两个圆的并集
+    ctx.fillStyle = highlightColor;
     ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.fill();
     ctx.beginPath(); ctx.arc(cx2, cy, r, 0, Math.PI*2); ctx.fill();
   }
 
   if (showInter && !isDisjoint) {
+    // A ∩ B：两个圆的交集
     ctx.fillStyle = 'rgba(239,68,68,0.35)';
     ctx.save();
     ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.clip();
@@ -392,21 +496,63 @@ function drawVenn() {
     ctx.restore();
   }
 
-  // 绘制圆圈
+  if (showCompA) {
+    // A的补集：整个矩形 - 圆A
+    ctx.fillStyle = highlightColor;
+    ctx.fillRect(0, 0, W, H);
+    // 用背景色覆盖圆A区域
+    ctx.fillStyle = bgColor;
+    ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.fill();
+  }
+
+  if (showCompB) {
+    // B的补集：整个矩形 - 圆B
+    ctx.fillStyle = highlightColor;
+    ctx.fillRect(0, 0, W, H);
+    // 用背景色覆盖圆B区域
+    ctx.fillStyle = bgColor;
+    ctx.beginPath(); ctx.arc(cx2, cy, r, 0, Math.PI*2); ctx.fill();
+  }
+
+  if (showDeMorgan) {
+    // A∪B的补集：整个矩形 - 圆A - 圆B
+    ctx.fillStyle = highlightColor;
+    ctx.fillRect(0, 0, W, H);
+    // 用背景色覆盖两个圆
+    ctx.fillStyle = bgColor;
+    ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx2, cy, r, 0, Math.PI*2); ctx.fill();
+  }
+
+  // ===== 绘制圆圈边框和填充 =====
   ctx.strokeStyle = '#2563eb';
   ctx.lineWidth = 2.5;
   ctx.fillStyle = 'rgba(37,99,235,0.06)';
   ctx.beginPath(); ctx.arc(cx1, cy, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
   ctx.beginPath(); ctx.arc(cx2, cy, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
 
-  // 标签
+  // ===== 标签 =====
   ctx.fillStyle = '#1e40af';
   ctx.font = 'bold 16px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('A', cx1 - r*0.65, cy - r*0.15);
   ctx.fillText('B', cx2 + r*0.65, cy - r*0.15);
 
-  // 如果选中互斥，绘制分隔线
+  // ===== 矩形边框（补集模式下显示样本空间边界） =====
+  if (showCompA || showCompB || showDeMorgan) {
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 3]);
+    ctx.strokeRect(2, 2, W - 4, H - 4);
+    ctx.setLineDash([]);
+    // 样本空间标签
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('S', 8, 16);
+  }
+
+  // ===== 互斥分隔线 =====
   if (isDisjoint) {
     ctx.strokeStyle = '#ef4444';
     ctx.lineWidth = 1.5;
