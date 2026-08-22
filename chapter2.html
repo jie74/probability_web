@@ -63,6 +63,387 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
 .slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
 .slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
 
+/* ===== 泊松分布专用样式 ===== */
+.poisson-control-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.poisson-number-input {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: monospace;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.poisson-number-input:focus { border-color: #2563eb; }
+.poisson-lambda-input:focus { border-color: #ef4444; }
+.poisson-k-input:focus { border-color: #16a34a; }
+
+.poisson-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  outline: none;
+}
+.poisson-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.1s;
+}
+.poisson-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.poisson-slider-lambda::-webkit-slider-thumb { background: #ef4444; }
+.poisson-slider-k::-webkit-slider-thumb { background: #16a34a; }
+
+.poisson-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.poisson-slider-lambda::-moz-range-thumb { background: #ef4444; }
+.poisson-slider-k::-moz-range-thumb { background: #16a34a; }
+
+.poisson-formula-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+.poisson-formula-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+.poisson-formula-line {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.8;
+  font-family: 'Cambria Math', 'Times New Roman', serif;
+}
+.poisson-formula-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 10px 0;
+}
+.poisson-formula-example {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.poisson-reset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 16px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.poisson-reset-btn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.poisson-chart-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  height: 100%;
+}
+.poisson-chart-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px 0;
+  font-size: 13px;
+  color: #64748b;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 4px;
+}
+.poisson-footer-left strong { color: #16a34a; font-weight: 600; }
+.poisson-footer-right strong { color: #16a34a; font-weight: 700; font-size: 14px; }
+
+/* ===== 二项分布专用样式 ===== */
+.binomial-control-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.binomial-number-input {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: monospace;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.binomial-number-input:focus { border-color: #2563eb; }
+.binomial-n-input:focus { border-color: #ef4444; }
+.binomial-p-input:focus { border-color: #f97316; }
+.binomial-k-input:focus { border-color: #16a34a; }
+
+.binomial-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  outline: none;
+}
+.binomial-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.1s;
+}
+.binomial-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.binomial-slider-n::-webkit-slider-thumb { background: #ef4444; }
+.binomial-slider-p::-webkit-slider-thumb { background: #f97316; }
+.binomial-slider-k::-webkit-slider-thumb { background: #16a34a; }
+
+.binomial-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.binomial-slider-n::-moz-range-thumb { background: #ef4444; }
+.binomial-slider-p::-moz-range-thumb { background: #f97316; }
+.binomial-slider-k::-moz-range-thumb { background: #16a34a; }
+
+.binomial-formula-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+.binomial-formula-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+.binomial-formula-line {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.8;
+  font-family: 'Cambria Math', 'Times New Roman', serif;
+}
+.binomial-formula-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 10px 0;
+}
+.binomial-formula-example {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.binomial-reset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 16px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.binomial-reset-btn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.binomial-chart-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  height: 100%;
+}
+.binomial-chart-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px 0;
+  font-size: 13px;
+  color: #64748b;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 4px;
+}
+.binomial-footer-left strong { color: #16a34a; font-weight: 600; }
+.binomial-footer-right strong { color: #16a34a; font-weight: 700; font-size: 14px; }
+
+/* ===== 几何分布专用样式 ===== */
+.geometric-control-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.geometric-number-input {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: monospace;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.geometric-number-input:focus { border-color: #2563eb; }
+.geometric-p-input:focus { border-color: #ef4444; }
+.geometric-k-input:focus { border-color: #16a34a; }
+
+.geometric-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  outline: none;
+}
+.geometric-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: transform 0.1s;
+}
+.geometric-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.geometric-slider-p::-webkit-slider-thumb { background: #ef4444; }
+.geometric-slider-k::-webkit-slider-thumb { background: #16a34a; }
+
+.geometric-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.geometric-slider-p::-moz-range-thumb { background: #ef4444; }
+.geometric-slider-k::-moz-range-thumb { background: #16a34a; }
+
+.geometric-formula-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+.geometric-formula-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+.geometric-formula-line {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.8;
+  font-family: 'Cambria Math', 'Times New Roman', serif;
+}
+.geometric-formula-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 10px 0;
+}
+.geometric-formula-example {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.geometric-reset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 16px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.geometric-reset-btn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.geometric-chart-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  height: 100%;
+}
+.geometric-chart-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px 0;
+  font-size: 13px;
+  color: #64748b;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 4px;
+}
+.geometric-footer-left strong { color: #16a34a; font-weight: 600; }
+.geometric-footer-right strong { color: #16a34a; font-weight: 700; font-size: 14px; }
+
 /* 移动端适配 */
 @media (max-width: 767px) {
   .main-content { margin-left: 0 !important; }
@@ -98,7 +479,261 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
     </p>
   </section>
 
-  <!-- ===== 卡片1：离散分布交互式 ===== -->
+
+  <!-- ===== 统一卡片：离散分布专用交互式（二项/泊松/几何） ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">
+        🎯 离散分布交互式可视化
+        <select id="dedicatedDistSelect" onchange="switchDedicatedDist()"
+                class="ml-3 text-sm border border-slate-300 rounded-lg px-3 py-1.5 align-middle">
+          <option value="binomial">二项分布 B(n,p)</option>
+          <option value="poisson">泊松分布 P(λ)</option>
+          <option value="geometric">几何分布 G(p)</option>
+        </select>
+      </h2>
+      
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">二项分布：</span><span class="katex-render" data-expr="P(X=k)=C_n^k p^k(1-p)^{n-k},\; E(X)=np,\; D(X)=np(1-p)"></span></div>
+            <div><span class="text-xs text-slate-400">泊松分布：</span><span class="katex-render" data-expr="P(X=k)=\frac{\lambda^k}{k!}e^{-\lambda},\; E(X)=\lambda,\; D(X)=\lambda"></span></div>
+            <div><span class="text-xs text-slate-400">几何分布：</span><span class="katex-render" data-expr="P(X=k)=(1-p)^{k-1}p,\; E(X)=\frac{1}{p},\; D(X)=\frac{1-p}{p^2}"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="distKnowledge" class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          二项分布描述<strong>n次独立重复伯努利试验中成功次数</strong>的概率分布。
+          期望 \(E(X)=np\)，方差 \(D(X)=np(1-p)\)。
+          当 n 很大 p 很小时，可用泊松分布近似（λ = np）。
+        </p>
+      </div>
+
+      <!-- ===== 二项分布面板 ===== -->
+      <div id="binomialPanel" class="dist-panel">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-1 space-y-4">
+            <div class="binomial-control-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-slate-700">试验次数 (n)</span>
+                <input type="number" id="binomialNInput" min="1" max="50" step="1" value="10"
+                  class="binomial-number-input binomial-n-input" oninput="syncBinomNFromInput(this.value)">
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="binomialNSlider" min="1" max="50" value="10" step="1"
+                  class="binomial-slider binomial-slider-n w-full" oninput="updateBinomialN()">
+              </div>
+            </div>
+
+            <div class="binomial-control-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-slate-700">成功概率 (p)</span>
+                <input type="number" id="binomialPInput" min="0" max="1" step="0.01" value="0.50"
+                  class="binomial-number-input binomial-p-input" oninput="syncBinomPFromInput(this.value)">
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="binomialPSlider" min="0" max="1" value="0.5" step="0.01"
+                  class="binomial-slider binomial-slider-p w-full" oninput="updateBinomialP()">
+              </div>
+            </div>
+
+            <div class="binomial-control-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-slate-700">目标成功次数 (k)</span>
+                <input type="number" id="binomialKInput" min="0" max="50" step="1" value="5"
+                  class="binomial-number-input binomial-k-input" oninput="syncBinomKFromInput(this.value)">
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="binomialKSlider" min="0" max="50" value="5" step="1"
+                  class="binomial-slider binomial-slider-k w-full" oninput="updateBinomialK()">
+              </div>
+            </div>
+
+            <div class="binomial-formula-card">
+              <div class="binomial-formula-title">二项分布概率公式</div>
+              <div class="binomial-formula-line">X ~ Binomial( n, p )</div>
+              <div class="binomial-formula-line">
+                P(X = k) = <span class="katex-render" data-expr="\binom{n}{k} p^k (1-p)^{n-k}"></span>
+              </div>
+              <div class="binomial-formula-divider"></div>
+              <div class="binomial-formula-example">
+                <div class="text-xs text-slate-500 mb-1">实时计算示例：</div>
+                <div id="binomialExampleFormula" class="text-xs font-mono text-slate-700 leading-relaxed">
+                  P(X=5) = C(10,5) · 0.50<sup>5</sup> · 0.50<sup>5</sup>
+                </div>
+                <div id="binomialExampleResult" class="text-lg font-bold text-purple-600 mt-2">
+                  = 24.61%
+                </div>
+              </div>
+            </div>
+
+            <button onclick="resetBinomial()" class="binomial-reset-btn">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              恢复默认参数
+            </button>
+          </div>
+
+          <div class="lg:col-span-2">
+            <div class="binomial-chart-card">
+              <div id="binomialChart" style="width:100%;height:360px;"></div>
+              <div class="binomial-chart-footer">
+                <span class="binomial-footer-left">计算成功事件发生 <strong id="binomialFooterK">5</strong> 次的概率</span>
+                <span class="binomial-footer-right">P(X=<span id="binomialFooterK2">5</span>) = <strong id="binomialFooterProb">24.61%</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 泊松分布面板 ===== -->
+      <div id="poissonPanel" class="dist-panel" style="display:none;">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-1 space-y-4">
+            <div class="poisson-control-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-slate-700">期望次数 (λ)</span>
+                <input type="number" id="poissonLambdaInput" min="0" max="30" step="0.1" value="5"
+                  class="poisson-number-input poisson-lambda-input" oninput="syncLambdaFromInput(this.value)">
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="poissonLambdaSlider" min="0" max="30" value="5" step="0.1"
+                  class="poisson-slider poisson-slider-lambda w-full" oninput="updatePoissonLambda()">
+              </div>
+            </div>
+
+            <div class="poisson-control-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-slate-700">目标次数 (k)</span>
+                <input type="number" id="poissonKInput" min="0" max="30" step="1" value="5"
+                  class="poisson-number-input poisson-k-input" oninput="syncKFromInput(this.value)">
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="poissonKSlider" min="0" max="30" value="5" step="1"
+                  class="poisson-slider poisson-slider-k w-full" oninput="updatePoissonK()">
+              </div>
+            </div>
+
+            <div class="poisson-formula-card">
+              <div class="poisson-formula-title">泊松分布概率公式</div>
+              <div class="poisson-formula-line">X ~ Poisson( λ )</div>
+              <div class="poisson-formula-line">
+                P(X = k) = <span class="katex-render" data-expr="\frac{\lambda^k \cdot e^{-\lambda}}{k!}"></span>
+              </div>
+              <div class="poisson-formula-divider"></div>
+              <div class="poisson-formula-example">
+                <div class="text-xs text-slate-500 mb-1">实时计算示例：</div>
+                <div id="poissonExampleFormula" class="text-sm font-mono text-slate-700 leading-relaxed">
+                  P(X=5) = (5.0<sup>5</sup> · e<sup>-5.0</sup>) / 5!
+                </div>
+                <div id="poissonExampleResult" class="text-lg font-bold text-purple-600 mt-2">
+                  = 17.55%
+                </div>
+              </div>
+            </div>
+
+            <button onclick="resetPoisson()" class="poisson-reset-btn">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              重置
+            </button>
+          </div>
+
+          <div class="lg:col-span-2">
+            <div class="poisson-chart-card">
+              <div id="poissonChart" style="width:100%;height:360px;"></div>
+              <div class="poisson-chart-footer">
+                <span class="poisson-footer-left">计算事件发生 <strong id="poissonFooterK">5</strong> 次的概率</span>
+                <span class="poisson-footer-right">P(X=<span id="poissonFooterK2">5</span>) = <strong id="poissonFooterProb">17.55%</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== 几何分布面板 ===== -->
+      <div id="geometricPanel" class="dist-panel" style="display:none;">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-1 space-y-4">
+            <div class="geometric-control-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-slate-700">单次成功概率 (p)</span>
+                <input type="number" id="geometricPInput" min="0.01" max="0.99" step="0.01" value="0.20"
+                  class="geometric-number-input geometric-p-input" oninput="syncGeomPFromInput(this.value)">
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="geometricPSlider" min="0.01" max="0.99" value="0.2" step="0.01"
+                  class="geometric-slider geometric-slider-p w-full" oninput="updateGeometricP()">
+              </div>
+            </div>
+
+            <div class="geometric-control-card">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-slate-700">目标试验次数 (k)</span>
+                <input type="number" id="geometricKInput" min="1" max="50" step="1" value="5"
+                  class="geometric-number-input geometric-k-input" oninput="syncGeomKFromInput(this.value)">
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="range" id="geometricKSlider" min="1" max="50" value="5" step="1"
+                  class="geometric-slider geometric-slider-k w-full" oninput="updateGeometricK()">
+              </div>
+            </div>
+
+            <div class="geometric-formula-card">
+              <div class="geometric-formula-title">几何分布概率公式</div>
+              <div class="geometric-formula-line">X ~ Geometric( p )</div>
+              <div class="geometric-formula-line">
+                P(X = k) = <span class="katex-render" data-expr="(1-p)^{k-1} p"></span>
+              </div>
+              <div class="geometric-formula-divider"></div>
+              <div class="geometric-formula-example">
+                <div class="text-xs text-slate-500 mb-1">实时计算示例：</div>
+                <div id="geometricExampleFormula" class="text-xs font-mono text-slate-700 leading-relaxed">
+                  P(X=5) = (1-0.20)<sup>4</sup> · 0.20
+                </div>
+                <div id="geometricExampleResult" class="text-lg font-bold text-purple-600 mt-2">
+                  = 8.19%
+                </div>
+              </div>
+            </div>
+
+            <button onclick="resetGeometric()" class="geometric-reset-btn">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              恢复默认参数
+            </button>
+          </div>
+
+          <div class="lg:col-span-2">
+            <div class="geometric-chart-card">
+              <div id="geometricChart" style="width:100%;height:360px;"></div>
+              <div class="geometric-chart-footer">
+                <span class="geometric-footer-left">计算首次成功出现在第 <strong id="geometricFooterK">5</strong> 次试验的概率</span>
+                <span class="geometric-footer-right">P(X=<span id="geometricFooterK2">5</span>) = <strong id="geometricFooterProb">8.19%</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">二项、泊松期望方差<strong>直接背</strong>，考试不要现场推导。二项分布 n 很大 p 很小时可用泊松近似（λ=np）。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片1：离散分布交互式（已注释，功能已整合到上方专用交互式卡片）===== -->
+  <!--
   <section class="max-w-5xl mx-auto px-10">
     <div class="card">
       <h2 class="text-lg font-bold text-slate-800 mb-3">📊 离散分布交互式（0-1、二项、泊松、几何）</h2>
@@ -162,6 +797,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
       </div>
     </div>
   </section>
+  -->
 
   <!-- ===== 卡片2：连续分布 ===== -->
   <section class="max-w-5xl mx-auto px-10">
@@ -340,6 +976,77 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
     </div>
   </section>
 
+  
+  <!-- ===== 卡片：六大常用分布总结 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📋 六大常用分布总结</h2>
+      
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          以下是概率论中最常用的六种分布（离散+连续）的分布律/概率密度与分布函数汇总。
+        </p>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="bg-slate-100">
+              <th class="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">分布名称</th>
+              <th class="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">记号</th>
+              <th class="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">分布律 / 概率密度</th>
+              <th class="border border-slate-300 px-3 py-2 text-left font-semibold text-slate-700">分布函数 F(x)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border border-slate-300 px-3 py-2 font-medium">0‑1 分布</td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="B(1,p)"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="P(X=k)=p^k(1-p)^{1-k},\; k=0,1"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="F(x)=\begin{cases}0, & x<0 \\ 1-p, & 0\le x<1 \\ 1, & x\ge 1\end{cases}"></span></td>
+            </tr>
+            <tr class="bg-slate-50">
+              <td class="border border-slate-300 px-3 py-2 font-medium">二项分布</td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="X\sim B(n,p)"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="P(X=k)=C_n^k p^k(1-p)^{n-k},\; k=0,1,\dots,n"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="F(x)=\sum_{k=0}^{\lfloor x\rfloor} C_n^k p^k(1-p)^{n-k}"></span></td>
+            </tr>
+            <tr>
+              <td class="border border-slate-300 px-3 py-2 font-medium">泊松分布</td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="X\sim P(\lambda)"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="P(X=k)=\frac{\lambda^k}{k!}e^{-\lambda},\; k=0,1,2,\dots"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="F(x)=\sum_{k=0}^{\lfloor x\rfloor} \frac{\lambda^k}{k!}e^{-\lambda}"></span></td>
+            </tr>
+            <tr class="bg-slate-50">
+              <td class="border border-slate-300 px-3 py-2 font-medium">均匀分布</td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="X\sim U(a,b)"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="f(x)=\begin{cases}\frac{1}{b-a}, & a<x<b \\ 0, & \text{其他}\end{cases}"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="F(x)=\begin{cases}0, & x<a \\ \frac{x-a}{b-a}, & a\le x<b \\ 1, & x\ge b\end{cases}"></span></td>
+            </tr>
+            <tr>
+              <td class="border border-slate-300 px-3 py-2 font-medium">指数分布</td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="X\sim E(\lambda)"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="f(x)=\begin{cases}\lambda e^{-\lambda x}, & x>0 \\ 0, & x\le 0\end{cases}"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="F(x)=\begin{cases}0, & x<0 \\ 1-e^{-\lambda x}, & x\ge 0\end{cases}"></span></td>
+            </tr>
+            <tr class="bg-slate-50">
+              <td class="border border-slate-300 px-3 py-2 font-medium">正态分布</td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="X\sim N(\mu,\sigma^2)"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="f(x)=\frac{1}{\sqrt{2\pi}\sigma}e^{-\frac{(x-\mu)^2}{2\sigma^2}}"></span></td>
+              <td class="border border-slate-300 px-3 py-2"><span class="katex-render" data-expr="F(x)=\Phi\left(\frac{x-\mu}{\sigma}\right)"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">六大分布的<strong>记号、参数含义、分布律/密度</strong>必须熟记。特别注意：离散分布的分布律是 \(P(X=k)\)，连续分布的是密度 \(f(x)\)，不要混淆。</span>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== 底部自测题 ===== -->
   <section class="max-w-5xl mx-auto px-10 pb-10">
     <div class="card">
@@ -400,7 +1107,24 @@ function toggleFormula(toggle) {
   if (body.classList.contains('show')) renderAllKatex();
 }
 
-// ===== 卡片1：离散分布 =====
+// ===== 卡片1：离散分布（已注释，功能已整合到上方专用交互式卡片）=====
+
+// 以下工具函数被卡片4（分布函数性质）使用，保留不注释
+function logFactorial(n) {
+  if (n <= 1) return 0;
+  var s = 0;
+  for (var i = 2; i <= n; i++) s += Math.log(i);
+  return s;
+}
+
+function binomialPMF(k, n, p) {
+  if (k < 0 || k > n) return 0;
+  var logC = 0;
+  for (var i = 1; i <= k; i++) logC += Math.log(n - k + i) - Math.log(i);
+  return Math.exp(logC + k*Math.log(p) + (n-k)*Math.log(1-p));
+}
+
+/*
 var discreteChart = echarts.init(document.getElementById('discreteChart'));
 
 function getDiscreteData() {
@@ -439,20 +1163,6 @@ function getDiscreteData() {
   return {data: data, ex: ex, dx: dx};
 }
 
-function logFactorial(n) {
-  if (n <= 1) return 0;
-  var s = 0;
-  for (var i = 2; i <= n; i++) s += Math.log(i);
-  return s;
-}
-
-function binomialPMF(k, n, p) {
-  if (k < 0 || k > n) return 0;
-  var logC = 0;
-  for (var i = 1; i <= k; i++) logC += Math.log(n - k + i) - Math.log(i);
-  return Math.exp(logC + k*Math.log(p) + (n-k)*Math.log(1-p));
-}
-
 function updateDiscrete() {
   var dist = document.getElementById('distSelect').value;
   var p = parseFloat(document.getElementById('paramPSlider').value);
@@ -465,7 +1175,7 @@ function updateDiscrete() {
     document.getElementById('paramPLabel').textContent = 'λ =';
     var lam = p * 10;
     document.getElementById('paramPVal').textContent = lam.toFixed(2);
-  } else if (dist === 'bernoulli') {
+  } else if (dist === 'bernoulli' || dist === 'geometric') {
     document.getElementById('paramNGroup').style.display = 'none';
     document.getElementById('paramPLabel').textContent = 'p =';
   } else {
@@ -484,14 +1194,14 @@ function updateDiscrete() {
 
   discreteChart.setOption({
     tooltip: { trigger: 'axis', formatter: function(p) { return 'X=' + p[0].data[0] + '<br/>P=' + p[0].data[1].toFixed(4); } },
-    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    grid: { left: 50, right: 20, top: 30, bottom: 35 },
     xAxis: { type: 'category', data: xData, axisLabel: { fontSize: 11 }, splitLine: { show: false } },
     yAxis: { type: 'value', name: 'P(X=k)', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: [{
       type: 'bar', data: yData, barWidth: '60%',
       itemStyle: { color: '#2563eb', borderRadius: [4, 4, 0, 0] }
     }]
-  });
+  }, true);
 }
 
 function resetDiscrete() {
@@ -506,6 +1216,11 @@ document.getElementById('paramNSlider').addEventListener('input', function() {
   document.getElementById('paramNVal').textContent = this.value;
   updateDiscrete();
 });
+
+document.getElementById('paramPSlider').addEventListener('input', function() {
+    updateDiscrete();
+});
+*/
 
 // ===== 卡片2：连续分布 =====
 var contPDFChart = echarts.init(document.getElementById('contPDFChart'));
@@ -808,7 +1523,7 @@ function updateFType() {
 
   ftypeChart.setOption({
     tooltip: { trigger: 'axis', formatter: function(p) { return 'x='+p[0].data[0].toFixed(3)+'<br/>F(x)='+p[0].data[1].toFixed(4); } },
-    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    grid: { left: 50, right: 20, top: 30, bottom: 35 },
     xAxis: { type: 'value', name: 'x', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     yAxis: { type: 'value', name: 'F(x)', min: 0, max: 1.05, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: [{
@@ -829,9 +1544,9 @@ updateFType();
 // ===== 自测题 =====
 var quizAnswers = { q1: 1, q2: 2, q3: 2 };
 var quizFeedback = {
-  q1: { correct: '正确！二项分布 B(n,p) 的方差 D(X)=np(1-p)。', wrong: '错误。二项分布 D(X)=np(1-p)，正确答案是 B。' },
-  q2: { correct: '正确！连续型随机变量单点概率恒为 0，这是与离散型的本质区别。', wrong: '错误。连续型随机变量单点概率 P(X=x₀)=0，正确答案是 C。' },
-  q3: { correct: '正确！标准化变换 \(Z=\frac{X-\mu}{\sigma}\sim N(0,1)\)。', wrong: '错误。标准化后服从标准正态分布 N(0,1)，正确答案是 C。' }
+  q1: { correct: '正确！二项分布 \\(B(n,p)\\) 的方差 \\(D(X)=np(1-p)\\)。', wrong: '错误。二项分布 \\(D(X)=np(1-p)\\)，正确答案是 B。' },
+  q2: { correct: '正确！连续型随机变量单点概率恒为 0，这是与离散型的本质区别。', wrong: '错误。连续型随机变量单点概率 \\(P(X=x_0)=0\\)，正确答案是 C。' },
+  q3: { correct: '正确！标准化变换 \\(Z=\\frac{X-\\mu}{\\sigma} \\sim N(0,1)\\)。', wrong: '错误。标准化后服从标准正态分布 \\(N(0,1)\\)，正确答案是 C。' }
 };
 
 function selectQuiz(qid, choice, el) {
@@ -855,15 +1570,916 @@ function selectQuiz(qid, choice, el) {
   }
   feedback.classList.remove('hidden');
   renderAllKatex();
+  // 渲染反馈文本中 \(...\) 分隔符包裹的 LaTeX 公式
+  if (typeof window.renderKatexAuto === 'function') {
+    window.renderKatexAuto(feedback);
+  }
+}
+
+// ===== 泊松分布专用交互式 =====
+var poissonChart = echarts.init(document.getElementById('poissonChart'));
+var POISSON_MAX_K = 30;
+
+function poissonPMF(k, lambda) {
+  if (lambda <= 0) return k === 0 ? 1 : 0;
+  // 使用对数计算避免溢出
+  var logP = -lambda + k * Math.log(lambda) - poissonLogFactorial(k);
+  return Math.exp(logP);
+}
+
+function poissonLogFactorial(n) {
+  if (n <= 1) return 0;
+  var s = 0;
+  for (var i = 2; i <= n; i++) s += Math.log(i);
+  return s;
+}
+
+function factorial(n) {
+  if (n <= 1) return 1;
+  var r = 1;
+  for (var i = 2; i <= n; i++) r *= i;
+  return r;
+}
+
+function getPoissonData(lambda) {
+  var data = [];
+  for (var k = 0; k <= POISSON_MAX_K; k++) {
+    data.push({ value: k, prob: poissonPMF(k, lambda) });
+  }
+  return data;
+}
+
+function updatePoissonLambda() {
+  var lambda = parseFloat(document.getElementById('poissonLambdaSlider').value);
+  document.getElementById('poissonLambdaInput').value = lambda.toFixed(1);
+  drawPoissonFull(lambda);
+}
+
+function syncLambdaFromInput(val) {
+  var lambda = parseFloat(val);
+  if (isNaN(lambda)) lambda = 0;
+  lambda = Math.max(0, Math.min(30, lambda));
+  document.getElementById('poissonLambdaSlider').value = lambda;
+  drawPoissonFull(lambda);
+}
+
+function updatePoissonK() {
+  var k = parseInt(document.getElementById('poissonKSlider').value);
+  document.getElementById('poissonKInput').value = k;
+  updatePoissonHighlight(k);
+}
+
+function syncKFromInput(val) {
+  var k = parseInt(val);
+  if (isNaN(k)) k = 0;
+  k = Math.max(0, Math.min(30, k));
+  document.getElementById('poissonKSlider').value = k;
+  updatePoissonHighlight(k);
+}
+
+function drawPoissonFull(lambda) {
+  var data = getPoissonData(lambda);
+  // 使用 [x, y] 坐标对，x轴为 value 类型
+  var xyData = data.map(function(d) { return [d.value, d.prob]; });
+
+  var k = parseInt(document.getElementById('poissonKSlider').value);
+  var probK = poissonPMF(k, lambda);
+
+  poissonChart.setOption({
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: function(params) {
+        var p = params[0];
+        var kVal = p.data[0];
+        var prob = p.data[1];
+        return 'k = ' + kVal + '<br/>P(X=' + kVal + ') = ' + (prob * 100).toFixed(2) + '%';
+      }
+    },
+    grid: { left: 55, right: 30, top: 45, bottom: 45 },
+    xAxis: {
+      type: 'value',
+      name: '事件发生次数',
+      nameLocation: 'middle',
+      nameGap: 25,
+      nameTextStyle: { fontSize: 12, color: '#64748b' },
+      min: -0.5,
+      max: 30.5,
+      interval: 5,
+      axisLabel: { fontSize: 11, color: '#64748b', formatter: function(v){ return Math.round(v); } },
+      splitLine: { show: false },
+      axisLine: { lineStyle: { color: '#cbd5e1' } },
+      axisTick: { show: true, lineStyle: { color: '#cbd5e1' } }
+    },
+    yAxis: {
+      type: 'value',
+      name: '概率',
+      nameTextStyle: { fontSize: 12, color: '#64748b' },
+      min: 0,
+      max: 0.22,
+      interval: 0.10,
+      axisLabel: {
+        fontSize: 11,
+        color: '#64748b',
+        formatter: function(v) { return v.toFixed(2); }
+      },
+      splitLine: { lineStyle: { color: '#f1f5f9' } },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [
+      // 柱状图
+      {
+        type: 'bar',
+        data: xyData,
+        barWidth: 12,
+        itemStyle: {
+          color: function(params) {
+            return params.data[0] === k ? '#22c55e' : '#a5b4fc';
+          },
+          borderRadius: [2, 2, 0, 0]
+        },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: function(params) {
+            if (params.data[0] === k) {
+              return (params.data[1] * 100).toFixed(2) + '%';
+            }
+            return '';
+          },
+          color: '#16a34a',
+          fontSize: 12,
+          fontWeight: 'bold',
+          distance: 3
+        },
+        z: 2
+      },
+      // 顶点圆点（深蓝色）
+      {
+        type: 'scatter',
+        data: xyData,
+        symbol: 'circle',
+        symbolSize: 7,
+        itemStyle: {
+          color: function(params) {
+            return params.data[0] === k ? '#15803d' : '#4f46e5';
+          },
+          borderColor: '#fff',
+          borderWidth: 1.5
+        },
+        z: 5,
+        silent: true
+      },
+      // 拟合折线（浅灰色虚线）
+      {
+        type: 'line',
+        data: xyData,
+        smooth: true,
+        symbol: 'none',
+        lineStyle: {
+          color: '#94a3b8',
+          type: 'dashed',
+          width: 1.5
+        },
+        z: 3,
+        silent: true
+      },
+      // λ 竖直虚线（红色）
+      {
+        type: 'line',
+        data: [[lambda, 0], [lambda, 0.20]],
+        symbol: 'none',
+        lineStyle: {
+          color: '#ef4444',
+          type: 'dashed',
+          width: 2
+        },
+        z: 6,
+        silent: true
+      },
+      // λ 标签（始终显示）
+      {
+        type: 'scatter',
+        data: [[lambda, 0.212]],
+        symbol: 'circle',
+        symbolSize: 1,
+        itemStyle: { color: '#ef4444' },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: 'λ=' + lambda.toFixed(1),
+          color: '#ef4444',
+          fontSize: 12,
+          fontWeight: 'bold',
+          backgroundColor: 'rgba(255,255,255,0.95)',
+          borderColor: '#ef4444',
+          borderWidth: 1,
+          padding: [2, 6],
+          borderRadius: 4,
+          distance: 2
+        },
+        z: 10,
+        silent: true
+      }
+    ]
+  }, true);
+
+  // 更新公式和文本
+  updatePoissonFormula(lambda, k, probK);
+}
+
+function updatePoissonHighlight(k) {
+  var lambda = parseFloat(document.getElementById('poissonLambdaSlider').value);
+  var probK = poissonPMF(k, lambda);
+
+  poissonChart.setOption({
+    series: [
+      // 柱子：更新颜色和顶部标签
+      {
+        type: 'bar',
+        itemStyle: {
+          color: function(params) {
+            return params.data[0] === k ? '#22c55e' : '#a5b4fc';
+          }
+        },
+        label: {
+          formatter: function(params) {
+            if (params.data[0] === k) {
+              return (params.data[1] * 100).toFixed(2) + '%';
+            }
+            return '';
+          }
+        }
+      },
+      // 顶点圆点
+      {
+        type: 'scatter',
+        itemStyle: {
+          color: function(params) {
+            return params.data[0] === k ? '#15803d' : '#4f46e5';
+          }
+        }
+      },
+      {}, // 折线不变
+      {}  // λ线不变
+    ]
+  });
+
+  updatePoissonFormula(lambda, k, probK);
+}
+
+function updatePoissonFormula(lambda, k, prob) {
+  // 更新公式卡片中的示例
+  var factK = factorial(k);
+  var lambdaK = Math.pow(lambda, k);
+  var expNegLam = Math.exp(-lambda);
+
+  var formulaText = 'P(X=' + k + ') = (' + lambda.toFixed(1) + '<sup>' + k + '</sup> · e<sup>-' + lambda.toFixed(1) + '</sup>) / ' + k + '!';
+  document.getElementById('poissonExampleFormula').innerHTML = formulaText;
+  document.getElementById('poissonExampleResult').textContent = '= ' + (prob * 100).toFixed(2) + '%';
+
+  // 更新底部文本
+  document.getElementById('poissonFooterK').textContent = k;
+  document.getElementById('poissonFooterK2').textContent = k;
+  document.getElementById('poissonFooterProb').textContent = (prob * 100).toFixed(2) + '%';
+}
+
+function resetPoisson() {
+  document.getElementById('poissonLambdaSlider').value = 5;
+  document.getElementById('poissonLambdaInput').value = '5.0';
+  document.getElementById('poissonKSlider').value = 5;
+  document.getElementById('poissonKInput').value = '5';
+  drawPoissonFull(5);
+}
+
+// 初始化
+drawPoissonFull(5);
+
+// ===== 二项分布专用交互式 =====
+var binomialChart = echarts.init(document.getElementById('binomialChart'));
+var BINOMIAL_MAX_N = 50;
+
+function binomPMF(k, n, p) {
+  if (k < 0 || k > n) return 0;
+  if (p === 0) return k === 0 ? 1 : 0;
+  if (p === 1) return k === n ? 1 : 0;
+  // 使用对数计算避免溢出
+  var logC = 0;
+  for (var i = 1; i <= k; i++) {
+    logC += Math.log(n - k + i) - Math.log(i);
+  }
+  return Math.exp(logC + k * Math.log(p) + (n - k) * Math.log(1 - p));
+}
+
+function binomCoef(n, k) {
+  if (k < 0 || k > n) return 0;
+  if (k === 0 || k === n) return 1;
+  k = Math.min(k, n - k);
+  var result = 1;
+  for (var i = 1; i <= k; i++) {
+    result = result * (n - k + i) / i;
+  }
+  return Math.round(result);
+}
+
+function getBinomialData(n, p) {
+  var data = [];
+  for (var k = 0; k <= BINOMIAL_MAX_N; k++) {
+    if (k <= n) {
+      data.push([k, binomPMF(k, n, p)]);
+    } else {
+      data.push([k, 0]);
+    }
+  }
+  return data;
+}
+
+function updateBinomialN() {
+  var n = parseInt(document.getElementById('binomialNSlider').value);
+  document.getElementById('binomialNInput').value = n;
+  // 确保k不超过n
+  var kSlider = document.getElementById('binomialKSlider');
+  var k = parseInt(kSlider.value);
+  if (k > n) {
+    kSlider.value = n;
+    document.getElementById('binomialKInput').value = n;
+  }
+  drawBinomialFull();
+}
+
+function syncBinomNFromInput(val) {
+  var n = parseInt(val);
+  if (isNaN(n)) n = 1;
+  n = Math.max(1, Math.min(50, n));
+  document.getElementById('binomialNSlider').value = n;
+  var kSlider = document.getElementById('binomialKSlider');
+  var k = parseInt(kSlider.value);
+  if (k > n) {
+    kSlider.value = n;
+    document.getElementById('binomialKInput').value = n;
+  }
+  drawBinomialFull();
+}
+
+function updateBinomialP() {
+  var p = parseFloat(document.getElementById('binomialPSlider').value);
+  document.getElementById('binomialPInput').value = p.toFixed(2);
+  drawBinomialFull();
+}
+
+function syncBinomPFromInput(val) {
+  var p = parseFloat(val);
+  if (isNaN(p)) p = 0;
+  p = Math.max(0, Math.min(1, p));
+  p = Math.round(p * 100) / 100;
+  document.getElementById('binomialPSlider').value = p;
+  document.getElementById('binomialPInput').value = p.toFixed(2);
+  drawBinomialFull();
+}
+
+function updateBinomialK() {
+  var k = parseInt(document.getElementById('binomialKSlider').value);
+  var n = parseInt(document.getElementById('binomialNSlider').value);
+  if (k > n) k = n;
+  document.getElementById('binomialKInput').value = k;
+  updateBinomialHighlight(k);
+}
+
+function syncBinomKFromInput(val) {
+  var k = parseInt(val);
+  var n = parseInt(document.getElementById('binomialNSlider').value);
+  if (isNaN(k)) k = 0;
+  k = Math.max(0, Math.min(n, k));
+  document.getElementById('binomialKSlider').value = k;
+  document.getElementById('binomialKInput').value = k;
+  updateBinomialHighlight(k);
+}
+
+function drawBinomialFull() {
+  var n = parseInt(document.getElementById('binomialNSlider').value);
+  var p = parseFloat(document.getElementById('binomialPSlider').value);
+  var k = parseInt(document.getElementById('binomialKSlider').value);
+  if (k > n) k = n;
+
+  var xyData = getBinomialData(n, p);
+  var probK = binomPMF(k, n, p);
+  var ex = n * p;
+
+  binomialChart.setOption({
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: function(params) {
+        var kVal = params[0].data[0];
+        var prob = params[0].data[1];
+        if (kVal > n) return 'k = ' + kVal + '<br/>超出试验范围';
+        return 'k = ' + kVal + '<br/>P(X=' + kVal + ') = ' + (prob * 100).toFixed(2) + '%';
+      }
+    },
+    grid: { left: 55, right: 30, top: 45, bottom: 45 },
+    xAxis: {
+      type: 'value',
+      name: '成功发生次数',
+      nameLocation: 'middle',
+      nameGap: 25,
+      nameTextStyle: { fontSize: 12, color: '#64748b' },
+      min: -0.5,
+      max: 50.5,
+      interval: 10,
+      axisLabel: { fontSize: 11, color: '#64748b', formatter: function(v){ return Math.round(v); } },
+      splitLine: { show: false },
+      axisLine: { lineStyle: { color: '#cbd5e1' } },
+      axisTick: { show: true, lineStyle: { color: '#cbd5e1' } }
+    },
+    yAxis: {
+      type: 'value',
+      name: '概率',
+      nameTextStyle: { fontSize: 12, color: '#64748b' },
+      min: 0,
+      max: 0.35,
+      interval: 0.10,
+      axisLabel: {
+        fontSize: 11,
+        color: '#64748b',
+        formatter: function(v) { return v.toFixed(2); }
+      },
+      splitLine: { lineStyle: { color: '#f1f5f9' } },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [
+      // 柱状图
+      {
+        type: 'bar',
+        data: xyData,
+        barWidth: 7,
+        itemStyle: {
+          color: function(params) {
+            if (params.data[0] > n) return 'transparent';
+            return params.data[0] === k ? '#22c55e' : '#a5b4fc';
+          },
+          borderRadius: [2, 2, 0, 0]
+        },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: function(params) {
+            if (params.data[0] === k && params.data[0] <= n) {
+              return (params.data[1] * 100).toFixed(2) + '%';
+            }
+            return '';
+          },
+          color: '#16a34a',
+          fontSize: 11,
+          fontWeight: 'bold',
+          distance: 2
+        },
+        z: 2
+      },
+      // 顶点圆点（深蓝色）
+      {
+        type: 'scatter',
+        data: xyData.filter(function(d){ return d[0] <= n; }),
+        symbol: 'circle',
+        symbolSize: 6,
+        itemStyle: {
+          color: function(params) {
+            return params.data[0] === k ? '#15803d' : '#4f46e5';
+          },
+          borderColor: '#fff',
+          borderWidth: 1.5
+        },
+        z: 5,
+        silent: true
+      },
+      // 拟合折线（浅灰色虚线）
+      {
+        type: 'line',
+        data: xyData.filter(function(d){ return d[0] <= n; }),
+        smooth: true,
+        symbol: 'none',
+        lineStyle: {
+          color: '#94a3b8',
+          type: 'dashed',
+          width: 1.5
+        },
+        z: 3,
+        silent: true
+      },
+      // 期望 E(X) 竖直虚线（红色）
+      {
+        type: 'line',
+        data: [[ex, 0], [ex, 0.31]],
+        symbol: 'none',
+        lineStyle: {
+          color: '#ef4444',
+          type: 'dashed',
+          width: 2
+        },
+        z: 6,
+        silent: true
+      },
+      // E(X) 标签（始终显示）
+      {
+        type: 'scatter',
+        data: [[ex, 0.325]],
+        symbol: 'circle',
+        symbolSize: 1,
+        itemStyle: { color: '#ef4444' },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: 'E(X)=' + ex.toFixed(1),
+          color: '#ef4444',
+          fontSize: 12,
+          fontWeight: 'bold',
+          backgroundColor: 'rgba(255,255,255,0.95)',
+          borderColor: '#ef4444',
+          borderWidth: 1,
+          padding: [2, 6],
+          borderRadius: 4,
+          distance: 2
+        },
+        z: 10,
+        silent: true
+      }
+    ]
+  }, true);
+
+  // 更新公式和文本
+  updateBinomialFormula(n, p, k, probK);
+}
+
+function updateBinomialHighlight(k) {
+  var n = parseInt(document.getElementById('binomialNSlider').value);
+  var p = parseFloat(document.getElementById('binomialPSlider').value);
+  if (k > n) k = n;
+  var probK = binomPMF(k, n, p);
+
+  binomialChart.setOption({
+    series: [
+      // 柱子：更新颜色和顶部标签
+      {
+        type: 'bar',
+        itemStyle: {
+          color: function(params) {
+            if (params.data[0] > n) return 'transparent';
+            return params.data[0] === k ? '#22c55e' : '#a5b4fc';
+          }
+        },
+        label: {
+          formatter: function(params) {
+            if (params.data[0] === k && params.data[0] <= n) {
+              return (params.data[1] * 100).toFixed(2) + '%';
+            }
+            return '';
+          }
+        }
+      },
+      // 顶点圆点
+      {
+        type: 'scatter',
+        itemStyle: {
+          color: function(params) {
+            return params.data[0] === k ? '#15803d' : '#4f46e5';
+          }
+        }
+      },
+      {}, // 折线不变
+      {}  // 期望线不变
+    ]
+  });
+
+  updateBinomialFormula(n, p, k, probK);
+}
+
+function updateBinomialFormula(n, p, k, prob) {
+  var pStr = p.toFixed(2);
+  var nmk = n - k;
+  var qStr = (1 - p).toFixed(2);
+  var cnk = binomCoef(n, k);
+
+  var formulaText = 'P(X=' + k + ') = C(' + n + ',' + k + ') · ' + pStr + '<sup>' + k + '</sup> · ' + qStr + '<sup>' + nmk + '</sup>';
+  document.getElementById('binomialExampleFormula').innerHTML = formulaText;
+  document.getElementById('binomialExampleResult').textContent = '= ' + (prob * 100).toFixed(2) + '%';
+
+  // 更新底部文本
+  document.getElementById('binomialFooterK').textContent = k;
+  document.getElementById('binomialFooterK2').textContent = k;
+  document.getElementById('binomialFooterProb').textContent = (prob * 100).toFixed(2) + '%';
+}
+
+function resetBinomial() {
+  document.getElementById('binomialNSlider').value = 10;
+  document.getElementById('binomialNInput').value = '10';
+  document.getElementById('binomialPSlider').value = 0.5;
+  document.getElementById('binomialPInput').value = '0.50';
+  document.getElementById('binomialKSlider').value = 5;
+  document.getElementById('binomialKInput').value = '5';
+  drawBinomialFull();
+}
+
+// 初始化二项分布
+drawBinomialFull();
+
+// ===== 几何分布专用交互式 =====
+var geometricChart = echarts.init(document.getElementById('geometricChart'));
+var GEOM_MAX_K = 50;
+
+function geomPMF(k, p) {
+  if (k < 1) return 0;
+  return Math.pow(1 - p, k - 1) * p;
+}
+
+function getGeometricData(p) {
+  var data = [];
+  for (var k = 1; k <= GEOM_MAX_K; k++) {
+    data.push([k, geomPMF(k, p)]);
+  }
+  return data;
+}
+
+function updateGeometricP() {
+  var p = parseFloat(document.getElementById('geometricPSlider').value);
+  document.getElementById('geometricPInput').value = p.toFixed(2);
+  drawGeometricFull();
+}
+
+function syncGeomPFromInput(val) {
+  var p = parseFloat(val);
+  if (isNaN(p)) p = 0.01;
+  p = Math.max(0.01, Math.min(0.99, p));
+  p = Math.round(p * 100) / 100;
+  document.getElementById('geometricPSlider').value = p;
+  document.getElementById('geometricPInput').value = p.toFixed(2);
+  drawGeometricFull();
+}
+
+function updateGeometricK() {
+  var k = parseInt(document.getElementById('geometricKSlider').value);
+  document.getElementById('geometricKInput').value = k;
+  updateGeometricHighlight(k);
+}
+
+function syncGeomKFromInput(val) {
+  var k = parseInt(val);
+  if (isNaN(k)) k = 1;
+  k = Math.max(1, Math.min(50, k));
+  document.getElementById('geometricKSlider').value = k;
+  document.getElementById('geometricKInput').value = k;
+  updateGeometricHighlight(k);
+}
+
+function drawGeometricFull() {
+  var p = parseFloat(document.getElementById('geometricPSlider').value);
+  var k = parseInt(document.getElementById('geometricKSlider').value);
+  var xyData = getGeometricData(p);
+  var probK = geomPMF(k, p);
+  var ex = 1.0 / p;
+
+  geometricChart.setOption({
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: function(params) {
+        var kVal = params[0].data[0];
+        var prob = params[0].data[1];
+        return 'k = ' + kVal + '<br/>P(X=' + kVal + ') = ' + (prob * 100).toFixed(2) + '%';
+      }
+    },
+    grid: { left: 55, right: 30, top: 45, bottom: 45 },
+    xAxis: {
+      type: 'value',
+      name: '首次成功的试验次数',
+      nameLocation: 'middle',
+      nameGap: 25,
+      nameTextStyle: { fontSize: 12, color: '#64748b' },
+      min: 0.5,
+      max: 50.5,
+      interval: 10,
+      axisLabel: { fontSize: 11, color: '#64748b', formatter: function(v){ return Math.round(v); } },
+      splitLine: { show: false },
+      axisLine: { lineStyle: { color: '#cbd5e1' } },
+      axisTick: { show: true, lineStyle: { color: '#cbd5e1' } }
+    },
+    yAxis: {
+      type: 'value',
+      name: '概率',
+      nameTextStyle: { fontSize: 12, color: '#64748b' },
+      min: 0,
+      max: 0.35,
+      interval: 0.10,
+      axisLabel: {
+        fontSize: 11,
+        color: '#64748b',
+        formatter: function(v) { return v.toFixed(2); }
+      },
+      splitLine: { lineStyle: { color: '#f1f5f9' } },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [
+      // 柱状图
+      {
+        type: 'bar',
+        data: xyData,
+        barWidth: 8,
+        itemStyle: {
+          color: function(params) {
+            return params.data[0] === k ? '#22c55e' : '#a5b4fc';
+          },
+          borderRadius: [2, 2, 0, 0]
+        },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: function(params) {
+            if (params.data[0] === k) {
+              return (params.data[1] * 100).toFixed(2) + '%';
+            }
+            return '';
+          },
+          color: '#16a34a',
+          fontSize: 11,
+          fontWeight: 'bold',
+          distance: 2
+        },
+        z: 2
+      },
+      // 顶点圆点（深蓝色）
+      {
+        type: 'scatter',
+        data: xyData,
+        symbol: 'circle',
+        symbolSize: 6,
+        itemStyle: {
+          color: function(params) {
+            return params.data[0] === k ? '#15803d' : '#4f46e5';
+          },
+          borderColor: '#fff',
+          borderWidth: 1.5
+        },
+        z: 5,
+        silent: true
+      },
+      // 拟合折线（浅灰色虚线）
+      {
+        type: 'line',
+        data: xyData,
+        smooth: true,
+        symbol: 'none',
+        lineStyle: {
+          color: '#94a3b8',
+          type: 'dashed',
+          width: 1.5
+        },
+        z: 3,
+        silent: true
+      },
+      // 期望 E(X) 竖直虚线（红色）
+      {
+        type: 'line',
+        data: [[ex, 0], [ex, 0.31]],
+        symbol: 'none',
+        lineStyle: {
+          color: '#ef4444',
+          type: 'dashed',
+          width: 2
+        },
+        z: 6,
+        silent: true
+      },
+      // E(X) 标签（始终显示）
+      {
+        type: 'scatter',
+        data: [[ex, 0.325]],
+        symbol: 'circle',
+        symbolSize: 1,
+        itemStyle: { color: '#ef4444' },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: 'E(X)=' + ex.toFixed(2),
+          color: '#ef4444',
+          fontSize: 12,
+          fontWeight: 'bold',
+          // backgroundColor: '#fff',
+          backgroundColor: 'rgba(255,255,255,0.95)',
+          borderColor: '#ef4444',
+          borderWidth: 1,
+          padding: [2, 6],
+          borderRadius: 4,
+          distance: 2
+        },
+        z: 10,
+        silent: true
+      }
+    ]
+  }, true);
+
+  updateGeometricFormula(p, k, probK);
+}
+
+function updateGeometricHighlight(k) {
+  var p = parseFloat(document.getElementById('geometricPSlider').value);
+  var probK = geomPMF(k, p);
+
+  geometricChart.setOption({
+    series: [
+      // 柱子：更新颜色和顶部标签
+      {
+        type: 'bar',
+        itemStyle: {
+          color: function(params) {
+            return params.data[0] === k ? '#22c55e' : '#a5b4fc';
+          }
+        },
+        label: {
+          formatter: function(params) {
+            if (params.data[0] === k) {
+              return (params.data[1] * 100).toFixed(2) + '%';
+            }
+            return '';
+          }
+        }
+      },
+      // 顶点圆点
+      {
+        type: 'scatter',
+        itemStyle: {
+          color: function(params) {
+            return params.data[0] === k ? '#15803d' : '#4f46e5';
+          }
+        }
+      },
+      {}, // 折线不变
+      {}, // 期望线不变
+      {}  // 期望标签不变
+    ]
+  });
+
+  updateGeometricFormula(p, k, probK);
+}
+
+function updateGeometricFormula(p, k, prob) {
+  var pStr = p.toFixed(2);
+  var km1 = k - 1;
+
+  var formulaText = 'P(X=' + k + ') = (1-' + pStr + ')<sup>' + km1 + '</sup> · ' + pStr;
+  document.getElementById('geometricExampleFormula').innerHTML = formulaText;
+  document.getElementById('geometricExampleResult').textContent = '= ' + (prob * 100).toFixed(2) + '%';
+
+  document.getElementById('geometricFooterK').textContent = k;
+  document.getElementById('geometricFooterK2').textContent = k;
+  document.getElementById('geometricFooterProb').textContent = (prob * 100).toFixed(2) + '%';
+}
+
+function resetGeometric() {
+  document.getElementById('geometricPSlider').value = 0.2;
+  document.getElementById('geometricPInput').value = '0.20';
+  document.getElementById('geometricKSlider').value = 5;
+  document.getElementById('geometricKInput').value = '5';
+  drawGeometricFull();
+}
+
+// 初始化几何分布
+drawGeometricFull();
+
+// ===== 专用分布卡片切换逻辑 =====
+var distKnowledgeMap = {
+  binomial: '<h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3><p class="text-sm text-slate-600 leading-relaxed">二项分布描述<strong>n次独立重复伯努利试验中成功次数</strong>的概率分布。期望 \\(E(X)=np\\)，方差 \\(D(X)=np(1-p)\\)。当 n 很大 p 很小时，可用泊松分布近似（λ = np）。</p>',
+  poisson: '<h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3><p class="text-sm text-slate-600 leading-relaxed">泊松分布描述<strong>单位时间/空间内稀有事件发生次数</strong>的概率分布。参数 λ 既是期望也是方差：\\(E(X)=\\lambda,\\; D(X)=\\lambda\\)。当二项分布 n 很大、p 很小时，可用泊松分布近似（λ = np）。</p>',
+  geometric: '<h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3><p class="text-sm text-slate-600 leading-relaxed">几何分布描述<strong>首次成功所需的试验次数</strong>的概率分布。期望 \\(E(X)=\\frac{1}{p}\\)，方差 \\(D(X)=\\frac{1-p}{p^2}\\)。核心特性：无记忆性 \\(P(X > m+n \\mid X > m) = P(X > n)\\)。</p>'
+};
+
+function switchDedicatedDist() {
+  var dist = document.getElementById('dedicatedDistSelect').value;
+  // 隐藏所有面板
+  var panels = document.querySelectorAll('.dist-panel');
+  for (var i = 0; i < panels.length; i++) panels[i].style.display = 'none';
+  // 显示目标面板
+  document.getElementById(dist + 'Panel').style.display = '';
+  // 更新知识点
+  document.getElementById('distKnowledge').innerHTML = distKnowledgeMap[dist];
+  // resize 对应 chart（ECharts 在 display:none 容器中无法正确获取尺寸）
+  if (dist === 'poisson') { poissonChart.resize(); }
+  else if (dist === 'binomial') { binomialChart.resize(); }
+  else if (dist === 'geometric') { geometricChart.resize(); }
+  // 重新渲染 KaTeX
+  renderAllKatex();
 }
 
 window.addEventListener('resize', function() {
-  discreteChart.resize();
+  // discreteChart.resize();
   contPDFChart.resize();
   contCDFChart.resize();
   normOrigChart.resize();
   normStdChart.resize();
   ftypeChart.resize();
+  poissonChart.resize();
+  binomialChart.resize();
+  geometricChart.resize();
 });
 </script>
 

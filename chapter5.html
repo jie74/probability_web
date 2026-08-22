@@ -299,7 +299,7 @@ function runLLN() {
 
   llnChart.setOption({
     tooltip: { trigger: 'axis', formatter: function(p) { return 'n='+p[0].data[0]+'<br/>均值='+p[0].data[1].toFixed(4); } },
-    grid: { left: 55, right: 20, top: 20, bottom: 35 },
+    grid: { left: 55, right: 20, top: 30, bottom: 35 },
     xAxis: { type: 'value', name: '样本量 n', nameLocation: 'center', nameGap: 25, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     yAxis: { type: 'value', name: '样本均值', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: [{
@@ -380,7 +380,7 @@ function runCLT() {
   cltChart.setOption({
     tooltip: { trigger: 'axis' },
     legend: { data: ['样本均值直方图', '理论正态曲线'], bottom: 0, textStyle: { fontSize: 11 } },
-    grid: { left: 50, right: 20, top: 20, bottom: 40 },
+    grid: { left: 50, right: 20, top: 30, bottom: 40 },
     xAxis: { type: 'category', data: barCats, axisLabel: { fontSize: 9, interval: Math.max(1, Math.floor(bins/8)) }, splitLine: { show: false } },
     yAxis: { type: 'value', name: '密度', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: [

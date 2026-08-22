@@ -118,9 +118,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
         <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
         <p class="text-sm text-slate-600 leading-relaxed">
           联合分布 \(P(X=x_i,Y=y_j)\) 描述二维离散随机变量同时取特定值的概率。
-          对行求和得到 Y 边缘分布；对列求和得到 X 边缘分布。
+          求X边缘分布和Y边缘分布，行内相加，列内相加。求X就对所有的y可能加起来，求Y就对所有的x可能加起来。
         </p>
-        <p class="text-sm text-red-500 mt-1 font-medium">⚠ 误区：仅知道边缘分布，不能推出联合分布。</p>
+        <p class="text-sm text-red-500 mt-1 font-medium">⚠ 注意：仅知道边缘分布，不能推出联合分布。</p>
       </div>
 
       <div class="formula-panel">
@@ -150,7 +150,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
 
       <div class="exam-tip">
         <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
-        <span class="text-sm text-yellow-700">大题<strong>经常考由联合求边缘</strong>。注意：对行求和得 Y 边缘，对列求和得 X 边缘，别搞反方向。</span>
+        <span class="text-sm text-yellow-700">大题<strong>经常考由联合求边缘</strong>。注意：求X边缘和Y边缘，行内相加，列内相加，别搞反方向。</span>
       </div>
     </div>
   </section>
@@ -399,7 +399,6 @@ function calcMarginal() {
 function drawJointHeatmap(xMarginal, yMarginal) {
   var xLabels = ['x₁', 'x₂', 'x₃', 'x₄'];
   var yLabels = ['y₁', 'y₂', 'y₃'];
-
   var heatData = [];
   var maxVal = 0;
   for (var i = 0; i < jointData.length; i++) {
@@ -408,25 +407,27 @@ function drawJointHeatmap(xMarginal, yMarginal) {
       if (jointData[i][j] > maxVal) maxVal = jointData[i][j];
     }
   }
-
   if (xMarginal) {
     for (var i = 0; i < xMarginal.length; i++) {
       heatData.push([jointData[0].length, i, xMarginal[i]]);
     }
-    yLabels.push('P(X)');
+    yLabels.push('P (X)');
   }
   if (yMarginal) {
     for (var j = 0; j < yMarginal.length; j++) {
       heatData.push([j, jointData.length, yMarginal[j]]);
     }
-    xLabels.push('P(Y)');
+    xLabels.push('P (Y)');
   }
-
   jointChart.setOption({
-    tooltip: { formatter: function(p) { return 'P(X='+xLabels[p.data[0]]+', Y='+yLabels[p.data[1]]+') = '+p.data[2].toFixed(4); } },
+    tooltip: {
+      formatter: function(p) {
+        return 'P (X=' + yLabels[p.data[0]] + ', Y=' + xLabels[p.data[1]] + ') = ' + p.data[2].toFixed(4);
+      }
+    },
     grid: { left: 60, right: 40, top: 20, bottom: 40 },
     xAxis: { type: 'category', data: yLabels, axisLabel: { fontSize: 12 }, splitLine: { show: false } },
-    yAxis: { type: 'category', data: xLabels, axisLabel: { fontSize: 12 }, splitLine: { show: false } },
+    yAxis: { type: 'category', data: xLabels, axisLabel: { fontSize: 12 }, splitLine: { show: false }, inverse: true },
     visualMap: { min: 0, max: maxVal || 0.2, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemWidth: 12, itemHeight: 100, inRange: { color: ['#eff6ff', '#2563eb'] } },
     series: [{
       type: 'heatmap', data: heatData,
@@ -435,7 +436,6 @@ function drawJointHeatmap(xMarginal, yMarginal) {
     }]
   });
 }
-
 function resetJoint() {
   jointData = [
     [0.06, 0.04, 0.02],

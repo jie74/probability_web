@@ -220,6 +220,31 @@ tailwind.config = {
   <section class="max-w-5xl mx-auto px-10">
     <div class="card">
       <h2 class="text-lg font-bold text-slate-800 mb-3">🏥 条件概率与贝叶斯公式 — 疾病检测案例</h2>
+      <div class="mb-5">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">🎯 情境引入</h3>
+        <p class="text-sm text-slate-600 leading-relaxed mb-3">
+          有一种疾病，人群患病概率 1%；检测真阳性率 95%（患病大概率测出阳性）；假阳性率 5%（健康人也有 5% 测出阳性）。
+        </p>
+        <blockquote class="pl-4 border-l-4 border-primary bg-primary-bg py-2 px-3 rounded-r-lg">
+          <p class="text-sm text-slate-700">
+            提问：<strong>如果一个人检测结果为阳性，他真正得病的概率是 95% 吗？</strong>
+          </p>
+        </blockquote>
+      </div>
+      <div class="mb-5">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📘 概念讲解</h3>
+        <ol class="list-decimal pl-6 space-y-2 text-sm text-slate-600 leading-relaxed">
+          <li>
+            <strong>先验概率 <span class="katex-render" data-expr="P(A)"></span></strong>：没有看检测结果前，人群本身患病概率，<span class="katex-render" data-expr="P(\text{患病})=1\%"></span>，是事前已知的基础概率。
+          </li>
+          <li>
+            <strong>似然 <span class="katex-render" data-expr="P(B|A)"></span></strong>：已知患病，测出阳性的概率，也就是检测的真阳性率 95%。
+          </li>
+          <li>
+            <strong>后验概率 <span class="katex-render" data-expr="P(A|B)"></span></strong>：拿到 “阳性” 这个证据之后，<strong>更新计算出的真实患病概率</strong>，就是我们真正关心的结果。
+          </li>
+        </ol>
+      </div>
 
       <div class="mb-4">
         <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
@@ -300,61 +325,14 @@ tailwind.config = {
           </div>
         </div>
       </div>
-
-      <script>
-      // 更新贝叶斯公式的动态计算显示
-      (function() {
-        function renderBayesCalc() {
-          var prior = parseFloat(document.getElementById('priorSlider').value);
-          var tpr = parseFloat(document.getElementById('tprSlider').value);
-          var fpr = parseFloat(document.getElementById('fprSlider').value);
-
-          var pAB = prior * tpr;
-          var pNotA = 1 - prior;
-          var pDenom = pAB + fpr * pNotA;
-          var posterior = pDenom > 0 ? pAB / pDenom : 0;
-
-          // 构建完整的 LaTeX 推导式（包含事件定义、已知条件、贝叶斯公式）
-          var latex = '\\text{设：A：患病；}\\ \\overline{A}\\text{：健康，}\\ B\\text{：检测阳性} \\\\' +
-              'P(A)=' + prior.toFixed(2) + ',\\ P(B|A)=' + tpr.toFixed(2) + ',\\ P(B|\\overline{A})=' + fpr.toFixed(2) + ' \\\\' +
-              '\\boldsymbol{P(A|B)=\\dfrac{P(B|A)P(A)}{P(B|A)P(A)+P(B|\\overline A)P(\\overline A)}} \\\\' +
-              '=\\frac{' + tpr.toFixed(2) + '\\times ' + prior.toFixed(3) +
-              '}{' + tpr.toFixed(2) + '\\times ' + prior.toFixed(3) +
-              '\\,+\\,' + fpr.toFixed(3) + '\\times ' + pNotA.toFixed(3) +
-              '} \\\\' +
-              '=\\frac{' + pAB.toFixed(4) +
-              '}{' + pDenom.toFixed(4) +
-              '} \\approx ' + (posterior * 100).toFixed(2) + '\\%';
-
-          var el = document.getElementById('bayesCalcLatex');
-          if (el) {
-            el.setAttribute('data-expr', latex);
-            try {
-              katex.render(latex, el, { displayMode: false, throwOnError: false });
-            } catch(e) {
-              el.textContent = latex;
-            }
-          }
-        }
-
-        // 初始渲染
-        renderBayesCalc();
-
-        // 监听三个滑块变化，实时更新公式中的数值
-        ['priorSlider', 'tprSlider', 'fprSlider'].forEach(function(id) {
-          var el = document.getElementById(id);
-          if (el) el.addEventListener('input', renderBayesCalc);
-        });
-
-        // 扩展原有的 updateBayes 函数，使其在更新图表时同步更新公式显示
-        var origUpdateBayes = window.updateBayes;
-        window.updateBayes = function() {
-          if (origUpdateBayes) origUpdateBayes();
-          renderBayesCalc();
-        };
-      })();
-      </script>
-
+      <!-- 核心结论 -->
+      <div class="rounded-lg border border-blue-300 bg-blue-50 p-4 mb-3">
+        <h4 class="text-sm font-bold text-blue-900 mb-2">📌 核心结论</h4>
+        <p class="text-sm text-slate-700 leading-relaxed">
+          检测阳性，实际患病只有<strong class="text-blue-700">16.10%</strong>，远低于 95%。<br>
+          👉 误区根源：忽略了<strong>先验概率（基础患病率很低）</strong>，大量健康人群产生的假阳性，拉高了阳性样本总数。
+        </p>
+      </div>
       <!-- 应试提示 -->
       <div class="exam-tip">
         <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
@@ -616,7 +594,7 @@ function updateCoinChart(n) {
 
   coinChart.setOption({
     tooltip: { trigger: 'axis', formatter: function(p) { return 'n=' + p[0].data[0] + '<br/>频率=' + p[0].data[1].toFixed(4); } },
-    grid: { left: 55, right: 20, top: 20, bottom: 35 },
+    grid: { left: 55, right: 20, top: 30, bottom: 35 },
     xAxis: { type: 'value', name: '试验次数 n', nameLocation: 'center', nameGap: 25, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     yAxis: { type: 'value', name: '正面频率', min: 0, max: 1, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: [{
@@ -728,7 +706,49 @@ function updateBayes() {
     ctx.fillStyle = '#065f46';
     ctx.fillText('真阴性', leftX + diseaseW + healthyW/2, 20 + fpHeight + tnHeight/2);
   }
+
+  // 同步更新下方计算过程公式
+  renderBayesCalc();
 }
+
+// 更新贝叶斯公式的动态计算显示
+function renderBayesCalc() {
+  var prior = parseFloat(document.getElementById('priorSlider').value);
+  var tpr = parseFloat(document.getElementById('tprSlider').value);
+  var fpr = parseFloat(document.getElementById('fprSlider').value);
+
+  var pAB = prior * tpr;
+  var pNotA = 1 - prior;
+  var pDenom = pAB + fpr * pNotA;
+  var posterior = pDenom > 0 ? pAB / pDenom : 0;
+
+  var latex = '\\text{设：A：患病；}\\ \\overline{A}\\text{：健康，}\\ B\\text{：检测阳性} \\\\' +
+      'P(A)=' + prior.toFixed(2) + ',\\ P(B|A)=' + tpr.toFixed(2) + ',\\ P(B|\\overline{A})=' + fpr.toFixed(2) + ' \\\\' +
+      '\\boldsymbol{P(A|B)=\\dfrac{P(B|A)P(A)}{P(B|A)P(A)+P(B|\\overline A)P(\\overline A)}} \\\\' +
+      '=\\frac{' + tpr.toFixed(2) + '\\times ' + prior.toFixed(3) +
+      '}{' + tpr.toFixed(2) + '\\times ' + prior.toFixed(3) +
+      '\\,+\\,' + fpr.toFixed(3) + '\\times ' + pNotA.toFixed(3) +
+      '} \\\\' +
+      '=\\frac{' + pAB.toFixed(4) +
+      '}{' + pDenom.toFixed(4) +
+      '} \\approx ' + (posterior * 100).toFixed(2) + '\\%';
+
+  var el = document.getElementById('bayesCalcLatex');
+  if (el) {
+    el.setAttribute('data-expr', latex);
+    try {
+      katex.render(latex, el, { displayMode: false, throwOnError: false });
+    } catch(e) {
+      el.textContent = latex;
+    }
+  }
+}
+
+// 监听滑块变化，实时更新公式中的数值
+['priorSlider', 'tprSlider', 'fprSlider'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('input', renderBayesCalc);
+});
 
 function resetBayes() {
   document.getElementById('priorSlider').value = 0.01;

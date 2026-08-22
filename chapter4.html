@@ -128,7 +128,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
       <div class="flex flex-wrap items-center gap-4 mb-4">
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">分布：</span>
-          <select id="expDistSelect" onchange="updateExpectation()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+          <select id="expDistSelect" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
             <option value="binomial">二项分布 B(n,p)</option>
             <option value="poisson">泊松分布 P(λ)</option>
             <option value="asymmetric">非对称离散分布</option>
@@ -281,6 +281,88 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
     </div>
   </section>
 
+
+  <!-- ===== 卡片4：六大常用分布性质表 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📊 六大常用分布性质表</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          以下为概率论中<strong>六大常用分布</strong>的期望与方差公式，建议熟记。其中离散分布：0-1分布、二项分布、泊松分布；连续分布：均匀分布、指数分布、正态分布。
+        </p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">📋 期望与方差对照表</h3>
+
+      <div class="overflow-x-auto rounded-lg border border-slate-200">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">属性 \ 分布</th>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">0-1 分布</th>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">二项分布</th>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">泊松分布</th>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">均匀分布</th>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">指数分布</th>
+              <th class="px-4 py-3 text-left font-semibold text-slate-700">正态分布</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr class="hover:bg-blue-50 transition-colors">
+              <td class="px-4 py-3 text-slate-700 font-semibold">分布记号</td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="B(1,p)"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="B(n,p)"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="P(\lambda)"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="U(a,b)"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="e(\lambda)"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="N(\mu,\sigma^2)"></span></td>
+            </tr>
+            <tr class="hover:bg-blue-50 transition-colors">
+              <td class="px-4 py-3 text-slate-700 font-semibold">E(X)</td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="p"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="np"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="\lambda"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="\frac{a+b}{2}"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="\frac{1}{\lambda}"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="\mu"></span></td>
+            </tr>
+            <tr class="hover:bg-blue-50 transition-colors">
+              <td class="px-4 py-3 text-slate-700 font-semibold">D(X)</td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="p(1-p)"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="np(1-p)"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="\lambda"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="\frac{(b-a)^2}{12}"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="\frac{1}{\lambda^2}"></span></td>
+              <td class="px-4 py-3"><span class="katex-render" data-expr="\sigma^2"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="formula-panel mt-4">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 记忆技巧与补充说明（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3 text-sm text-slate-600">
+            <div><span class="font-semibold text-slate-700">📌 0-1 分布 → 二项分布：</span>0-1 分布是二项分布 n=1 的特例。</div>
+            <div><span class="font-semibold text-slate-700">📌 泊松分布：</span>期望和方差<strong>相等</strong>，都是 λ，这是泊松分布的重要特征。</div>
+            <div><span class="font-semibold text-slate-700">📌 均匀分布：</span>方差公式 \(\frac{(b-a)^2}{12}\) 记忆时注意分母是 12。</div>
+            <div><span class="font-semibold text-slate-700">📌 指数分布：</span>期望 \(\frac{1}{\lambda}\)，方差 \(\frac{1}{\lambda^2}\)，即方差是期望的平方。</div>
+            <div><span class="font-semibold text-slate-700">📌 正态分布：</span>参数 μ 即为期望，参数 σ² 即为方差，参数意义直观。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">这张表是<strong>高频考点</strong>，选择题、填空题、计算题中均有涉及。特别注意泊松分布的 E(X)=D(X)=λ，以及指数分布的 D(X)=[E(X)]² 这两个特殊关系。</span>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== 底部自测题 ===== -->
   <section class="max-w-5xl mx-auto px-10 pb-10">
     <div class="card">
@@ -351,32 +433,309 @@ document.getElementById('expDistSelect').addEventListener('change', function() {
 
   if (dist === 'binomial') {
     label.textContent = 'p =';
-    slider.min = 0.1; slider.max = 0.9; slider.value = 0.5; slider.step = 0.05;
-    group.style.display = '';
+    slider.min = '0.1'; slider.max = '0.9'; slider.value = '0.5'; slider.step = '0.05';
   } else if (dist === 'poisson') {
     label.textContent = 'λ =';
-    slider.min = 0.5; slider.max = 10; slider.value = 4; slider.step = 0.5;
-    group.style.display = '';
+    slider.min = '0.5'; slider.max = '10'; slider.value = '4'; slider.step = '0.5';
   } else {
     // 非对称分布：偏度参数
     label.textContent = '偏度 =';
-    slider.min = 0; slider.max = 1; slider.value = 0.5; slider.step = 0.05;
-    group.style.display = '';
+    slider.min = '0'; slider.max = '1'; slider.value = '0.5'; slider.step = '0.05';
   }
   updateExpectation();
 });
+
+// function updateExpectation() {
+//   var dist = document.getElementById('expDistSelect').value;
+//   var paramVal = parseFloat(document.getElementById('expParamSlider').value);
+//   document.getElementById('expParamVal').textContent = paramVal.toFixed(2);
+
+//   var data = [], ex = 0;
+//   if (dist === 'binomial') {
+//     var n = 10, p = paramVal;
+//     for (var k = 0; k <= n; k++) {
+//       var prob = binomialPMF(k, n, p);
+//       data.push({value: k, prob: prob});
+//       ex += k * prob;
+//     }
+//   } else if (dist === 'poisson') {
+//     var lam = paramVal;
+//     var maxK = Math.ceil(lam + 4*Math.sqrt(lam));
+//     if (maxK < 10) maxK = 10;
+//     for (var k = 0; k <= maxK; k++) {
+//       var prob = Math.exp(-lam + k*Math.log(lam) - logFactorial(k));
+//       data.push({value: k, prob: prob});
+//       ex += k * prob;
+//     }
+//   } else {
+//     // 非对称分布：偏度参数控制左右偏
+//     var w = paramVal; // 0=左偏, 1=右偏
+//     var vals = [0, 1, 2, 3, 5, 8];
+//     // 左偏分布（概率集中在右侧高值）
+//     var leftProbs = [0.02, 0.08, 0.15, 0.15, 0.25, 0.35];
+//     // 右偏分布（概率集中在左侧低值）
+//     var rightProbs = [0.35, 0.25, 0.15, 0.15, 0.08, 0.02];
+//     var probs = [];
+//     for (var i = 0; i < vals.length; i++) {
+//       var prob = leftProbs[i] * (1 - w) + rightProbs[i] * w;
+//       probs.push(prob);
+//     }
+//     // 归一化
+//     var sum = 0;
+//     for (var i = 0; i < probs.length; i++) sum += probs[i];
+//     for (var i = 0; i < vals.length; i++) {
+//       var prob = probs[i] / sum;
+//       data.push({value: vals[i], prob: prob});
+//       ex += vals[i] * prob;
+//     }
+//   }
+
+//   document.getElementById('expVal').textContent = ex.toFixed(2);
+
+//   var xData = data.map(function(d) { return d.value; });
+//   var yData = data.map(function(d) { return d.prob; });
+
+//   // 找到期望值最接近的 x 轴索引，用于 markLine 定位
+//   var closestIdx = 0;
+//   var minDiff = Infinity;
+//   for (var i = 0; i < data.length; i++) {
+//     var diff = Math.abs(data[i].value - ex);
+//     if (diff < minDiff) { minDiff = diff; closestIdx = i; }
+//   }
+
+//   // 分布切换时需要全量替换，同分布参数变化时合并更新
+//   var notMerge = true;
+
+//   expChart.setOption({
+//     tooltip: { trigger: 'axis', formatter: function(p) { return 'X='+p[0].data[0]+'<br/>P='+p[0].data[1].toFixed(4); } },
+//     grid: { left: 50, right: 20, top: 20, bottom: 35 },
+//     xAxis: { type: 'category', data: xData, axisLabel: { fontSize: 11 }, splitLine: { show: false } },
+//     yAxis: { type: 'value', name: 'P(X=k)', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+//     series: [{
+//       type: 'bar', data: yData, barWidth: '50%',
+//       itemStyle: { color: '#2563eb', borderRadius: [4, 4, 0, 0] },
+//       markLine: {
+//         silent: true, symbol: 'none',
+//         lineStyle: { color: '#ef4444', type: 'dashed', width: 2 },
+//         label: { fontSize: 11, formatter: 'E(X)={c}', position: 'start' },
+//         data: [{ xAxis: xData[closestIdx] }]
+//       }
+//     }]
+//   }, notMerge);
+// }
+
+// function updateExpectation() {
+//   var dist = document.getElementById('expDistSelect').value;
+//   var paramVal = parseFloat(document.getElementById('expParamSlider').value);
+//   document.getElementById('expParamVal').textContent = paramVal.toFixed(2);
+
+//   var data = [], ex = 0;
+//   if (dist === 'binomial') {
+//     var n = 10, p = paramVal;
+//     for (var k = 0; k <= n; k++) {
+//       var prob = binomialPMF(k, n, p);
+//       data.push({value: k, prob: prob});
+//       ex += k * prob;
+//     }
+//   } else if (dist === 'poisson') {
+//     var lam = paramVal;
+//     var maxK = Math.ceil(lam + 4*Math.sqrt(lam));
+//     if (maxK < 10) maxK = 10;
+//     for (var k = 0; k <= maxK; k++) {
+//       var prob = Math.exp(-lam + k*Math.log(lam) - logFactorial(k));
+//       data.push({value: k, prob: prob});
+//       ex += k * prob;
+//     }
+//   } else {
+//     var w = paramVal;
+//     var vals = [0, 1, 2, 3, 5, 8];
+//     var leftProbs = [0.02, 0.08, 0.15, 0.15, 0.25, 0.35];
+//     var rightProbs = [0.35, 0.25, 0.15, 0.15, 0.08, 0.02];
+//     var probs = [];
+//     for (var i = 0; i < vals.length; i++) {
+//       var prob = leftProbs[i] * (1 - w) + rightProbs[i] * w;
+//       probs.push(prob);
+//     }
+//     var sum = 0;
+//     for (var i = 0; i < probs.length; i++) sum += probs[i];
+//     for (var i = 0; i < vals.length; i++) {
+//       var prob = probs[i] / sum;
+//       data.push({value: vals[i], prob: prob});
+//       ex += vals[i] * prob;
+//     }
+//   }
+
+//   document.getElementById('expVal').textContent = ex.toFixed(2);
+
+//   // 关键修复1：series.data 改为 [x, y] 坐标对
+//   var seriesData = data.map(function(d) { return [d.value, d.prob]; });
+  
+//   // 计算 x 轴范围，让柱子居中在刻度上
+//   var xValues = data.map(function(d) { return d.value; });
+//   var xMin = Math.min.apply(null, xValues);
+//   var xMax = Math.max.apply(null, xValues);
+
+//   expChart.setOption({
+//     tooltip: { 
+//       trigger: 'axis', 
+//       formatter: function(p) { 
+//         return 'X=' + p[0].data[0] + '<br/>P=' + p[0].data[1].toFixed(4); 
+//       } 
+//     },
+//     grid: { left: 50, right: 20, top: 20, bottom: 35 },
+//     xAxis: { 
+//       type: 'value',           // ← 改为 value，markLine 才能落在非整数位置
+//       min: xMin,
+//       max: xMax + 0.5,
+//       interval: 1,
+//       axisLabel: { fontSize: 11 }, 
+//       splitLine: { show: false } 
+//     },
+//     yAxis: { 
+//       type: 'value', 
+//       name: 'P(X=k)', 
+//       axisLabel: { fontSize: 11 }, 
+//       splitLine: { lineStyle: { color: '#f1f5f9' } } 
+//     },
+//     series: [{
+//       type: 'bar', 
+//       data: seriesData,        // ← value 轴需要 [x, y] 格式
+//       barWidth: 20,            // ← value 轴建议用固定像素宽度
+//       itemStyle: { 
+//         color: '#2563eb', 
+//         borderRadius: [4, 4, 0, 0] 
+//       },
+//       markLine: {
+//         silent: true, 
+//         symbol: 'none',
+//         lineStyle: { color: '#ef4444', type: 'dashed', width: 2 },
+//         label: { 
+//           fontSize: 11, 
+//           formatter: 'E(X)=' + ex.toFixed(2),  // ← 直接写死期望值，避免 {c} 失效
+//           position: 'start' 
+//         },
+//         data: [{ xAxis: ex }]   // ← 直接传精确期望值，不再四舍五入到最近离散点
+//       }
+//     }]
+//   });
+// }
+
+// function updateExpectation() {
+//   var dist = document.getElementById('expDistSelect').value;
+//   var paramVal = parseFloat(document.getElementById('expParamSlider').value);
+//   document.getElementById('expParamVal').textContent = paramVal.toFixed(2);
+
+//   var data = [], ex = 0;
+//   if (dist === 'binomial') {
+//     var n = 10, p = paramVal;
+//     for (var k = 0; k <= n; k++) {
+//       var prob = binomialPMF(k, n, p);
+//       data.push({value: k, prob: prob});
+//       ex += k * prob;
+//     }
+//   } else if (dist === 'poisson') {
+//     var lam = paramVal;
+//     var maxK = Math.ceil(lam + 4*Math.sqrt(lam));
+//     if (maxK < 10) maxK = 10;
+//     for (var k = 0; k <= maxK; k++) {
+//       var prob = Math.exp(-lam + k*Math.log(lam) - logFactorial(k));
+//       data.push({value: k, prob: prob});
+//       ex += k * prob;
+//     }
+//   } else {
+//     var w = paramVal;
+//     var vals = [0, 1, 2, 3, 5, 8];
+//     var leftProbs = [0.02, 0.08, 0.15, 0.15, 0.25, 0.35];
+//     var rightProbs = [0.35, 0.25, 0.15, 0.15, 0.08, 0.02];
+//     var probs = [];
+//     for (var i = 0; i < vals.length; i++) {
+//       var prob = leftProbs[i] * (1 - w) + rightProbs[i] * w;
+//       probs.push(prob);
+//     }
+//     var sum = 0;
+//     for (var i = 0; i < probs.length; i++) sum += probs[i];
+//     for (var i = 0; i < vals.length; i++) {
+//       var prob = probs[i] / sum;
+//       data.push({value: vals[i], prob: prob});
+//       ex += vals[i] * prob;
+//     }
+//   }
+
+//   document.getElementById('expVal').textContent = ex.toFixed(2);
+
+//   var seriesData = data.map(function(d) { return [d.value, d.prob]; });
+//   var xValues = data.map(function(d) { return d.value; });
+//   var xMin = Math.min.apply(null, xValues);
+//   var xMax = Math.max.apply(null, xValues);
+
+//   expChart.setOption({
+//     tooltip: { 
+//       trigger: 'axis', 
+//       formatter: function(p) { 
+//         return 'X=' + p[0].data[0] + '<br/>P=' + p[0].data[1].toFixed(4); 
+//       } 
+//     },
+//     grid: { 
+//       left: 70,    // ← 加大左边距，给 y 轴标题留空间
+//       right: 30, 
+//       top: 30, 
+//       bottom: 35 
+//     },
+//     xAxis: { 
+//       type: 'value',
+//       min: xMin - 1,     // ← 左边界多留 1 格，避免 x=0 柱子贴到 y 轴
+//       max: xMax + 1,     // ← 右边界对称留空
+//       interval: 1,
+//       axisLabel: { fontSize: 11 }, 
+//       splitLine: { show: false } 
+//     },
+//     yAxis: { 
+//       type: 'value', 
+//       name: 'P(X=k)', 
+//       nameGap: 10,       // ← 标题与轴线间距
+//       nameTextStyle: {   // ← 标题样式，确保可见
+//         align: 'right',
+//         padding: [0, 8, 0, 0]
+//       },
+//       axisLabel: { fontSize: 11 }, 
+//       splitLine: { lineStyle: { color: '#f1f5f9' } } 
+//     },
+//     series: [{
+//       type: 'bar', 
+//       data: seriesData,
+//       barWidth: '60%',
+//       itemStyle: { 
+//         color: '#2563eb', 
+//         borderRadius: [4, 4, 0, 0] 
+//       },
+//       markLine: {
+//         silent: true, 
+//         symbol: 'none',
+//         lineStyle: { color: '#ef4444', type: 'dashed', width: 2 },
+//         label: { 
+//           fontSize: 11, 
+//           formatter: 'E(X)=' + ex.toFixed(2),
+//           position: 'start' 
+//         },
+//         data: [{ xAxis: ex }]
+//       }
+//     }]
+//   });
+// }
 
 function updateExpectation() {
   var dist = document.getElementById('expDistSelect').value;
   var paramVal = parseFloat(document.getElementById('expParamSlider').value);
   document.getElementById('expParamVal').textContent = paramVal.toFixed(2);
 
-  var data = [], ex = 0;
+  var data = [], ex = 0, vals = [];
+  
   if (dist === 'binomial') {
     var n = 10, p = paramVal;
     for (var k = 0; k <= n; k++) {
       var prob = binomialPMF(k, n, p);
       data.push({value: k, prob: prob});
+      vals.push(k);
       ex += k * prob;
     }
   } else if (dist === 'poisson') {
@@ -386,22 +745,19 @@ function updateExpectation() {
     for (var k = 0; k <= maxK; k++) {
       var prob = Math.exp(-lam + k*Math.log(lam) - logFactorial(k));
       data.push({value: k, prob: prob});
+      vals.push(k);
       ex += k * prob;
     }
   } else {
-    // 非对称分布：偏度参数控制左右偏
-    var w = paramVal; // 0=左偏, 1=右偏
-    var vals = [0, 1, 2, 3, 5, 8];
-    // 左偏分布（概率集中在右侧高值）
+    var w = paramVal;
+    vals = [0, 1, 2, 3, 5, 8];
     var leftProbs = [0.02, 0.08, 0.15, 0.15, 0.25, 0.35];
-    // 右偏分布（概率集中在左侧低值）
     var rightProbs = [0.35, 0.25, 0.15, 0.15, 0.08, 0.02];
     var probs = [];
     for (var i = 0; i < vals.length; i++) {
       var prob = leftProbs[i] * (1 - w) + rightProbs[i] * w;
       probs.push(prob);
     }
-    // 归一化
     var sum = 0;
     for (var i = 0; i < probs.length; i++) sum += probs[i];
     for (var i = 0; i < vals.length; i++) {
@@ -413,34 +769,77 @@ function updateExpectation() {
 
   document.getElementById('expVal').textContent = ex.toFixed(2);
 
-  var xData = data.map(function(d) { return d.value; });
+  var xData = data.map(function(d) { return String(d.value); });
   var yData = data.map(function(d) { return d.prob; });
 
-  // 找到期望值最接近的 x 轴索引，用于 markLine 定位
-  var closestIdx = 0;
-  var minDiff = Infinity;
-  for (var i = 0; i < data.length; i++) {
-    var diff = Math.abs(data[i].value - ex);
-    if (diff < minDiff) { minDiff = diff; closestIdx = i; }
+  // 计算 markLine 在 category 轴上的精确索引（支持小数插值）
+  var markLineX;
+  if (dist === 'binomial' || dist === 'poisson') {
+    markLineX = ex;  // 值即索引，小数自然落在两柱之间
+  } else {
+    markLineX = getMarkLineIndex(vals, ex);
   }
 
   expChart.setOption({
-    tooltip: { trigger: 'axis', formatter: function(p) { return 'X='+p[0].data[0]+'<br/>P='+p[0].data[1].toFixed(4); } },
-    grid: { left: 50, right: 20, top: 20, bottom: 35 },
-    xAxis: { type: 'category', data: xData, axisLabel: { fontSize: 11 }, splitLine: { show: false } },
-    yAxis: { type: 'value', name: 'P(X=k)', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    tooltip: { 
+      trigger: 'axis', 
+      formatter: function(p) { 
+        return 'X=' + p[0].name + '<br/>P=' + p[0].data.toFixed(4); 
+      } 
+    },
+    grid: { left: 50, right: 20, top: 30, bottom: 35 },
+    xAxis: { 
+      type: 'category',           // ← 改回 category，柱子自动落在"两点之间"
+      data: xData,
+      boundaryGap: true,          // 柱子在类目区间内，两侧留边距
+      // axisLine: { lineStyle: { color: '#e2e8f0' } },
+      axisLabel: { fontSize: 11 },
+      splitLine: { show: false }
+    },
+    yAxis: { 
+      type: 'value',
+      name: 'P(X=k)',
+      axisLine: { show: false },  // ← y轴线不可见
+      axisTick: { show: true },  // 保留刻度
+      axisLabel: { fontSize: 11 },
+      splitLine: { lineStyle: { color: '#f1f5f9' } }
+    },
     series: [{
-      type: 'bar', data: yData, barWidth: '50%',
-      itemStyle: { color: '#2563eb', borderRadius: [4, 4, 0, 0] },
+      type: 'bar',
+      data: yData,
+      barWidth: '55%',
+      itemStyle: { 
+        color: '#2563eb', 
+        borderRadius: [4, 4, 0, 0] 
+      },
       markLine: {
-        silent: true, symbol: 'none',
+        silent: true,
+        symbol: 'none',
         lineStyle: { color: '#ef4444', type: 'dashed', width: 2 },
-        label: { fontSize: 11, formatter: 'E(X)={c}', position: 'start' },
-        data: [{ xAxis: closestIdx }]
+        label: { 
+          fontSize: 11,
+          formatter: 'E(X)=' + ex.toFixed(2),
+          position: 'start'
+        },
+        data: [{ xAxis: ex }]   // category 轴支持小数索引，精确落在期望位置
       }
     }]
   });
 }
+
+// 辅助：非连续取值时，把实际期望值映射到类目轴的插值索引
+function getMarkLineIndex(vals, ex) {
+  if (ex <= vals[0]) return 0;
+  var n = vals.length;
+  if (ex >= vals[n - 1]) return n - 1;
+  for (var i = 0; i < n - 1; i++) {
+    if (ex >= vals[i] && ex <= vals[i + 1]) {
+      return i + (ex - vals[i]) / (vals[i + 1] - vals[i]);
+    }
+  }
+  return 0;
+}
+
 
 function logFactorial(n) { if (n <= 1) return 0; var s = 0; for (var i = 2; i <= n; i++) s += Math.log(i); return s; }
 function binomialPMF(k, n, p) { if (k < 0 || k > n) return 0; var logC = 0; for (var i = 1; i <= k; i++) logC += Math.log(n - k + i) - Math.log(i); return Math.exp(logC + k*Math.log(p) + (n-k)*Math.log(1-p)); }
@@ -452,15 +851,14 @@ function resetExpectation() {
   var label = group.querySelector('span');
   if (dist === 'binomial') {
     label.textContent = 'p =';
-    slider.min = 0.1; slider.max = 0.9; slider.value = 0.5; slider.step = 0.05;
+    slider.min = '0.1'; slider.max = '0.9'; slider.value = '0.5'; slider.step = '0.05';
   } else if (dist === 'poisson') {
     label.textContent = 'λ =';
-    slider.min = 0.5; slider.max = 10; slider.value = 4; slider.step = 0.5;
+    slider.min = '0.5'; slider.max = '10'; slider.value = '4'; slider.step = '0.5';
   } else { // asymmetric
     label.textContent = '偏度 =';
-    slider.min = 0; slider.max = 1; slider.value = 0.5; slider.step = 0.05;
+    slider.min = '0'; slider.max = '1'; slider.value = '0.5'; slider.step = '0.05';
   }
-  group.style.display = '';
   updateExpectation();
 }
 updateExpectation();
@@ -490,13 +888,13 @@ function updateVariance() {
 
   varChart.setOption({
     tooltip: { trigger: 'axis', formatter: function(p) { return 'x='+p[0].data[0].toFixed(3)+'<br/>f(x)='+p[0].data[1].toFixed(4); } },
-    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    grid: { left: 50, right: 20, top: 30, bottom: 35 },
     xAxis: { type: 'value', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     yAxis: { type: 'value', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: [{
       type: 'line', data: data, smooth: true, symbol: 'none',
       lineStyle: { color: '#2563eb', width: 2.5 },
-      areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,0.25)'},{offset:1,color:'rgba(37,99,235,0.02)'}]) },
+      areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,0.75)'},{offset:1,color:'rgba(37,99,235,0.02)'}]) },
       markLine: {
         silent: true, symbol: 'none', lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 },
         label: { fontSize: 10, formatter: 'μ={c}' },
@@ -554,7 +952,7 @@ function updateCorr() {
 
   corrLinearChart.setOption({
     tooltip: { trigger: 'item' },
-    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    grid: { left: 50, right: 20, top: 30, bottom: 35 },
     xAxis: { type: 'value', name: 'X', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     yAxis: { type: 'value', name: 'Y', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: [{
@@ -573,7 +971,7 @@ function updateCorr() {
 
   corrNonLinearChart.setOption({
     tooltip: { trigger: 'item' },
-    grid: { left: 50, right: 20, top: 20, bottom: 35 },
+    grid: { left: 50, right: 20, top: 30, bottom: 35 },
     xAxis: { type: 'value', name: 'X', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     yAxis: { type: 'value', name: 'Y', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: [{
