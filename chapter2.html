@@ -927,17 +927,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <div class="text-xs text-slate-400 mb-1 text-center">原分布 N(μ, σ²)</div>
+          <div class="flex flex-wrap justify-center gap-x-3 gap-y-1 mb-1 text-xs text-slate-500">
+            <span id="normOrigMark">x = 1.00</span>
+            <span id="normOrigProb">P(X ≤ x) = 0.8413</span>
+          </div>
           <div id="normOrigChart" style="width:100%;height:300px;"></div>
         </div>
         <div>
           <div class="text-xs text-slate-400 mb-1 text-center">标准正态 N(0,1)</div>
+          <div class="flex flex-wrap justify-center gap-x-3 gap-y-1 mb-1 text-xs text-slate-500">
+            <span id="normStdMark">z = (x - μ) / σ = 1.00</span>
+            <span id="normStdProb">P(Z ≤ 1.00) = Φ(1.00) = 0.8413</span>
+          </div>
           <div id="normStdChart" style="width:100%;height:300px;"></div>
         </div>
       </div>
 
       <div class="exam-tip">
         <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
-        <span class="text-sm text-yellow-700">正态标准化<strong>期末考试必考</strong>。记住：先标准化再查表，\(\Phi(-z)=1-\Phi(z)\)。常用分位点 \(z_{0.025}=1.96\) 要牢记。</span>
+        <span class="text-sm text-yellow-700">正态标准化<strong>期末考试必考</strong>。记住：先标准化再查表，\(\Phi(-z)=1-\Phi(z)\)。</span>
       </div>
     </div>
   </section>
@@ -1251,20 +1259,70 @@ function uniformCDF(x, a, b) { if (x < a) return 0; if (x > b) return 1; return 
 function expPDF(x, lam) { return x >= 0 ? lam*Math.exp(-lam*x) : 0; }
 function expCDF(x, lam) { return x >= 0 ? 1 - Math.exp(-lam*x) : 0; }
 
+var CONT_VIEWS = {
+  normal: [
+    { xMin: -5, xMax: 5, pdfYMax: 1.4, cdfYMax: 1 },
+    { xMin: -8, xMax: 8, pdfYMax: 0.6, cdfYMax: 1 }
+  ],
+  uniform: [
+    { xMin: -4, xMax: 6, pdfYMax: 2.5, cdfYMax: 1 },
+    { xMin: -4, xMax: 6, pdfYMax: 1.0, cdfYMax: 1 }
+  ],
+  exponential: [
+    { xMin: 0, xMax: 5, pdfYMax: 3.2, cdfYMax: 1 },
+    { xMin: 0, xMax: 10, pdfYMax: 1.0, cdfYMax: 1 }
+  ]
+};
+var STD_NORMAL_VIEW = { xMin: -4, xMax: 4, pdfYMax: 0.5 };
+var STANDARDIZE_ORIG_VIEWS = {
+  standard: { xMin: -4, xMax: 4, pdfYMax: 0.5 },
+  extended: { xMin: -8, xMax: 8, pdfYMax: 1.4 }
+};
+
+function getStandardizeOrigView(mu, sigma) {
+  return Math.abs(mu) + 3 * sigma <= 4 && sigma >= 0.8
+    ? STANDARDIZE_ORIG_VIEWS.standard
+    : STANDARDIZE_ORIG_VIEWS.extended;
+}
+
+function getContParams() {
+  var dist = document.getElementById('contDistSelect').value;
+  var p1Slider = document.getElementById('contParam1Slider');
+  var p2Slider = document.getElementById('contParam2Slider');
+  var p1 = parseFloat(p1Slider.value);
+  var p2 = parseFloat(p2Slider.value);
+
+  if (dist === 'uniform') {
+    p2Slider.min = p1;
+    if (p2 <= p1 + 0.1) {
+      p2 = Math.min(5, p1 + 0.1);
+      if (p2 <= p1) {
+        p1 = Math.max(-3, p2 - 0.1);
+        p2Slider.min = p1;
+      }
+      p1Slider.value = p1;
+      p2Slider.value = p2;
+    }
+  }
+
+  return { p1: p1, p2: p2 };
+}
+
+function getContView(dist, p1, p2) {
+  if (dist === 'normal') {
+    return p2 <= 1.2 ? CONT_VIEWS.normal[0] : CONT_VIEWS.normal[1];
+  }
+  if (dist === 'uniform') {
+    return (p2 - p1) <= 2.5 ? CONT_VIEWS.uniform[0] : CONT_VIEWS.uniform[1];
+  }
+  return p1 >= 1.0 ? CONT_VIEWS.exponential[0] : CONT_VIEWS.exponential[1];
+}
+
 function getContRange() {
   var dist = document.getElementById('contDistSelect').value;
-  if (dist === 'normal') {
-    var mu = parseFloat(document.getElementById('contParam1Slider').value);
-    var sigma = parseFloat(document.getElementById('contParam2Slider').value);
-    return {xMin: mu-4*sigma, xMax: mu+4*sigma};
-  } else if (dist === 'uniform') {
-    var a = parseFloat(document.getElementById('contParam1Slider').value);
-    var b = parseFloat(document.getElementById('contParam2Slider').value);
-    return {xMin: a-0.5, xMax: b+0.5};
-  } else {
-    var lam = parseFloat(document.getElementById('contParam1Slider').value);
-    return {xMin: 0, xMax: 5/lam};
-  }
+  var params = getContParams();
+  var view = getContView(dist, params.p1, params.p2);
+  return {xMin: view.xMin, xMax: view.xMax};
 }
 
 function updateContinuous() {
@@ -1281,16 +1339,17 @@ function updateContinuous() {
     document.getElementById('contParam2Label').textContent = 'b =';
     document.getElementById('contParam2Group').style.display = 'flex';
     document.getElementById('contParam1Slider').min = -3; document.getElementById('contParam1Slider').max = 1; document.getElementById('contParam1Slider').step = 0.1;
-    document.getElementById('contParam2Slider').min = 1; document.getElementById('contParam2Slider').max = 5; document.getElementById('contParam2Slider').step = 0.1;
+    document.getElementById('contParam2Slider').min = document.getElementById('contParam1Slider').value; document.getElementById('contParam2Slider').max = 5; document.getElementById('contParam2Slider').step = 0.1;
   } else {
     document.getElementById('contParam1Label').textContent = 'λ =';
     document.getElementById('contParam2Group').style.display = 'none';
     document.getElementById('contParam1Slider').min = 0.3; document.getElementById('contParam1Slider').max = 3; document.getElementById('contParam1Slider').step = 0.1;
   }
 
-  var p1 = parseFloat(document.getElementById('contParam1Slider').value);
+  var params = getContParams();
+  var p1 = params.p1;
   document.getElementById('contParam1Val').textContent = p1.toFixed(1);
-  var p2 = parseFloat(document.getElementById('contParam2Slider').value);
+  var p2 = params.p2;
   document.getElementById('contParam2Val').textContent = p2.toFixed(1);
 
   contX0 = null;
@@ -1301,11 +1360,13 @@ function updateContinuous() {
 
 function drawContinuous() {
   var dist = document.getElementById('contDistSelect').value;
-  var p1 = parseFloat(document.getElementById('contParam1Slider').value);
-  var p2 = parseFloat(document.getElementById('contParam2Slider').value);
+  var params = getContParams();
+  var p1 = params.p1;
+  var p2 = params.p2;
   var range = getContRange();
   var N = 200;
   var pdfData = [], cdfData = [];
+  var view = getContView(dist, p1, p2);
 
   var pdfFunc, cdfFunc;
   if (dist === 'normal') { pdfFunc = function(x){return normalPDF(x,p1,p2);}; cdfFunc = function(x){return normalCDF(x,p1,p2);}; }
@@ -1344,19 +1405,27 @@ function drawContinuous() {
     }
   }
 
+  var pdfYAxis = {
+    type: 'value',
+    min: 0,
+    max: view.pdfYMax,
+    axisLabel: { fontSize: 10 },
+    splitLine: { lineStyle: { color: '#f1f5f9' } }
+  };
+
   contPDFChart.setOption({
     tooltip: { trigger: 'axis', formatter: function(p) { return 'x='+p[0].data[0].toFixed(3)+'<br/>f(x)='+p[0].data[1].toFixed(4); } },
     grid: { left: 45, right: 15, top: 15, bottom: 30 },
-    xAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    xAxis: { type: 'value', min: range.xMin, max: range.xMax, axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: pdfYAxis,
     series: pdfSeries
   });
 
   contCDFChart.setOption({
     tooltip: { trigger: 'axis', formatter: function(p) { return 'x='+p[0].data[0].toFixed(3)+'<br/>F(x)='+p[0].data[1].toFixed(4); } },
     grid: { left: 45, right: 15, top: 15, bottom: 30 },
-    xAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    yAxis: { type: 'value', min: 0, max: 1, axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    xAxis: { type: 'value', min: range.xMin, max: range.xMax, axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', min: 0, max: view.cdfYMax, axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: [{
       type: 'line', data: cdfData, smooth: true, symbol: 'none',
       lineStyle: { color: '#2563eb', width: 2 }
@@ -1378,9 +1447,22 @@ contPDFChart.on('click', function(params) {
 });
 
 function resetContinuous() {
-  document.getElementById('contDistSelect').value = 'normal';
-  document.getElementById('contParam1Slider').value = 0;
-  document.getElementById('contParam2Slider').value = 1;
+  // 保持当前选中的分布类型不变，只重置该分布的参数为默认值
+  var dist = document.getElementById('contDistSelect').value;
+  var p1Slider = document.getElementById('contParam1Slider');
+  var p2Slider = document.getElementById('contParam2Slider');
+  if (dist === 'exponential') {
+    // 指数分布 E(λ)：λ=1
+    p1Slider.value = 1;
+  } else if (dist === 'uniform') {
+    // 均匀分布 U(a,b)：a=0, b=1
+    p1Slider.value = 0;
+    p2Slider.value = 1;
+  } else {
+    // 正态分布 N(μ,σ²)：μ=0, σ=1
+    p1Slider.value = 0;
+    p2Slider.value = 1;
+  }
   contX0 = null;
   updateContinuous();
 }
@@ -1403,20 +1485,42 @@ var normStdChart = echarts.init(document.getElementById('normStdChart'));
 function updateStandardize() {
   var mu = parseFloat(document.getElementById('normMuSlider').value);
   var sigma = parseFloat(document.getElementById('normSigmaSlider').value);
-  var xVal = parseFloat(document.getElementById('normXSlider').value);
+  var xSlider = document.getElementById('normXSlider');
+  var xMinAllowed = Math.max(-5, mu - 4 * sigma);
+  var xMaxAllowed = Math.min(5, mu + 4 * sigma);
+  xSlider.min = xMinAllowed.toFixed(1);
+  xSlider.max = xMaxAllowed.toFixed(1);
+
+  var xVal = parseFloat(xSlider.value);
+  if (xVal < xMinAllowed) {
+    xVal = xMinAllowed;
+    xSlider.value = xVal.toFixed(1);
+  } else if (xVal > xMaxAllowed) {
+    xVal = xMaxAllowed;
+    xSlider.value = xVal.toFixed(1);
+  }
 
   document.getElementById('normMuVal').textContent = mu.toFixed(1);
   document.getElementById('normSigmaVal').textContent = sigma.toFixed(1);
   document.getElementById('normXVal').textContent = xVal.toFixed(1);
 
   var z = (xVal - mu) / sigma;
+  var origProb = normalCDF(xVal, mu, sigma);
+  var stdProb = normalCDF(z, 0, 1);
   document.getElementById('normZVal').textContent = z.toFixed(2);
+  document.getElementById('normOrigMark').textContent = 'x = ' + xVal.toFixed(2);
+  // document.getElementById('normOrigProb').textContent = 'P(X ≤ x) = ' + origProb.toFixed(4);
+  document.getElementById('normOrigProb').textContent = 'P(X ≤ ' + xVal.toFixed(2) + ') = ' + origProb.toFixed(4);
+  document.getElementById('normStdMark').textContent = 'z = (x - μ) / σ = ' + z.toFixed(2);
+  var zText = z.toFixed(2);
+  document.getElementById('normStdProb').textContent = 'P(Z ≤ ' + zText + ') = Φ(' + zText + ') = ' + stdProb.toFixed(4);
 
-  var xMin = mu - 4*sigma, xMax = mu + 4*sigma;
+  var normalView = getStandardizeOrigView(mu, sigma);
+  var xMin = normalView.xMin, xMax = normalView.xMax;
   var N = 200;
   var origData = [], stdData = [];
   var step = (xMax - xMin) / N;
-  var zMin = -4, zMax = 4, zStep = (zMax - zMin) / N;
+  var zMin = STD_NORMAL_VIEW.xMin, zMax = STD_NORMAL_VIEW.xMax, zStep = (zMax - zMin) / N;
 
   for (var i = 0; i <= N; i++) {
     var x = xMin + i*step;
@@ -1445,7 +1549,14 @@ function updateStandardize() {
     var series = [{
       type: 'line', data: lineData, smooth: true, symbol: 'none',
       lineStyle: { color: '#2563eb', width: 2 },
-      areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,0.15)'},{offset:1,color:'rgba(37,99,235,0.02)'}]) }
+      areaStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'rgba(37,99,235,0.15)'},{offset:1,color:'rgba(37,99,235,0.02)'}]) },
+      markLine: {
+        silent: true,
+        symbol: 'none',
+        label: { show: false },
+        lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 },
+        data: [{ xAxis: markX }]
+      }
     }];
     if (shadeData.length > 0) {
       shadeData.push([markX, 0]);
@@ -1456,26 +1567,22 @@ function updateStandardize() {
         areaStyle: { color: 'rgba(37,99,235,0.35)' }, silent: true
       });
     }
-    series.push({
-      type: 'line', data: [[markX, 0], [markX, Math.max.apply(null, lineData.map(function(d){return d[1];}))]],
-      symbol: 'none', lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 }, silent: true
-    });
     return series;
   };
 
   normOrigChart.setOption({
     tooltip: { trigger: 'axis' },
     grid: { left: 45, right: 15, top: 15, bottom: 30 },
-    xAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    xAxis: { type: 'value', min: normalView.xMin, max: normalView.xMax, axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', min: 0, max: normalView.pdfYMax, axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: makeSeries(origData, origShade, xVal)
   });
 
   normStdChart.setOption({
     tooltip: { trigger: 'axis' },
     grid: { left: 45, right: 15, top: 15, bottom: 30 },
-    xAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    xAxis: { type: 'value', min: STD_NORMAL_VIEW.xMin, max: STD_NORMAL_VIEW.xMax, axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+    yAxis: { type: 'value', min: 0, max: STD_NORMAL_VIEW.pdfYMax, axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: makeSeries(stdData, stdShade, z)
   });
 }
@@ -1523,7 +1630,7 @@ function updateFType() {
 
   ftypeChart.setOption({
     tooltip: { trigger: 'axis', formatter: function(p) { return 'x='+p[0].data[0].toFixed(3)+'<br/>F(x)='+p[0].data[1].toFixed(4); } },
-    grid: { left: 50, right: 20, top: 30, bottom: 35 },
+    grid: { left: 50, right: 50, top: 30, bottom: 35 },
     xAxis: { type: 'value', name: 'x', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     yAxis: { type: 'value', name: 'F(x)', min: 0, max: 1.05, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
     series: [{
