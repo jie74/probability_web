@@ -1447,22 +1447,21 @@ contPDFChart.on('click', function(params) {
 });
 
 function resetContinuous() {
-  // 保持当前选中的分布类型不变，只重置该分布的参数为默认值
+  // 保留当前选中的分布，只重置该分布的参数到默认值
   var dist = document.getElementById('contDistSelect').value;
   var p1Slider = document.getElementById('contParam1Slider');
   var p2Slider = document.getElementById('contParam2Slider');
-  if (dist === 'exponential') {
-    // 指数分布 E(λ)：λ=1
-    p1Slider.value = 1;
+
+  if (dist === 'normal') {
+    p1Slider.value = 0;   // μ = 0
+    p2Slider.value = 1;    // σ = 1
   } else if (dist === 'uniform') {
-    // 均匀分布 U(a,b)：a=0, b=1
-    p1Slider.value = 0;
-    p2Slider.value = 1;
-  } else {
-    // 正态分布 N(μ,σ²)：μ=0, σ=1
-    p1Slider.value = 0;
-    p2Slider.value = 1;
+    p1Slider.value = -1;  // a = -1
+    p2Slider.value = 2;    // b = 2
+  } else { // exponential
+    p1Slider.value = 1;    // λ = 1
   }
+
   contX0 = null;
   updateContinuous();
 }

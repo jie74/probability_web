@@ -97,6 +97,65 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
     </p>
   </section>
 
+  <!-- ===== 切比雪夫不等式交互演示 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-800">切比雪夫不等式</h2>
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+          <p class="text-sm text-slate-500 mt-1">以正态分布 \(X\sim N(\mu,\sigma^2)\) 为例，对比真实概率与保守界。</p>
+        </div>
+        <span class="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 rounded-full">μ = 0</span>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 切比雪夫不等式交互演示</h3>
+
+      <div class="flex flex-wrap items-end gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <label for="chebSigmaSlider" class="text-sm text-slate-600">标准差 σ</label>
+          <input type="range" id="chebSigmaSlider" min="0.3" max="3" value="1" step="0.1" class="slider-input w-40">
+          <input id="chebSigmaValue" type="number" value="1.0" readonly class="w-16 px-2 py-1 text-sm font-mono text-blue-700 bg-blue-50 border border-blue-200 rounded-md text-center">
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="chebEpsilonSlider" class="text-sm text-slate-600">偏差阈值 ε</label>
+          <input type="range" id="chebEpsilonSlider" min="0.3" max="6" value="2" step="0.1" class="slider-input w-40">
+          <input id="chebEpsilonValue" type="number" value="2.0" readonly class="w-16 px-2 py-1 text-sm font-mono text-blue-700 bg-blue-50 border border-blue-200 rounded-md text-center">
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-500">典型阈值预设</span>
+          <button class="cheb-preset px-3 py-1.5 text-sm text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors" data-multiple="2">ε=2σ</button>
+          <button class="cheb-preset px-3 py-1.5 text-sm text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors" data-multiple="3">ε=3σ</button>
+          <button class="cheb-preset px-3 py-1.5 text-sm text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors" data-multiple="5">ε=5σ</button>
+        </div>
+        <button id="chebResetButton" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div id="chebyshevChart" style="width:100%;height:400px;"></div>
+      <div class="text-center mt-1 text-sm text-slate-500">ε增大，数据中间占比下限增大，数据两边占比上限减小</div>
+
+      <div class="formula-panel mt-4">
+        <div class="formula-toggle open" onclick="toggleFormula(this)">
+          <span class="arrow" style="transform:rotate(90deg);">▶</span> 切比雪夫不等式实时计算结果
+        </div>
+        <div class="formula-body show">
+          <div class="space-y-3">
+            <!-- <div class="katex-render" data-expr="P(|X-\mu|\ge\epsilon)\le \frac{\sigma^2}{\epsilon^2}"></div>
+            <div class="katex-render" data-expr="P(|X-\mu|<\epsilon)\ge 1-\frac{\sigma^2}{\epsilon^2}"></div> -->
+            <div id="chebDynamicFormula" class="text-slate-600"></div>
+            <p class="text-sm text-slate-500 leading-relaxed">
+              <span id="chebUpperExplanation">25.0%</span> 为 \(P(|X-\mu|\ge\epsilon)\) 的通用概率上界，
+              与图表中的\(\color{#dc2626}{\text{淡红色外侧区域}}\)对应。
+              <span id="chebLowerExplanation">75.0%</span> 为 \(P(|X-\mu|<\epsilon)\) 的通用概率下界，
+              与图表中的\(\color{#2563eb}{\text{蓝色内侧区域}}\)对应。切比雪夫不等式对任意存在期望与方差的随机变量成立，
+              与正态分布的真实概率不同，体现了它的保守性。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== 卡片1：大数定律模拟 ===== -->
   <section class="max-w-5xl mx-auto px-10">
     <div class="card">
@@ -200,7 +259,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
 
       <div class="exam-tip">
         <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
-        <span class="text-sm text-yellow-700">期末考试<strong>大题高频考点</strong>。记住核心：是<strong>样本均值</strong>趋近正态，不是原始数据趋近正态。原始总体可以任意分布，只要期望方差存在且 n 足够大。</span>
+        <span class="text-sm text-yellow-700">是<strong>样本均值</strong>趋近正态，不是原始数据趋近正态。原始总体可以任意分布，只要期望方差存在且 n 足够大。</span>
       </div>
     </div>
   </section>
@@ -322,6 +381,7 @@ function resetLLN() {
   llnChart.setOption({ series: [{ data: [] }] });
 }
 updateLLNSlider();
+runLLN();
 
 // ===== 卡片2：中心极限定理 =====
 var cltChart = echarts.init(document.getElementById('cltChart'));
@@ -402,6 +462,183 @@ function resetCLT() {
   cltChart.setOption({ series: [{ data: [] }, { data: [] }] });
 }
 updateCLTSlider();
+runCLT();
+
+// ===== 切比雪夫不等式交互演示 =====
+var chebyshevChart = echarts.init(document.getElementById('chebyshevChart'));
+
+function normalCDFStandard(z) {
+  var sign = z < 0 ? -1 : 1;
+  var x = Math.abs(z) / Math.sqrt(2);
+  var t = 1 / (1 + 0.3275911 * x);
+  var erf = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+  return 0.5 * (1 + sign * erf);
+}
+
+function chebyshevNormalProbability(sigma, epsilon) {
+  return 2 * normalCDFStandard(epsilon / sigma) - 1;
+}
+
+function chebyshevFillData(start, end, sigma, yMax, points) {
+  var data = [[start, 0]];
+  for (var i = 0; i <= points; i++) {
+    var x = start + (end - start) * i / points;
+    data.push([x, normalPDF(x, 0, sigma)]);
+  }
+  data.push([end, 0]);
+  return data;
+}
+
+function updateChebyshevFormula(sigma, epsilon, lowerBound, upperBound) {
+  var sigmaText = sigma.toFixed(1);
+  var epsilonText = epsilon.toFixed(1);
+  var fractionText = (sigma * sigma).toFixed(1) + '^2/' + epsilonText + '^2';
+  var formula = 'P(|X-\\mu|\\ge\\epsilon)\\le \\frac{\\sigma^2}{\\epsilon^2}=\\color{#dc2626}{\\frac{' + sigmaText + '^2}{' + epsilonText + '^2}}=' + (upperBound * 100).toFixed(1) + '\\%';
+  var formulaLt = 'P(|X-\\mu|<\\epsilon)\\ge 1-\\frac{\\sigma^2}{\\epsilon^2}=\\color{#2563eb}{1-\\frac{' + sigmaText + '^2}{' + epsilonText + '^2}}=' + (lowerBound * 100).toFixed(1) + '\\%';
+  var formulaEl = document.getElementById('chebDynamicFormula');
+  formulaEl.setAttribute('data-expr', formula);
+  formulaEl.innerHTML = '<span class="text-slate-400 mr-2">代入当前参数：</span><span class="katex-render" data-expr="' + formula + '"></span><br><span class="text-slate-400 mr-2">等价形式：</span><span class="katex-render" data-expr="' + formulaLt + '"></span>';
+  document.getElementById('chebLowerExplanation').textContent = (lowerBound * 100).toFixed(1) + '%';
+  document.getElementById('chebUpperExplanation').textContent = (upperBound * 100).toFixed(1) + '%';
+  renderAllKatex();
+}
+
+function updateChebyshev() {
+  var sigmaSlider = document.getElementById('chebSigmaSlider');
+  var epsilonSlider = document.getElementById('chebEpsilonSlider');
+  var sigma = parseFloat(sigmaSlider.value);
+  var epsilon = parseFloat(epsilonSlider.value);
+  var varianceRatio = Math.min(1, (sigma * sigma) / (epsilon * epsilon));
+  var lowerBound = Math.max(0, 1 - varianceRatio);
+  var upperBound = varianceRatio;
+  var actualInside = chebyshevNormalProbability(sigma, epsilon);
+  var actualOutside = 1 - actualInside;
+  var xMin = -6, xMax = 6, points = 240;
+  var peak = normalPDF(0, 0, sigma);
+  var yMax = peak <= 0.42 ? 0.5 : (peak <= 0.82 ? 1.0 : 1.5);
+  var curveData = [], insideData = [], leftOutsideData = [], rightOutsideData = [];
+
+  for (var i = 0; i <= points; i++) {
+    var x = xMin + (xMax - xMin) * i / points;
+    curveData.push([x, normalPDF(x, 0, sigma)]);
+  }
+
+  var leftBoundary = Math.max(xMin, -epsilon);
+  var rightBoundary = Math.min(xMax, epsilon);
+  insideData = chebyshevFillData(leftBoundary, rightBoundary, sigma, 0.5, 120);
+  if (leftBoundary > xMin) leftOutsideData = chebyshevFillData(xMin, leftBoundary, sigma, 0.5, 80);
+  if (rightBoundary < xMax) rightOutsideData = chebyshevFillData(rightBoundary, xMax, sigma, 0.5, 80);
+
+  sigmaSlider.nextElementSibling.value = sigma.toFixed(1);
+  epsilonSlider.nextElementSibling.value = epsilon.toFixed(1);
+  updateChebyshevFormula(sigma, epsilon, lowerBound, upperBound);
+
+  chebyshevChart.setOption({
+    animationDuration: 180,
+    tooltip: {
+      trigger: 'axis',
+      formatter: function(params) {
+        var point = params.find(function(item) { return item.seriesName === '正态密度'; });
+        return point ? 'x = ' + point.data[0].toFixed(2) + '<br/>f(x) = ' + point.data[1].toFixed(4) : '';
+      }
+    },
+    grid: { left: 52, right: 28, top: 62, bottom: 42 },
+    xAxis: {
+      type: 'value', min: xMin, max: xMax, name: 'x',
+      nameLocation: 'middle', nameGap: 25,
+      axisLabel: { fontSize: 11 },
+      splitLine: { lineStyle: { color: '#e2e8f0' } }
+    },
+    yAxis: {
+      type: 'value', min: 0, max: yMax, name: '密度',
+      axisLabel: { fontSize: 11 },
+      splitLine: { lineStyle: { color: '#e2e8f0' } }
+    },
+    graphic: [
+      {
+        type: 'text', left: 'center', top: 100,
+        style: {
+          text: '正态分布实际占比: ' + (actualInside * 100).toFixed(1) + '%',
+          fill: '#1d4ed8', font: '700 14px sans-serif',
+          textAlign: 'center'
+        }
+      },
+      {
+        type: 'text', right: 34, top: 100,
+        style: {
+          text: '正态分布实际两边占比: ' + (actualOutside * 100).toFixed(1) + '%',
+          fill: '#dc2626', font: '600 14px sans-serif',
+          textAlign: 'right'
+        }
+      },
+      {
+        type: 'text', left: 'center', top: 10,
+        style: {
+          text: '下限 ≥ ' + (lowerBound * 100).toFixed(1) + '%',
+          fill: '#2563eb', font: '600 20px sans-serif',
+          textAlign: 'right'
+        }
+      },
+      {
+        type: 'text', right: 60, top: 10,
+        style: {
+          text: '上限 ≤ ' + (upperBound * 100).toFixed(1) + '%',
+          fill: '#dc2626', font: '600 20px sans-serif',
+          textAlign: 'right'
+        }
+      }
+    ],
+    series: [
+      {
+        name: '区间外部区域', type: 'line', data: leftOutsideData,
+        smooth: true, symbol: 'none', lineStyle: { color: 'transparent' },
+        areaStyle: { color: 'rgba(248, 113, 113, 0.34)' }, silent: true
+      },
+      {
+        name: '区间内部区域', type: 'line', data: insideData,
+        smooth: true, symbol: 'none', lineStyle: { color: 'transparent' },
+        areaStyle: { color: 'rgba(96, 165, 250, 0.34)' }, silent: true
+      },
+      {
+        name: '右侧外部区域', type: 'line', data: rightOutsideData,
+        smooth: true, symbol: 'none', lineStyle: { color: 'transparent' },
+        areaStyle: { color: 'rgba(248, 113, 113, 0.34)' }, silent: true
+      },
+      {
+        name: '正态密度', type: 'line', data: curveData,
+        smooth: true, symbol: 'none',
+        lineStyle: { color: '#2563eb', width: 2.5 },
+        areaStyle: { color: 'rgba(147, 197, 253, 0.08)' },
+        markLine: {
+          silent: true, symbol: 'none',
+          label: { show: true, color: '#2563eb', fontSize: 11, formatter: function(item) { return item.value; } },
+          lineStyle: { color: '#2563eb', type: 'dashed', width: 1.5 },
+          data: [
+            { xAxis: -epsilon, name: 'μ−ε', value: 'μ−ε=' + (-epsilon).toFixed(1) },
+            { xAxis: epsilon, name: 'μ+ε', value: 'μ+ε=' + epsilon.toFixed(1) },
+            { xAxis: 0, name: 'μ', value: 'μ', lineStyle: { color: '#64748b', type: 'solid', width: 1.2 } }
+          ]
+        }
+      }
+    ]
+  });
+}
+
+document.getElementById('chebSigmaSlider').addEventListener('input', updateChebyshev);
+document.getElementById('chebEpsilonSlider').addEventListener('input', updateChebyshev);
+document.querySelectorAll('.cheb-preset').forEach(function(button) {
+  button.addEventListener('click', function() {
+    var sigma = parseFloat(document.getElementById('chebSigmaSlider').value);
+    document.getElementById('chebEpsilonSlider').value = Math.min(6, (sigma * parseFloat(button.dataset.multiple)).toFixed(1));
+    updateChebyshev();
+  });
+});
+document.getElementById('chebResetButton').addEventListener('click', function() {
+  document.getElementById('chebSigmaSlider').value = 1;
+  document.getElementById('chebEpsilonSlider').value = 2;
+  updateChebyshev();
+});
+updateChebyshev();
 
 // ===== 自测题 =====
 var quizAnswers = { q1: 1, q2: 2, q3: 2 };
@@ -434,7 +671,7 @@ function selectQuiz(qid, choice, el) {
   renderAllKatex();
 }
 
-window.addEventListener('resize', function() { llnChart.resize(); cltChart.resize(); });
+window.addEventListener('resize', function() { llnChart.resize(); cltChart.resize(); chebyshevChart.resize(); });
 </script>
 
 </body>
