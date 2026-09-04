@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>概率论与数理统计交互式可视化平台</title>
+<link rel="icon" type="image/png" href="logo.png">
 
 <!-- TailwindCSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -438,22 +439,22 @@ tailwind.config = {
         <div class="katex-formula text-center" data-expr="\frac{\sum_{i=1}^{n}X_i-n\mu}{\sqrt{n}\sigma}\xrightarrow{d}N(0,1)"></div>
       </div>
       <div class="bg-white rounded-xl border border-slate-200 p-6">
-        <div class="text-xs text-slate-400 mb-3 uppercase tracking-wider font-semibold">极大似然估计</div>
-        <div class="katex-formula text-center" data-expr="\hat{\theta}=\arg\max_{\theta}\prod_{i=1}^{n}f(x_i;\theta)"></div>
+        <div class="text-xs text-slate-400 mb-3 uppercase tracking-wider font-semibold">切比雪夫不等式</div>
+        <div class="katex-formula text-center" data-expr="P(|X-\mu|\geq \varepsilon)\leq \frac{\sigma^2}{\varepsilon^2}"></div>
       </div>
     </div>
   </section>
 
   <!-- ===== 示例图表区域 ===== -->
-  <section class="max-w-5xl mx-auto px-10 py-8">
+  <!-- <section class="max-w-5xl mx-auto px-10 py-8">
     <div class="mb-8">
       <h2 class="text-xl font-bold text-slate-900 mb-2">交互式可视化预览</h2>
       <p class="text-sm text-slate-500">拖动滑块，直观感受参数变化对分布的影响</p>
       <div class="w-12 h-1 bg-primary rounded-full mt-2"></div>
-    </div>
+    </div> -->
 
     <!-- 正态分布交互图 -->
-    <div class="chart-container mb-6">
+    <!-- <div class="chart-container mb-6">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-base font-semibold text-slate-800">正态分布 <span class="katex-inline" data-expr="N(\mu,\sigma^2)"></span> — 参数调节演示</h3>
         <span class="text-xs text-slate-400">拖动滑块改变参数</span>
@@ -478,10 +479,10 @@ tailwind.config = {
       </div>
 
       <div id="normalChart" style="width:100%;height:320px;"></div>
-    </div>
+    </div> -->
 
     <!-- 二项分布交互图 -->
-    <div class="chart-container">
+    <!-- <div class="chart-container">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-base font-semibold text-slate-800">二项分布 <span class="katex-inline" data-expr="B(n,p)"></span> — 与正态近似对比</h3>
         <span class="text-xs text-slate-400">拖动滑块改变参数</span>
@@ -507,7 +508,7 @@ tailwind.config = {
 
       <div id="binomChart" style="width:100%;height:320px;"></div>
     </div>
-  </section>
+  </section> -->
 
   <!-- ===== 应试重点提示 ===== -->
   <section class="max-w-5xl mx-auto px-10 py-8">

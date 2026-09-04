@@ -1,151 +1,299 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>大数定律及中心极限定理 — 概率论与数理统计可视化平台</title>
-<!-- TailwindCSS CDN（与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        primary: '#2563eb',
-        'primary-light': '#3b82f6',
-        'primary-dark': '#1d4ed8',
-        'primary-bg': '#eff6ff',
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大数定律及中心极限定理 — 概率论与数理统计可视化平台</title>
+<link rel="icon" type="image/png" href="logo.png">
+  <!-- TailwindCSS CDN（与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb',
+            'primary-light': '#3b82f6',
+            'primary-dark': '#1d4ed8',
+            'primary-bg': '#eff6ff',
+          }
+        }
       }
     }
-  }
-}
-</script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"></script>
-<script src="js/katex-setup.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4/dist/echarts.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
-<link rel="stylesheet" href="css/sidebar.css">
-<style>
-html { scroll-behavior: smooth; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8fafc; }
-.main-content { margin-left: 256px; min-height: 100vh; }
-.card {
-  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;
-  margin-bottom: 24px; transition: all 0.2s;
-}
-.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
-.formula-panel {
-  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 12px; overflow: hidden;
-}
-.formula-toggle {
-  display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer;
-  font-size: 14px; font-weight: 500; color: #475569; user-select: none;
-  transition: background 0.15s;
-}
-.formula-toggle:hover { background: #f1f5f9; }
-.formula-toggle .arrow { transition: transform 0.2s; font-size: 12px; }
-.formula-toggle.open .arrow { transform: rotate(90deg); }
-.formula-body { display: none; padding: 0 16px 16px 16px; }
-.formula-body.show { display: block; }
-.exam-tip {
-  background: #fef9c3; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px 16px; margin-top: 16px;
-}
-.quiz-option {
-  display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px;
-  border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.15s; font-size: 14px;
-}
-.quiz-option:hover { border-color: #93c5fd; background: #eff6ff; }
-.quiz-option.selected { border-color: #2563eb; background: #eff6ff; }
-.quiz-option.correct { border-color: #16a34a; background: #f0fdf4; }
-.quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
-.slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
-.slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"></script>
+  <script src="js/katex-setup.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4/dist/echarts.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <link rel="stylesheet" href="css/sidebar.css">
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
 
-/* 移动端适配 */
-@media (max-width: 767px) {
-  .main-content { margin-left: 0 !important; }
-  section { padding-left: 16px !important; padding-right: 16px !important; }
-  .card { padding: 16px; }
-  h1 { font-size: 1.35rem !important; }
-  h2 { font-size: 1.05rem !important; }
-  .slider-input { width: 100% !important; max-width: 200px; }
-  .flex-wrap.items-center.gap-4 { gap: 8px !important; }
-  button { font-size: 0.8rem !important; padding: 6px 12px !important; }
-}
-</style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f8fafc;
+    }
+
+    .main-content {
+      margin-left: 256px;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: all 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .formula-panel {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .formula-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #475569;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .formula-toggle:hover {
+      background: #f1f5f9;
+    }
+
+    .formula-toggle .arrow {
+      transition: transform 0.2s;
+      font-size: 12px;
+    }
+
+    .formula-toggle.open .arrow {
+      transform: rotate(90deg);
+    }
+
+    .formula-body {
+      display: none;
+      padding: 0 16px 16px 16px;
+    }
+
+    .formula-body.show {
+      display: block;
+    }
+
+    .exam-tip {
+      background: #fef9c3;
+      border-left: 4px solid #eab308;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 16px;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 14px;
+    }
+
+    .quiz-option:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
+
+    .quiz-option.selected {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .quiz-option.correct {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .quiz-option.wrong {
+      border-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    .slider-input {
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      outline: none;
+    }
+
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #2563eb;
+      cursor: pointer;
+    }
+
+    /* 掷骰子实验画布 */
+    .dice-canvas-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .dice-canvas-wrap canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 767px) {
+      .main-content {
+        margin-left: 0 !important;
+      }
+
+      section {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 1.35rem !important;
+      }
+
+      h2 {
+        font-size: 1.05rem !important;
+      }
+
+      .slider-input {
+        width: 100% !important;
+        max-width: 200px;
+      }
+
+      .flex-wrap.items-center.gap-4 {
+        gap: 8px !important;
+      }
+
+      button {
+        font-size: 0.8rem !important;
+        padding: 6px 12px !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
-<div id="sidebar-container"></div>
-<script src="js/sidebar.js"></script>
+  <!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+  <div id="sidebar-container"></div>
+  <script src="js/sidebar.js"></script>
 
-<main class="main-content">
+  <main class="main-content">
 
-  <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
-    <div class="flex items-center gap-3 mb-2">
-      <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第5章</span>
-      <span class="text-xs text-slate-400">模块一 · 概率论</span>
-    </div>
-    <h1 class="text-2xl font-bold text-slate-900 mb-2">大数定律及中心极限定理</h1>
-    <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
-      大数定律：样本均值收敛于理论期望；
-      中心极限定理(CLT)：大量独立同分布样本均值近似服从正态分布，<strong>原始总体不需要正态</strong>。
-      应试重点：中心极限定理大题。
-    </p>
-  </section>
-
-  <!-- ===== 切比雪夫不等式交互演示 ===== -->
-  <section class="max-w-5xl mx-auto px-10">
-    <div class="card">
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <div>
-          <h2 class="text-lg font-bold text-slate-800">切比雪夫不等式</h2>
-          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
-          <p class="text-sm text-slate-500 mt-1">以正态分布 \(X\sim N(\mu,\sigma^2)\) 为例，对比真实概率与保守界。</p>
-        </div>
-        <span class="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 rounded-full">μ = 0</span>
+    <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第5章</span>
+        <span class="text-xs text-slate-400">模块一 · 概率论</span>
       </div>
+      <h1 class="text-2xl font-bold text-slate-900 mb-2">大数定律及中心极限定理</h1>
+      <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
+        大数定律：样本均值收敛于理论期望；
+        中心极限定理(CLT)：大量独立同分布样本均值近似服从正态分布，<strong>原始总体不需要正态</strong>。
+        应试重点：中心极限定理大题。
+      </p>
+    </section>
 
-      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 切比雪夫不等式交互演示</h3>
+    <!-- ===== 切比雪夫不等式交互演示 ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <div class="card">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800">切比雪夫不等式</h2>
+            <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+            <p class="text-sm text-slate-500 mt-1">以正态分布 \(X\sim N(\mu,\sigma^2)\) 为例，对比真实概率与保守界。</p>
+          </div>
+          <span class="px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-50 rounded-full">μ = 0</span>
+        </div>
 
-      <div class="flex flex-wrap items-end gap-4 mb-4">
-        <div class="flex items-center gap-2">
-          <label for="chebSigmaSlider" class="text-sm text-slate-600">标准差 σ</label>
-          <input type="range" id="chebSigmaSlider" min="0.3" max="3" value="1" step="0.1" class="slider-input w-40">
-          <input id="chebSigmaValue" type="number" value="1.0" readonly class="w-16 px-2 py-1 text-sm font-mono text-blue-700 bg-blue-50 border border-blue-200 rounded-md text-center">
-        </div>
-        <div class="flex items-center gap-2">
-          <label for="chebEpsilonSlider" class="text-sm text-slate-600">偏差阈值 ε</label>
-          <input type="range" id="chebEpsilonSlider" min="0.3" max="6" value="2" step="0.1" class="slider-input w-40">
-          <input id="chebEpsilonValue" type="number" value="2.0" readonly class="w-16 px-2 py-1 text-sm font-mono text-blue-700 bg-blue-50 border border-blue-200 rounded-md text-center">
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-slate-500">典型阈值预设</span>
-          <button class="cheb-preset px-3 py-1.5 text-sm text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors" data-multiple="2">ε=2σ</button>
-          <button class="cheb-preset px-3 py-1.5 text-sm text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors" data-multiple="3">ε=3σ</button>
-          <button class="cheb-preset px-3 py-1.5 text-sm text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors" data-multiple="5">ε=5σ</button>
-        </div>
-        <button id="chebResetButton" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
-      </div>
+        <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 切比雪夫不等式交互演示</h3>
 
-      <div id="chebyshevChart" style="width:100%;height:400px;"></div>
-      <div class="text-center mt-1 text-sm text-slate-500">ε增大，数据中间占比下限增大，数据两边占比上限减小</div>
-
-      <div class="formula-panel mt-4">
-        <div class="formula-toggle open" onclick="toggleFormula(this)">
-          <span class="arrow" style="transform:rotate(90deg);">▶</span> 切比雪夫不等式实时计算结果
+        <div class="flex flex-wrap items-end gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <label for="chebSigmaSlider" class="text-sm text-slate-600">标准差 σ</label>
+            <input type="range" id="chebSigmaSlider" min="0.3" max="3" value="1" step="0.1" class="slider-input w-40">
+            <input id="chebSigmaValue" type="number" value="1.0" readonly
+              class="w-16 px-2 py-1 text-sm font-mono text-blue-700 bg-blue-50 border border-blue-200 rounded-md text-center">
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="chebEpsilonSlider" class="text-sm text-slate-600">偏差阈值 ε</label>
+            <input type="range" id="chebEpsilonSlider" min="0.3" max="6" value="2" step="0.1" class="slider-input w-40">
+            <input id="chebEpsilonValue" type="number" value="2.0" readonly
+              class="w-16 px-2 py-1 text-sm font-mono text-blue-700 bg-blue-50 border border-blue-200 rounded-md text-center">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-500">典型阈值预设</span>
+            <button
+              class="cheb-preset px-3 py-1.5 text-sm text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+              data-multiple="2">ε=2σ</button>
+            <button
+              class="cheb-preset px-3 py-1.5 text-sm text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+              data-multiple="3">ε=3σ</button>
+            <button
+              class="cheb-preset px-3 py-1.5 text-sm text-blue-700 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors"
+              data-multiple="5">ε=5σ</button>
+          </div>
+          <button id="chebResetButton"
+            class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
+            重置</button>
         </div>
-        <div class="formula-body show">
-          <div class="space-y-3">
-            <!-- <div class="katex-render" data-expr="P(|X-\mu|\ge\epsilon)\le \frac{\sigma^2}{\epsilon^2}"></div>
+
+        <div id="chebyshevChart" style="width:100%;height:400px;"></div>
+        <div class="text-center mt-1 text-sm text-slate-500">ε增大，数据中间占比下限增大，数据两边占比上限减小</div>
+
+        <div class="formula-panel mt-4">
+          <div class="formula-toggle open" onclick="toggleFormula(this)">
+            <span class="arrow" style="transform:rotate(90deg);">▶</span> 切比雪夫不等式实时计算结果
+          </div>
+          <div class="formula-body show">
+            <div class="space-y-3">
+              <!-- <div class="katex-render" data-expr="P(|X-\mu|\ge\epsilon)\le \frac{\sigma^2}{\epsilon^2}"></div>
             <div class="katex-render" data-expr="P(|X-\mu|<\epsilon)\ge 1-\frac{\sigma^2}{\epsilon^2}"></div> -->
-            <div id="chebDynamicFormula" class="text-slate-600"></div>
-            <p class="text-sm text-slate-500 leading-relaxed">
-              <span id="chebUpperExplanation">25.0%</span> 为 \(P(|X-\mu|\ge\epsilon)\) 的通用概率上界，
-              与图表中的\(\color{#dc2626}{\text{淡红色外侧区域}}\)对应。
+              <div id="chebDynamicFormula" class="text-slate-600"></div>
+              <p class="text-sm text-slate-500 leading-relaxed">
+                <span id="chebUpperExplanation">25.0%</span> 为 \(P(|X-\mu|\ge\epsilon)\) 的通用概率上界，
+                与图表中的\(\color{#dc2626}{\text{淡红色外侧区域}}\)对应。
               <span id="chebLowerExplanation">75.0%</span> 为 \(P(|X-\mu|<\epsilon)\) 的通用概率下界，
               与图表中的\(\color{#2563eb}{\text{蓝色内侧区域}}\)对应。切比雪夫不等式对任意存在期望与方差的随机变量成立，
               与正态分布的真实概率不同，体现了它的保守性。
@@ -201,6 +349,88 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
     </div>
   </section>
 
+  <!-- ===== 卡片：掷骰子验证中心极限定理 ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">🎲 掷骰子验证中心极限定理</h2>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          单个骰子的点数服从离散均匀分布（1~6 等概率），<strong>完全不是正态分布</strong>。
+          但同时掷 \(n\) 个骰子，点数之和 \(S_n\) 的分布会随着 \(n\) 增大逐渐变成钟形——
+          这就是中心极限定理最直观的例子：\(E(S_n)=3.5n\)，\(\mathrm{Var}(S_n)=\frac{35}{12}n\)，
+          即 \(S_n\stackrel{\text{近似}}{\sim}N(3.5n,\frac{35}{12}n)\)。
+        </p>
+      </div>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 掷骰子模拟 — 点数和直方图（动画）</h3>
+
+      <div class="flex flex-wrap items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">每次骰子数 n =</span>
+          <input type="range" id="diceNumSlider" min="1" max="10" value="3" step="1" oninput="updateDiceNumSlider()" class="slider-input w-32">
+          <span id="diceNumVal" class="text-sm font-mono text-slate-700 w-6">3</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">总投掷次数</span>
+          <input type="number" id="diceTotalInput" value="50000" min="100" max="2000000" step="1000"
+            class="w-28 px-2 py-1 text-sm border border-slate-300 rounded-lg">
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">每帧次数</span>
+          <input type="number" id="diceBatchInput" value="500" min="1" max="50000" step="100"
+            class="w-24 px-2 py-1 text-sm border border-slate-300 rounded-lg">
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-slate-600">动画速度</span>
+          <input type="range" id="diceSpeedSlider" min="1" max="100" value="50"
+            oninput="document.getElementById('diceSpeedVal').textContent=this.value" class="slider-input w-28">
+          <span id="diceSpeedVal" class="text-sm font-mono text-slate-700 w-8">50</span>
+        </div>
+        <button id="diceRunBtn" onclick="runDiceSim()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 开始模拟</button>
+        <button id="diceStopBtn" onclick="stopDiceSim()" class="px-4 py-1.5 text-sm text-white rounded-lg hidden" style="background:#e11d48;">⏹ 停止</button>
+        <button onclick="resetDiceSim()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div class="dice-canvas-wrap">
+        <canvas id="diceCanvas"></canvas>
+      </div>
+
+      <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden mt-3">
+        <div id="diceProgress" class="h-full rounded-full" style="width:0%; background:linear-gradient(90deg,#2563eb,#60a5fa); transition: width 0.1s;"></div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+          <div id="diceStatRolls" class="text-xl font-bold text-blue-600 font-mono">0</div>
+          <div class="text-xs text-slate-500 mt-1">投掷次数</div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+          <div id="diceStatTheory" class="text-xl font-bold text-blue-600 font-mono">10.50</div>
+          <div class="text-xs text-slate-500 mt-1">理论均值 (3.5n)</div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+          <div id="diceStatActual" class="text-xl font-bold text-blue-600 font-mono">—</div>
+          <div class="text-xs text-slate-500 mt-1">实际均值</div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
+          <div id="diceStatN" class="text-xl font-bold text-blue-600 font-mono">3</div>
+          <div class="text-xs text-slate-500 mt-1">骰子数 n</div>
+        </div>
+      </div>
+
+      <div class="text-center mt-2 text-sm text-slate-500">
+        粉色虚线为理论均值 3.5n；n 越大，点数和的直方图越接近钟形正态曲线
+      </div>
+
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">骰子点数本身是均匀分布，但<strong>多个骰子之和</strong>近似正态 \(N(3.5n,\frac{35}{12}n)\)。中心极限定理作用于"和 / 均值"的分布，而不是单个骰子的分布。</span>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== 卡片2：中心极限定理 ===== -->
   <section class="max-w-5xl mx-auto px-10">
     <div class="card">
@@ -232,7 +462,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
       <div class="flex flex-wrap items-center gap-4 mb-4">
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">原始总体：</span>
-          <select id="cltDistSelect" onchange="resetCLT()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+          <select id="cltDistSelect" onchange="runCLT()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
             <option value="uniform">均匀分布 U(0,1)</option>
             <option value="exponential">指数分布 E(1)</option>
             <option value="binomial">二项分布 B(1,0.3)</option>
@@ -245,10 +475,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">模拟次数 =</span>
-          <input type="range" id="cltSimSlider" min="200" max="5000" value="1000" step="100" oninput="document.getElementById('cltSimVal').textContent=this.value;" class="slider-input w-36">
+          <input type="range" id="cltSimSlider" min="200" max="5000" value="1000" step="100" oninput="updateCLTSimSlider()" class="slider-input w-36">
           <span id="cltSimVal" class="text-sm font-mono text-slate-700 w-12">1000</span>
         </div>
-        <button onclick="runCLT()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 开始模拟</button>
         <button onclick="resetCLT()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
       </div>
 
@@ -307,371 +536,537 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
 </main>
 
 <script>
-function renderAllKatex() {
-  document.querySelectorAll('.katex-render').forEach(function(el) {
-    try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
-    catch(e) { el.textContent = el.getAttribute('data-expr'); }
-  });
-}
-renderAllKatex();
-
-function toggleFormula(toggle) {
-  toggle.classList.toggle('open');
-  var body = toggle.nextElementSibling;
-  body.classList.toggle('show');
-  if (body.classList.contains('show')) renderAllKatex();
-}
-
-// ===== 卡片1：大数定律 =====
-var llnChart = echarts.init(document.getElementById('llnChart'));
-
-function getLLNTheory() {
-  var dist = document.getElementById('llnDistSelect').value;
-  if (dist === 'uniform') return 0.5;
-  if (dist === 'exponential') return 1;
-  return 0.5;
-}
-
-function sampleOne(dist) {
-  if (dist === 'uniform') return Math.random();
-  if (dist === 'exponential') return -Math.log(Math.random());
-  return Math.random() < 0.5 ? 1 : 0;
-}
-
-function runLLN() {
-  var n = parseInt(document.getElementById('llnSlider').value);
-  var dist = document.getElementById('llnDistSelect').value;
-  var theory = getLLNTheory();
-  document.getElementById('llnTheory').textContent = theory.toFixed(4);
-
-  var cumSum = 0;
-  var data = [];
-  var step = Math.max(1, Math.floor(n / 300));
-  for (var i = 1; i <= n; i++) {
-    cumSum += sampleOne(dist);
-    if (i % step === 0 || i === n) {
-      data.push([i, cumSum / i]);
-    }
+  function renderAllKatex() {
+    document.querySelectorAll('.katex-render').forEach(function (el) {
+      try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
+      catch (e) { el.textContent = el.getAttribute('data-expr'); }
+    });
   }
-
-  document.getElementById('llnMean').textContent = (cumSum / n).toFixed(4);
-
-  llnChart.setOption({
-    tooltip: { trigger: 'axis', formatter: function(p) { return 'n='+p[0].data[0]+'<br/>均值='+p[0].data[1].toFixed(4); } },
-    grid: { left: 55, right: 20, top: 30, bottom: 35 },
-    xAxis: { type: 'value', name: '样本量 n', nameLocation: 'center', nameGap: 25, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    yAxis: { type: 'value', name: '样本均值', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    series: [{
-      type: 'line', data: data, smooth: false, symbol: 'none',
-      lineStyle: { color: '#2563eb', width: 1.5 },
-      markLine: { silent: true, symbol: 'none', lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 }, label: { fontSize: 11, formatter: 'E(X)={c}' }, data: [{ yAxis: theory }] }
-    }]
-  });
-}
-
-function updateLLNSlider() {
-  document.getElementById('llnSliderVal').textContent = document.getElementById('llnSlider').value;
-}
-
-function resetLLN() {
-  document.getElementById('llnSlider').value = 1000;
-  document.getElementById('llnSliderVal').textContent = '1000';
-  document.getElementById('llnMean').textContent = '—';
-  document.getElementById('llnTheory').textContent = '—';
-  llnChart.setOption({ series: [{ data: [] }] });
-}
-updateLLNSlider();
-runLLN();
-
-// ===== 卡片2：中心极限定理 =====
-var cltChart = echarts.init(document.getElementById('cltChart'));
-
-function normalPDF(x, mu, sigma) { return 1/(sigma*Math.sqrt(2*Math.PI)) * Math.exp(-0.5*Math.pow((x-mu)/sigma, 2)); }
-
-function runCLT() {
-  var dist = document.getElementById('cltDistSelect').value;
-  var n = parseInt(document.getElementById('cltNSlider').value);
-  var sims = parseInt(document.getElementById('cltSimSlider').value);
-
-  // 理论均值和方差
-  var mu, sigma2;
-  if (dist === 'uniform') { mu = 0.5; sigma2 = 1/12; }
-  else if (dist === 'exponential') { mu = 1; sigma2 = 1; }
-  else { mu = 0.3; sigma2 = 0.3*0.7; }
-
-  var sampMeans = [];
-  for (var s = 0; s < sims; s++) {
-    var sum = 0;
-    for (var i = 0; i < n; i++) {
-      if (dist === 'uniform') sum += Math.random();
-      else if (dist === 'exponential') sum += -Math.log(Math.random());
-      else sum += (Math.random() < 0.3 ? 1 : 0);
-    }
-    sampMeans.push(sum / n);
-  }
-
-  // 直方图
-  var bins = Math.min(40, Math.max(15, Math.floor(3.5*Math.sqrt(sims))));
-  var minM = Math.min.apply(null, sampMeans), maxM = Math.max.apply(null, sampMeans);
-  var binW = (maxM - minM) / bins;
-  var counts = new Array(bins).fill(0);
-  for (var i = 0; i < sims; i++) {
-    var idx = Math.min(Math.floor((sampMeans[i] - minM) / binW), bins - 1);
-    counts[idx]++;
-  }
-
-  var barData = [];
-  var barCats = [];
-  for (var i = 0; i < bins; i++) {
-    var center = minM + (i + 0.5) * binW;
-    barData.push({ value: counts[i] / sims / binW, itemStyle: { color: '#2563eb', borderRadius: [3,3,0,0] } });
-    barCats.push(center.toFixed(3));
-  }
-
-  // 理论正态曲线
-  var cltMu = mu, cltSigma = Math.sqrt(sigma2 / n);
-  var curveData = [];
-  var xMin = minM - binW, xMax = maxM + binW;
-  for (var i = 0; i <= 150; i++) {
-    var x = xMin + i*(xMax-xMin)/150;
-    curveData.push([x, normalPDF(x, cltMu, cltSigma)]);
-  }
-
-  cltChart.setOption({
-    tooltip: { trigger: 'axis' },
-    legend: { data: ['样本均值直方图', '理论正态曲线'], bottom: 0, textStyle: { fontSize: 11 } },
-    grid: { left: 50, right: 20, top: 30, bottom: 40 },
-    xAxis: { type: 'category', data: barCats, axisLabel: { fontSize: 9, interval: Math.max(1, Math.floor(bins/8)) }, splitLine: { show: false } },
-    yAxis: { type: 'value', name: '密度', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    series: [
-      { name: '样本均值直方图', type: 'bar', data: barData, barWidth: '90%' },
-      { name: '理论正态曲线', type: 'line', data: curveData, smooth: true, symbol: 'none', lineStyle: { color: '#ef4444', width: 2.5 } }
-    ]
-  });
-}
-
-function updateCLTSlider() {
-  document.getElementById('cltNSliderVal').textContent = document.getElementById('cltNSlider').value;
-}
-
-function resetCLT() {
-  document.getElementById('cltNSlider').value = 5;
-  document.getElementById('cltNSliderVal').textContent = '5';
-  document.getElementById('cltSimSlider').value = 1000;
-  document.getElementById('cltSimVal').textContent = '1000';
-  cltChart.setOption({ series: [{ data: [] }, { data: [] }] });
-}
-updateCLTSlider();
-runCLT();
-
-// ===== 切比雪夫不等式交互演示 =====
-var chebyshevChart = echarts.init(document.getElementById('chebyshevChart'));
-
-function normalCDFStandard(z) {
-  var sign = z < 0 ? -1 : 1;
-  var x = Math.abs(z) / Math.sqrt(2);
-  var t = 1 / (1 + 0.3275911 * x);
-  var erf = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
-  return 0.5 * (1 + sign * erf);
-}
-
-function chebyshevNormalProbability(sigma, epsilon) {
-  return 2 * normalCDFStandard(epsilon / sigma) - 1;
-}
-
-function chebyshevFillData(start, end, sigma, yMax, points) {
-  var data = [[start, 0]];
-  for (var i = 0; i <= points; i++) {
-    var x = start + (end - start) * i / points;
-    data.push([x, normalPDF(x, 0, sigma)]);
-  }
-  data.push([end, 0]);
-  return data;
-}
-
-function updateChebyshevFormula(sigma, epsilon, lowerBound, upperBound) {
-  var sigmaText = sigma.toFixed(1);
-  var epsilonText = epsilon.toFixed(1);
-  var fractionText = (sigma * sigma).toFixed(1) + '^2/' + epsilonText + '^2';
-  var formula = 'P(|X-\\mu|\\ge\\epsilon)\\le \\frac{\\sigma^2}{\\epsilon^2}=\\color{#dc2626}{\\frac{' + sigmaText + '^2}{' + epsilonText + '^2}}=' + (upperBound * 100).toFixed(1) + '\\%';
-  var formulaLt = 'P(|X-\\mu|<\\epsilon)\\ge 1-\\frac{\\sigma^2}{\\epsilon^2}=\\color{#2563eb}{1-\\frac{' + sigmaText + '^2}{' + epsilonText + '^2}}=' + (lowerBound * 100).toFixed(1) + '\\%';
-  var formulaEl = document.getElementById('chebDynamicFormula');
-  formulaEl.setAttribute('data-expr', formula);
-  formulaEl.innerHTML = '<span class="text-slate-400 mr-2">代入当前参数：</span><span class="katex-render" data-expr="' + formula + '"></span><br><span class="text-slate-400 mr-2">等价形式：</span><span class="katex-render" data-expr="' + formulaLt + '"></span>';
-  document.getElementById('chebLowerExplanation').textContent = (lowerBound * 100).toFixed(1) + '%';
-  document.getElementById('chebUpperExplanation').textContent = (upperBound * 100).toFixed(1) + '%';
   renderAllKatex();
-}
 
-function updateChebyshev() {
-  var sigmaSlider = document.getElementById('chebSigmaSlider');
-  var epsilonSlider = document.getElementById('chebEpsilonSlider');
-  var sigma = parseFloat(sigmaSlider.value);
-  var epsilon = parseFloat(epsilonSlider.value);
-  var varianceRatio = Math.min(1, (sigma * sigma) / (epsilon * epsilon));
-  var lowerBound = Math.max(0, 1 - varianceRatio);
-  var upperBound = varianceRatio;
-  var actualInside = chebyshevNormalProbability(sigma, epsilon);
-  var actualOutside = 1 - actualInside;
-  var xMin = -6, xMax = 6, points = 240;
-  var peak = normalPDF(0, 0, sigma);
-  var yMax = peak <= 0.42 ? 0.5 : (peak <= 0.82 ? 1.0 : 1.5);
-  var curveData = [], insideData = [], leftOutsideData = [], rightOutsideData = [];
-
-  for (var i = 0; i <= points; i++) {
-    var x = xMin + (xMax - xMin) * i / points;
-    curveData.push([x, normalPDF(x, 0, sigma)]);
+  function toggleFormula(toggle) {
+    toggle.classList.toggle('open');
+    var body = toggle.nextElementSibling;
+    body.classList.toggle('show');
+    if (body.classList.contains('show')) renderAllKatex();
   }
 
-  var leftBoundary = Math.max(xMin, -epsilon);
-  var rightBoundary = Math.min(xMax, epsilon);
-  insideData = chebyshevFillData(leftBoundary, rightBoundary, sigma, 0.5, 120);
-  if (leftBoundary > xMin) leftOutsideData = chebyshevFillData(xMin, leftBoundary, sigma, 0.5, 80);
-  if (rightBoundary < xMax) rightOutsideData = chebyshevFillData(rightBoundary, xMax, sigma, 0.5, 80);
+  // ===== 卡片1：大数定律 =====
+  var llnChart = echarts.init(document.getElementById('llnChart'));
 
-  sigmaSlider.nextElementSibling.value = sigma.toFixed(1);
-  epsilonSlider.nextElementSibling.value = epsilon.toFixed(1);
-  updateChebyshevFormula(sigma, epsilon, lowerBound, upperBound);
+  function getLLNTheory() {
+    var dist = document.getElementById('llnDistSelect').value;
+    if (dist === 'uniform') return 0.5;
+    if (dist === 'exponential') return 1;
+    return 0.5;
+  }
 
-  chebyshevChart.setOption({
-    animationDuration: 180,
-    tooltip: {
-      trigger: 'axis',
-      formatter: function(params) {
-        var point = params.find(function(item) { return item.seriesName === '正态密度'; });
-        return point ? 'x = ' + point.data[0].toFixed(2) + '<br/>f(x) = ' + point.data[1].toFixed(4) : '';
+  function sampleOne(dist) {
+    if (dist === 'uniform') return Math.random();
+    if (dist === 'exponential') return -Math.log(Math.random());
+    return Math.random() < 0.5 ? 1 : 0;
+  }
+
+  function runLLN() {
+    var n = parseInt(document.getElementById('llnSlider').value);
+    var dist = document.getElementById('llnDistSelect').value;
+    var theory = getLLNTheory();
+    document.getElementById('llnTheory').textContent = theory.toFixed(4);
+
+    var cumSum = 0;
+    var data = [];
+    var step = Math.max(1, Math.floor(n / 300));
+    for (var i = 1; i <= n; i++) {
+      cumSum += sampleOne(dist);
+      if (i % step === 0 || i === n) {
+        data.push([i, cumSum / i]);
       }
-    },
-    grid: { left: 52, right: 28, top: 62, bottom: 42 },
-    xAxis: {
-      type: 'value', min: xMin, max: xMax, name: 'x',
-      nameLocation: 'middle', nameGap: 25,
-      axisLabel: { fontSize: 11 },
-      splitLine: { lineStyle: { color: '#e2e8f0' } }
-    },
-    yAxis: {
-      type: 'value', min: 0, max: yMax, name: '密度',
-      axisLabel: { fontSize: 11 },
-      splitLine: { lineStyle: { color: '#e2e8f0' } }
-    },
-    graphic: [
-      {
-        type: 'text', left: 'center', top: 100,
-        style: {
-          text: '正态分布实际占比: ' + (actualInside * 100).toFixed(1) + '%',
-          fill: '#1d4ed8', font: '700 14px sans-serif',
-          textAlign: 'center'
-        }
-      },
-      {
-        type: 'text', right: 34, top: 100,
-        style: {
-          text: '正态分布实际两边占比: ' + (actualOutside * 100).toFixed(1) + '%',
-          fill: '#dc2626', font: '600 14px sans-serif',
-          textAlign: 'right'
-        }
-      },
-      {
-        type: 'text', left: 'center', top: 10,
-        style: {
-          text: '下限 ≥ ' + (lowerBound * 100).toFixed(1) + '%',
-          fill: '#2563eb', font: '600 20px sans-serif',
-          textAlign: 'right'
-        }
-      },
-      {
-        type: 'text', right: 60, top: 10,
-        style: {
-          text: '上限 ≤ ' + (upperBound * 100).toFixed(1) + '%',
-          fill: '#dc2626', font: '600 20px sans-serif',
-          textAlign: 'right'
+    }
+
+    document.getElementById('llnMean').textContent = (cumSum / n).toFixed(4);
+
+    llnChart.setOption({
+      tooltip: { trigger: 'axis', formatter: function (p) { return 'n=' + p[0].data[0] + '<br/>均值=' + p[0].data[1].toFixed(4); } },
+      grid: { left: 55, right: 20, top: 30, bottom: 35 },
+      xAxis: { type: 'value', name: '样本量 n', nameLocation: 'center', nameGap: 25, axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+      yAxis: { type: 'value', name: '样本均值', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+      series: [{
+        type: 'line', data: data, smooth: false, symbol: 'none',
+        lineStyle: { color: '#2563eb', width: 1.5 },
+        markLine: { silent: true, symbol: 'none', lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 }, label: { fontSize: 11, formatter: 'E(X)={c}' }, data: [{ yAxis: theory }] }
+      }]
+    });
+  }
+
+  function updateLLNSlider() {
+    document.getElementById('llnSliderVal').textContent = document.getElementById('llnSlider').value;
+  }
+
+  function resetLLN() {
+    document.getElementById('llnSlider').value = 1000;
+    document.getElementById('llnSliderVal').textContent = '1000';
+    document.getElementById('llnMean').textContent = '—';
+    document.getElementById('llnTheory').textContent = '—';
+    llnChart.setOption({ series: [{ data: [] }] });
+  }
+  updateLLNSlider();
+  runLLN();
+
+  // ===== 卡片2：中心极限定理 =====
+  var cltChart = echarts.init(document.getElementById('cltChart'));
+
+  function normalPDF(x, mu, sigma) { return 1 / (sigma * Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2)); }
+
+  function runCLT() {
+    var dist = document.getElementById('cltDistSelect').value;
+    var n = parseInt(document.getElementById('cltNSlider').value, 10);
+    var sims = parseInt(document.getElementById('cltSimSlider').value, 10);
+
+    // Population parameters: the sample mean is approximated by N(mu, sigma^2 / n).
+    var mu, sigma2, domainMin, domainMax;
+    if (dist === 'uniform') { mu = 0.5; sigma2 = 1 / 12; domainMin = 0; domainMax = 1; }
+    else if (dist === 'exponential') { mu = 1; sigma2 = 1; domainMin = 0; domainMax = Math.max(3, mu + 4 * Math.sqrt(sigma2 / n)); }
+    else { mu = 0.3; sigma2 = 0.3 * 0.7; domainMin = 0; domainMax = 1; }
+
+    var sampMeans = [];
+    for (var s = 0; s < sims; s++) {
+      var sum = 0;
+      for (var i = 0; i < n; i++) {
+        if (dist === 'uniform') sum += Math.random();
+        else if (dist === 'exponential') sum += -Math.log(Math.max(Math.random(), Number.EPSILON));
+        else sum += (Math.random() < 0.3 ? 1 : 0);
+      }
+      sampMeans.push(sum / n);
+    }
+
+    // Use a stable value axis so bars and the theoretical curve share the same coordinates.
+    var cltSigma = Math.sqrt(sigma2 / n);
+    var xMin = dist === 'exponential' ? 0 : Math.max(domainMin, mu - 4 * cltSigma);
+    var xMax = dist === 'exponential' ? Math.max(domainMax, mu + 4 * cltSigma) : Math.min(domainMax, mu + 4 * cltSigma);
+    if (xMax - xMin < 1e-8) { xMin = domainMin; xMax = domainMax; }
+    var bins = 32;
+    var binW = (xMax - xMin) / bins;
+    var counts = new Array(bins).fill(0);
+    for (var j = 0; j < sampMeans.length; j++) {
+      var idx = Math.max(0, Math.min(bins - 1, Math.floor((sampMeans[j] - xMin) / binW)));
+      counts[idx]++;
+    }
+    var barData = counts.map(function (count, index) {
+      return [xMin + (index + 0.5) * binW, count / sims / binW];
+    });
+    var curveData = [];
+    for (var k = 0; k <= 180; k++) {
+      var x = xMin + k * (xMax - xMin) / 180;
+      curveData.push([x, normalPDF(x, mu, cltSigma)]);
+    }
+
+    cltChart.setOption({
+      animationDuration: 260,
+      tooltip: { trigger: 'axis' },
+      legend: { data: ['样本均值直方图', '理论正态曲线'], bottom: 0, textStyle: { fontSize: 11 } },
+      grid: { left: 50, right: 20, top: 30, bottom: 60 },
+      xAxis: { type: 'value', min: xMin, max: xMax, name: '样本均值', nameLocation: 'center', nameGap: 25, axisLabel: { fontSize: 9, formatter: function (value) { return value.toFixed(2); } }, splitLine: { show: false } },
+      yAxis: { type: 'value', name: '密度', axisLabel: { fontSize: 11 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+      series: [
+        { name: '样本均值直方图', type: 'bar', data: barData, barWidth: '60%', itemStyle: { color: '#2563eb', borderRadius: [3, 3, 0, 0] } },
+        { name: '理论正态曲线', type: 'line', data: curveData, smooth: true, symbol: 'none', lineStyle: { color: '#ef4444', width: 2.5 } }
+      ]
+    }, { notMerge: true });
+  }
+
+  function updateCLTSlider() {
+    document.getElementById('cltNSliderVal').textContent = document.getElementById('cltNSlider').value;
+    runCLT();
+  }
+
+  function updateCLTSimSlider() {
+    document.getElementById('cltSimVal').textContent = document.getElementById('cltSimSlider').value;
+    runCLT();
+  }
+
+  function resetCLT() {
+    document.getElementById('cltNSlider').value = 5;
+    document.getElementById('cltNSliderVal').textContent = '5';
+    document.getElementById('cltSimSlider').value = 1000;
+    document.getElementById('cltSimVal').textContent = '1000';
+    runCLT();
+  }
+  runCLT();
+
+  // ===== 卡片：掷骰子验证中心极限定理（移植自 monte_carlo.html 掷骰子实验） =====
+  var diceCanvas = document.getElementById('diceCanvas');
+  var diceCtx = diceCanvas.getContext('2d');
+  var diceRunning = false;
+  var diceStopFlag = false;
+
+  function resizeDiceCanvas() {
+    var wrap = diceCanvas.parentElement;
+    var dpr = window.devicePixelRatio || 1;
+    var cw = wrap.clientWidth;
+    var ch = wrap.clientHeight;
+    diceCanvas.width = cw * dpr;
+    diceCanvas.height = ch * dpr;
+    diceCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: cw, h: ch };
+  }
+
+  function drawDiceEmpty() {
+    var dim = resizeDiceCanvas();
+    diceCtx.fillStyle = '#f8fafc';
+    diceCtx.fillRect(0, 0, dim.w, dim.h);
+    diceCtx.fillStyle = '#94a3b8';
+    diceCtx.font = '15px system-ui, sans-serif';
+    diceCtx.textAlign = 'center';
+    diceCtx.fillText('点击「开始模拟」掷骰子', dim.w / 2, dim.h / 2);
+  }
+
+  function updateDiceNumSlider() {
+    var n = document.getElementById('diceNumSlider').value;
+    document.getElementById('diceNumVal').textContent = n;
+    document.getElementById('diceStatN').textContent = n;
+    document.getElementById('diceStatTheory').textContent = (n * 3.5).toFixed(2);
+  }
+
+  function diceSleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  async function runDiceSim() {
+    if (diceRunning) return;
+    diceRunning = true;
+    diceStopFlag = false;
+    document.getElementById('diceRunBtn').classList.add('hidden');
+    document.getElementById('diceStopBtn').classList.remove('hidden');
+
+    var numDice = parseInt(document.getElementById('diceNumSlider').value, 10);
+    var total = Math.max(100, parseInt(document.getElementById('diceTotalInput').value, 10) || 50000);
+    var batch = Math.max(1, parseInt(document.getElementById('diceBatchInput').value, 10) || 500);
+    var speed = parseInt(document.getElementById('diceSpeedSlider').value, 10);
+
+    var dim = resizeDiceCanvas();
+    var w = dim.w, h = dim.h;
+
+    var minSum = numDice;
+    var maxSum = numDice * 6;
+    var numBins = maxSum - minSum + 1;
+    var bins = new Array(numBins).fill(0);
+    var rolls = 0;
+
+    var padL = 56, padR = 20, padT = 34, padB = 46;
+    var chartW = w - padL - padR;
+    var chartH = h - padT - padB;
+    var barW = chartW / numBins;
+    var mean = numDice * 3.5;
+    var meanX = padL + (mean - minSum) * barW;
+
+    while (rolls < total && !diceStopFlag) {
+      var n = Math.min(batch, total - rolls);
+      for (var i = 0; i < n; i++) {
+        var sum = 0;
+        for (var d = 0; d < numDice; d++) sum += Math.floor(Math.random() * 6) + 1;
+        bins[sum - minSum]++;
+      }
+      rolls += n;
+
+      var maxBin = Math.max.apply(null, bins);
+
+      diceCtx.fillStyle = '#f8fafc';
+      diceCtx.fillRect(0, 0, w, h);
+
+      // 坐标轴
+      diceCtx.strokeStyle = '#cbd5e1';
+      diceCtx.lineWidth = 1;
+      diceCtx.beginPath();
+      diceCtx.moveTo(padL, padT);
+      diceCtx.lineTo(padL, h - padB);
+      diceCtx.lineTo(w - padR, h - padB);
+      diceCtx.stroke();
+
+      // 柱子（浅色主题色相渐变）
+      for (var bi = 0; bi < numBins; bi++) {
+        var barH = maxBin > 0 ? (bins[bi] / maxBin) * chartH : 0;
+        var bx = padL + bi * barW;
+        var by = h - padB - barH;
+        var hue = 200 + (bi / numBins) * 160;
+        diceCtx.fillStyle = 'hsla(' + hue + ', 55%, 50%, 0.85)';
+        diceCtx.fillRect(bx + 1, by, barW - 2, barH);
+
+        if (numBins <= 20 || bi % 2 === 0) {
+          diceCtx.fillStyle = '#64748b';
+          diceCtx.font = '11px system-ui, sans-serif';
+          diceCtx.textAlign = 'center';
+          diceCtx.fillText(minSum + bi, bx + barW / 2, h - padB + 16);
         }
       }
-    ],
-    series: [
-      {
-        name: '区间外部区域', type: 'line', data: leftOutsideData,
-        smooth: true, symbol: 'none', lineStyle: { color: 'transparent' },
-        areaStyle: { color: 'rgba(248, 113, 113, 0.34)' }, silent: true
-      },
-      {
-        name: '区间内部区域', type: 'line', data: insideData,
-        smooth: true, symbol: 'none', lineStyle: { color: 'transparent' },
-        areaStyle: { color: 'rgba(96, 165, 250, 0.34)' }, silent: true
-      },
-      {
-        name: '右侧外部区域', type: 'line', data: rightOutsideData,
-        smooth: true, symbol: 'none', lineStyle: { color: 'transparent' },
-        areaStyle: { color: 'rgba(248, 113, 113, 0.34)' }, silent: true
-      },
-      {
-        name: '正态密度', type: 'line', data: curveData,
-        smooth: true, symbol: 'none',
-        lineStyle: { color: '#2563eb', width: 2.5 },
-        areaStyle: { color: 'rgba(147, 197, 253, 0.08)' },
-        markLine: {
-          silent: true, symbol: 'none',
-          label: { show: true, color: '#2563eb', fontSize: 11, formatter: function(item) { return item.value; } },
-          lineStyle: { color: '#2563eb', type: 'dashed', width: 1.5 },
-          data: [
-            { xAxis: -epsilon, name: 'μ−ε', value: 'μ−ε=' + (-epsilon).toFixed(1) },
-            { xAxis: epsilon, name: 'μ+ε', value: 'μ+ε=' + epsilon.toFixed(1) },
-            { xAxis: 0, name: 'μ', value: 'μ', lineStyle: { color: '#64748b', type: 'solid', width: 1.2 } }
-          ]
+
+      // 理论均值线（粉色虚线）
+      diceCtx.strokeStyle = '#e11d48';
+      diceCtx.lineWidth = 2;
+      diceCtx.setLineDash([5, 3]);
+      diceCtx.beginPath();
+      diceCtx.moveTo(meanX, padT);
+      diceCtx.lineTo(meanX, h - padB);
+      diceCtx.stroke();
+      diceCtx.setLineDash([]);
+      diceCtx.fillStyle = '#e11d48';
+      diceCtx.font = '600 11px system-ui, sans-serif';
+      diceCtx.textAlign = 'center';
+      var labelX = Math.min(Math.max(meanX, padL + 44), w - padR - 44);
+      diceCtx.fillText('理论均值 ' + mean.toFixed(1), labelX, padT - 10);
+
+      // 实际均值
+      var actualMean = 0;
+      for (var ai = 0; ai < numBins; ai++) actualMean += (minSum + ai) * bins[ai];
+      actualMean /= rolls;
+
+      document.getElementById('diceStatRolls').textContent = rolls.toLocaleString();
+      document.getElementById('diceStatTheory').textContent = mean.toFixed(2);
+      document.getElementById('diceStatActual').textContent = actualMean.toFixed(4);
+      document.getElementById('diceStatN').textContent = numDice;
+      document.getElementById('diceProgress').style.width = (rolls / total * 100) + '%';
+
+      await diceSleep(Math.max(1, 51 - speed));
+    }
+
+    document.getElementById('diceProgress').style.width = (rolls / total * 100) + '%';
+    diceRunning = false;
+    diceStopFlag = false;
+    document.getElementById('diceRunBtn').classList.remove('hidden');
+    document.getElementById('diceStopBtn').classList.add('hidden');
+  }
+
+  function stopDiceSim() {
+    diceStopFlag = true;
+  }
+
+  function resetDiceSim() {
+    diceStopFlag = true;
+    setTimeout(function () {
+      document.getElementById('diceNumSlider').value = 3;
+      document.getElementById('diceTotalInput').value = 50000;
+      document.getElementById('diceBatchInput').value = 500;
+      document.getElementById('diceSpeedSlider').value = 50;
+      document.getElementById('diceSpeedVal').textContent = '50';
+      document.getElementById('diceProgress').style.width = '0%';
+      document.getElementById('diceStatRolls').textContent = '0';
+      document.getElementById('diceStatActual').textContent = '—';
+      updateDiceNumSlider();
+      drawDiceEmpty();
+    }, diceRunning ? 80 : 0);
+  }
+
+  updateDiceNumSlider();
+  drawDiceEmpty();
+
+  // ===== 切比雪夫不等式交互演示 =====
+  var chebyshevChart = echarts.init(document.getElementById('chebyshevChart'));
+
+  function normalCDFStandard(z) {
+    var sign = z < 0 ? -1 : 1;
+    var x = Math.abs(z) / Math.sqrt(2);
+    var t = 1 / (1 + 0.3275911 * x);
+    var erf = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+    return 0.5 * (1 + sign * erf);
+  }
+
+  function chebyshevNormalProbability(sigma, epsilon) {
+    return 2 * normalCDFStandard(epsilon / sigma) - 1;
+  }
+
+  function chebyshevFillData(start, end, sigma, yMax, points) {
+    var data = [[start, 0]];
+    for (var i = 0; i <= points; i++) {
+      var x = start + (end - start) * i / points;
+      data.push([x, normalPDF(x, 0, sigma)]);
+    }
+    data.push([end, 0]);
+    return data;
+  }
+
+  function updateChebyshevFormula(sigma, epsilon, lowerBound, upperBound) {
+    var sigmaText = sigma.toFixed(1);
+    var epsilonText = epsilon.toFixed(1);
+    var fractionText = (sigma * sigma).toFixed(1) + '^2/' + epsilonText + '^2';
+    var formula = 'P(|X-\\mu|\\ge\\epsilon)\\le \\frac{\\sigma^2}{\\epsilon^2}=\\color{#dc2626}{\\frac{' + sigmaText + '^2}{' + epsilonText + '^2}}=' + (upperBound * 100).toFixed(1) + '\\%';
+    var formulaLt = 'P(|X-\\mu|<\\epsilon)\\ge 1-\\frac{\\sigma^2}{\\epsilon^2}=\\color{#2563eb}{1-\\frac{' + sigmaText + '^2}{' + epsilonText + '^2}}=' + (lowerBound * 100).toFixed(1) + '\\%';
+    var formulaEl = document.getElementById('chebDynamicFormula');
+    formulaEl.setAttribute('data-expr', formula);
+    formulaEl.innerHTML = '<span class="text-slate-400 mr-2">代入当前参数：</span><span class="katex-render" data-expr="' + formula + '"></span><br><span class="text-slate-400 mr-2">等价形式：</span><span class="katex-render" data-expr="' + formulaLt + '"></span>';
+    document.getElementById('chebLowerExplanation').textContent = (lowerBound * 100).toFixed(1) + '%';
+    document.getElementById('chebUpperExplanation').textContent = (upperBound * 100).toFixed(1) + '%';
+    renderAllKatex();
+  }
+
+  function updateChebyshev() {
+    var sigmaSlider = document.getElementById('chebSigmaSlider');
+    var epsilonSlider = document.getElementById('chebEpsilonSlider');
+    var sigma = parseFloat(sigmaSlider.value);
+    var epsilon = parseFloat(epsilonSlider.value);
+    var varianceRatio = Math.min(1, (sigma * sigma) / (epsilon * epsilon));
+    var lowerBound = Math.max(0, 1 - varianceRatio);
+    var upperBound = varianceRatio;
+    var actualInside = chebyshevNormalProbability(sigma, epsilon);
+    var actualOutside = 1 - actualInside;
+    var xMin = -6, xMax = 6, points = 240;
+    var peak = normalPDF(0, 0, sigma);
+    var yMax = peak <= 0.42 ? 0.5 : (peak <= 0.82 ? 1.0 : 1.5);
+    var curveData = [], insideData = [], leftOutsideData = [], rightOutsideData = [];
+
+    for (var i = 0; i <= points; i++) {
+      var x = xMin + (xMax - xMin) * i / points;
+      curveData.push([x, normalPDF(x, 0, sigma)]);
+    }
+
+    var leftBoundary = Math.max(xMin, -epsilon);
+    var rightBoundary = Math.min(xMax, epsilon);
+    insideData = chebyshevFillData(leftBoundary, rightBoundary, sigma, 0.5, 120);
+    if (leftBoundary > xMin) leftOutsideData = chebyshevFillData(xMin, leftBoundary, sigma, 0.5, 80);
+    if (rightBoundary < xMax) rightOutsideData = chebyshevFillData(rightBoundary, xMax, sigma, 0.5, 80);
+
+    sigmaSlider.nextElementSibling.value = sigma.toFixed(1);
+    epsilonSlider.nextElementSibling.value = epsilon.toFixed(1);
+    updateChebyshevFormula(sigma, epsilon, lowerBound, upperBound);
+
+    chebyshevChart.setOption({
+      animationDuration: 180,
+      tooltip: {
+        trigger: 'axis',
+        formatter: function (params) {
+          var point = params.find(function (item) { return item.seriesName === '正态密度'; });
+          return point ? 'x = ' + point.data[0].toFixed(2) + '<br/>f(x) = ' + point.data[1].toFixed(4) : '';
         }
-      }
-    ]
+      },
+      grid: { left: 52, right: 28, top: 62, bottom: 42 },
+      xAxis: {
+        type: 'value', min: xMin, max: xMax, name: 'x',
+        nameLocation: 'middle', nameGap: 25,
+        axisLabel: { fontSize: 11 },
+        splitLine: { lineStyle: { color: '#e2e8f0' } }
+      },
+      yAxis: {
+        type: 'value', min: 0, max: yMax, name: '密度',
+        axisLabel: { fontSize: 11 },
+        splitLine: { lineStyle: { color: '#e2e8f0' } }
+      },
+      graphic: [
+        {
+          type: 'text', left: 'center', top: 100,
+          style: {
+            text: '正态分布实际占比: ' + (actualInside * 100).toFixed(1) + '%',
+            fill: '#1d4ed8', font: '700 14px sans-serif',
+            textAlign: 'center'
+          }
+        },
+        {
+          type: 'text', right: 34, top: 100,
+          style: {
+            text: '正态分布实际两边占比: ' + (actualOutside * 100).toFixed(1) + '%',
+            fill: '#dc2626', font: '600 14px sans-serif',
+            textAlign: 'right'
+          }
+        },
+        {
+          type: 'text', left: 'center', top: 10,
+          style: {
+            text: '下限 ≥ ' + (lowerBound * 100).toFixed(1) + '%',
+            fill: '#2563eb', font: '600 20px sans-serif',
+            textAlign: 'right'
+          }
+        },
+        {
+          type: 'text', right: 60, top: 10,
+          style: {
+            text: '上限 ≤ ' + (upperBound * 100).toFixed(1) + '%',
+            fill: '#dc2626', font: '600 20px sans-serif',
+            textAlign: 'right'
+          }
+        }
+      ],
+      series: [
+        {
+          name: '区间外部区域', type: 'line', data: leftOutsideData,
+          smooth: true, symbol: 'none', lineStyle: { color: 'transparent' },
+          areaStyle: { color: 'rgba(248, 113, 113, 0.34)' }, silent: true
+        },
+        {
+          name: '区间内部区域', type: 'line', data: insideData,
+          smooth: true, symbol: 'none', lineStyle: { color: 'transparent' },
+          areaStyle: { color: 'rgba(96, 165, 250, 0.34)' }, silent: true
+        },
+        {
+          name: '右侧外部区域', type: 'line', data: rightOutsideData,
+          smooth: true, symbol: 'none', lineStyle: { color: 'transparent' },
+          areaStyle: { color: 'rgba(248, 113, 113, 0.34)' }, silent: true
+        },
+        {
+          name: '正态密度', type: 'line', data: curveData,
+          smooth: true, symbol: 'none',
+          lineStyle: { color: '#2563eb', width: 2.5 },
+          areaStyle: { color: 'rgba(147, 197, 253, 0.08)' },
+          markLine: {
+            silent: true, symbol: 'none',
+            label: { show: true, color: '#2563eb', fontSize: 11, formatter: function (item) { return item.value; } },
+            lineStyle: { color: '#2563eb', type: 'dashed', width: 1.5 },
+            data: [
+              { xAxis: -epsilon, name: 'μ−ε', value: 'μ−ε=' + (-epsilon).toFixed(1) },
+              { xAxis: epsilon, name: 'μ+ε', value: 'μ+ε=' + epsilon.toFixed(1) },
+              { xAxis: 0, name: 'μ', value: 'μ', lineStyle: { color: '#64748b', type: 'solid', width: 1.2 } }
+            ]
+          }
+        }
+      ]
+    });
+  }
+
+  document.getElementById('chebSigmaSlider').addEventListener('input', updateChebyshev);
+  document.getElementById('chebEpsilonSlider').addEventListener('input', updateChebyshev);
+  document.querySelectorAll('.cheb-preset').forEach(function (button) {
+    button.addEventListener('click', function () {
+      var sigma = parseFloat(document.getElementById('chebSigmaSlider').value);
+      document.getElementById('chebEpsilonSlider').value = Math.min(6, (sigma * parseFloat(button.dataset.multiple)).toFixed(1));
+      updateChebyshev();
+    });
   });
-}
-
-document.getElementById('chebSigmaSlider').addEventListener('input', updateChebyshev);
-document.getElementById('chebEpsilonSlider').addEventListener('input', updateChebyshev);
-document.querySelectorAll('.cheb-preset').forEach(function(button) {
-  button.addEventListener('click', function() {
-    var sigma = parseFloat(document.getElementById('chebSigmaSlider').value);
-    document.getElementById('chebEpsilonSlider').value = Math.min(6, (sigma * parseFloat(button.dataset.multiple)).toFixed(1));
+  document.getElementById('chebResetButton').addEventListener('click', function () {
+    document.getElementById('chebSigmaSlider').value = 1;
+    document.getElementById('chebEpsilonSlider').value = 2;
     updateChebyshev();
   });
-});
-document.getElementById('chebResetButton').addEventListener('click', function() {
-  document.getElementById('chebSigmaSlider').value = 1;
-  document.getElementById('chebEpsilonSlider').value = 2;
   updateChebyshev();
-});
-updateChebyshev();
 
-// ===== 自测题 =====
-var quizAnswers = { q1: 1, q2: 2, q3: 2 };
-var quizFeedback = {
-  q1: { correct: '正确！大数定律说明样本均值依概率收敛到总体期望。', wrong: '错误。大数定律说明的是样本均值依概率收敛到总体期望。中心极限定理才涉及分布收敛到正态。正确答案是 B。' },
-  q2: { correct: '正确！CLT不要求原始总体正态，只要独立同分布且期望方差存在即可。', wrong: '错误。中心极限定理不要求原始总体服从特定分布，只要独立同分布且期望方差存在，n足够大时样本均值近似正态。正确答案是 C。' },
-  q3: { correct: '正确！\(\frac{\overline{X}-\mu}{\sigma/\sqrt{n}}\) 近似服从标准正态分布 N(0,1)。', wrong: '错误。根据中心极限定理，标准化后的样本均值近似服从 N(0,1)。正确答案是 C。' }
-};
+  // ===== 自测题 =====
+  var quizAnswers = { q1: 1, q2: 2, q3: 2 };
+  var quizFeedback = {
+    q1: { correct: '正确！大数定律说明样本均值依概率收敛到总体期望。', wrong: '错误。大数定律说明的是样本均值依概率收敛到总体期望。中心极限定理才涉及分布收敛到正态。正确答案是 B。' },
+    q2: { correct: '正确！CLT不要求原始总体正态，只要独立同分布且期望方差存在即可。', wrong: '错误。中心极限定理不要求原始总体服从特定分布，只要独立同分布且期望方差存在，n足够大时样本均值近似正态。正确答案是 C。' },
+    q3: { correct: '正确！\(\frac{\overline{X}-\mu}{\sigma/\sqrt{n}}\) 近似服从标准正态分布 N(0,1)。', wrong: '错误。根据中心极限定理，标准化后的样本均值近似服从 N(0,1)。正确答案是 C。' }
+  };
 
-function selectQuiz(qid, choice, el) {
-  var container = document.getElementById('quiz' + qid.slice(1));
-  var allOptions = container.querySelectorAll('.quiz-option');
-  var feedback = document.getElementById(qid + 'Feedback');
-  var correctAnswer = quizAnswers[qid];
+  function selectQuiz(qid, choice, el) {
+    var container = document.getElementById('quiz' + qid.slice(1));
+    var allOptions = container.querySelectorAll('.quiz-option');
+    var feedback = document.getElementById(qid + 'Feedback');
+    var correctAnswer = quizAnswers[qid];
 
-  allOptions.forEach(function(opt) { opt.classList.remove('selected', 'correct', 'wrong'); });
-  el.classList.add('selected');
+    allOptions.forEach(function (opt) { opt.classList.remove('selected', 'correct', 'wrong'); });
+    el.classList.add('selected');
 
-  if (choice === correctAnswer) {
-    el.classList.add('correct');
-    feedback.className = 'text-sm mt-2 text-green-600';
-    feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
-  } else {
-    el.classList.add('wrong');
-    allOptions[correctAnswer].classList.add('correct');
-    feedback.className = 'text-sm mt-2 text-red-600';
-    feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
+    if (choice === correctAnswer) {
+      el.classList.add('correct');
+      feedback.className = 'text-sm mt-2 text-green-600';
+      feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
+    } else {
+      el.classList.add('wrong');
+      allOptions[correctAnswer].classList.add('correct');
+      feedback.className = 'text-sm mt-2 text-red-600';
+      feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
+    }
+    feedback.classList.remove('hidden');
+    renderAllKatex();
   }
-  feedback.classList.remove('hidden');
-  renderAllKatex();
-}
 
-window.addEventListener('resize', function() { llnChart.resize(); cltChart.resize(); chebyshevChart.resize(); });
+  window.addEventListener('resize', function () {
+    llnChart.resize(); cltChart.resize(); chebyshevChart.resize();
+    if (!diceRunning) drawDiceEmpty();
+  });
 </script>
 
 </body>

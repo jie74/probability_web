@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>概率论思维导图</title>
+  <link rel="icon" type="image/png" href="logo.png">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-view@0.15.4/dist/browser/index.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -79,6 +80,38 @@
       outline: none;
     }
 
+    .mindmap-context-menu {
+      background: #fff;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+      display: none;
+      min-width: 160px;
+      padding: 4px;
+      position: fixed;
+      z-index: 10;
+    }
+
+    .mindmap-context-menu button {
+      background: transparent;
+      border: 0;
+      border-radius: 4px;
+      color: #2d3748;
+      cursor: pointer;
+      display: block;
+      font: inherit;
+      font-size: 13px;
+      padding: 8px 10px;
+      text-align: left;
+      width: 100%;
+    }
+
+    .mindmap-context-menu button:hover,
+    .mindmap-context-menu button:focus-visible {
+      background: #ebf8ff;
+      outline: none;
+    }
+
     .markmap-node text {
       fill: #2d3748;
       font-size: 14px;
@@ -114,11 +147,20 @@
       <h2>概率论思维导图</h2>
     <div class="mindmap-controls" aria-label="Mind map expansion controls">
       <button type="button" data-expand-level="0">全部收起</button>
+      <button type="button" data-expand-level="-1">全部展开</button>
       <button type="button" data-expand-level="1">展开到 1 级</button>
       <button type="button" data-expand-level="2">展开到 2 级</button>
       <button type="button" data-expand-level="3">展开到 3 级</button>
     </div>
       <svg id="mindmap"></svg>
+      <div id="mindmap-context-menu" class="mindmap-context-menu" role="menu">
+        <button type="button" data-context-action="expand" role="menuitem">
+          展开所有子主题
+        </button>
+        <button type="button" data-context-action="collapse" role="menuitem">
+          折叠所有子主题
+        </button>
+      </div>
     </div>
   </main>
 
@@ -147,9 +189,111 @@
         const getRoot = () => transformer.transform(markdown).root;
         const mindmap = Markmap.create(
           '#mindmap',
-          { initialExpandLevel: 1 },
+          {
+            initialExpandLevel: 1,
+            autoFit: false,
+            // 普通左键仅展开/收起当前节点，不递归影响后代。
+            toggleRecursively: false
+          },
           getRoot()
         );
+
+        // KaTeX 字体是异步加载的。首次测量如果发生在字体加载前，
+        // 长公式会得到偏小的 foreignObject 宽度，字体加载后尾部就会
+        // 被裁剪。字体就绪后重新测量节点，确保公式宽度完整。
+        if (document.fonts && document.fonts.ready) {
+          await document.fonts.ready;
+          await new Promise((resolve) => requestAnimationFrame(resolve));
+          mindmap.setData(getRoot());
+          await mindmap.fit();
+        }
+
+        // Markmap 的节点点击会直接调用 toggleNode()，但该路径不会像
+        // 按钮展开那样在布局完成后重新 fit。延迟到浏览器完成布局后
+        // 再适配一次，确保逐级展开时所有内容都在视口内。
+        let fitFrame = 0;
+        const scheduleFit = () => {
+          cancelAnimationFrame(fitFrame);
+          fitFrame = requestAnimationFrame(() => {
+            fitFrame = requestAnimationFrame(() => {
+              mindmap.fit();
+            });
+          });
+        };
+        const toggleNode = mindmap.toggleNode.bind(mindmap);
+        mindmap.toggleNode = (...args) => {
+          toggleNode(...args);
+          scheduleFit();
+        };
+
+        const contextMenu = document.querySelector('#mindmap-context-menu');
+        let contextNode = null;
+
+        const hideContextMenu = () => {
+          contextMenu.style.display = 'none';
+          contextNode = null;
+        };
+
+        const setDescendantsFold = (node, fold) => {
+          (node.children || []).forEach((child) => {
+            child.payload = { ...(child.payload || {}), fold };
+            setDescendantsFold(child, fold);
+          });
+        };
+
+        const showContextMenu = (event, node) => {
+          contextNode = node;
+          contextMenu.style.display = 'block';
+          contextMenu.style.left = `${event.clientX}px`;
+          contextMenu.style.top = `${event.clientY}px`;
+
+          const rect = contextMenu.getBoundingClientRect();
+          contextMenu.style.left = `${Math.min(
+            event.clientX,
+            window.innerWidth - rect.width - 8
+          )}px`;
+          contextMenu.style.top = `${Math.min(
+            event.clientY,
+            window.innerHeight - rect.height - 8
+          )}px`;
+        };
+
+        mindmap.g.node().addEventListener('contextmenu', (event) => {
+          let element = event.target;
+          while (element && element !== mindmap.g.node()) {
+            if (element.classList?.contains('markmap-node')) {
+              const hierarchyNode = d3.select(element).datum();
+              if (hierarchyNode?.data) {
+                event.preventDefault();
+                showContextMenu(event, hierarchyNode.data);
+              }
+              return;
+            }
+            element = element.parentElement;
+          }
+        });
+
+        contextMenu.addEventListener('click', (event) => {
+          const action = event.target.closest('[data-context-action]')?.dataset
+            .contextAction;
+          if (!action || !contextNode) return;
+
+          const fold = action === 'expand' ? 0 : 1;
+          // 右键菜单是递归操作：展开时当前节点及后代全部展开；
+          // 折叠时当前节点及后代全部收起。
+          contextNode.payload = { ...(contextNode.payload || {}), fold };
+          setDescendantsFold(contextNode, fold);
+          mindmap.renderData(contextNode);
+          hideContextMenu();
+          scheduleFit();
+        });
+
+        document.addEventListener('click', (event) => {
+          if (!contextMenu.contains(event.target)) hideContextMenu();
+        });
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') hideContextMenu();
+        });
 
         document.querySelectorAll('[data-expand-level]').forEach((button) => {
           button.addEventListener('click', () => {
