@@ -157,6 +157,24 @@
       cursor: pointer;
     }
 
+    .param-value-input {
+      width: 64px;
+      padding: 2px 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      outline: none;
+      font-size: 0.875rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #334155;
+      text-align: center;
+    }
+
+    .param-value-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
     /* 移动端适配 */
     @media (max-width: 767px) {
       .main-content {
@@ -262,13 +280,17 @@
             <span class="text-sm text-slate-600">α =</span>
             <input type="range" id="rejAlphaSlider" min="0.01" max="0.15" value="0.05" step="0.01"
               oninput="updateRejection()" class="slider-input w-28">
-            <span id="rejAlphaVal" class="text-sm font-mono text-slate-700 w-10">0.05</span>
+            <input type="number" id="rejAlphaVal" min="0.01" max="0.15" step="0.01" value="0.05"
+              oninput="syncNumericInput('rejAlphaVal','rejAlphaSlider',updateRejection,this.value)"
+              class="param-value-input w-16">
           </div>
           <div class="flex items-center gap-2">
             <span class="text-sm text-slate-600">观测统计量 =</span>
             <input type="range" id="rejStatSlider" min="-3" max="3" value="1.5" step="0.05" oninput="updateRejection()"
               class="slider-input w-32">
-            <span id="rejStatVal" class="text-sm font-mono text-slate-700 w-10">1.50</span>
+            <input type="number" id="rejStatVal" min="-3" max="3" step="0.05" value="1.5"
+              oninput="syncNumericInput('rejStatVal','rejStatSlider',updateRejection,this.value)"
+              class="param-value-input w-16">
           </div>
           <button onclick="resetRejection()"
             class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
@@ -304,13 +326,17 @@
                   <span class="text-sm text-slate-600">α =</span>
                   <input type="range" id="pvAlphaSlider" min="0.01" max="0.15" value="0.05" step="0.01"
                     oninput="updatePValue()" class="slider-input w-28">
-                  <span id="pvAlphaVal" class="text-sm font-mono text-slate-700 w-10">0.05</span>
+                  <input type="number" id="pvAlphaVal" min="0.01" max="0.15" step="0.01" value="0.05"
+                    oninput="syncNumericInput('pvAlphaVal','pvAlphaSlider',updatePValue,this.value)"
+                    class="param-value-input w-16">
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-sm text-slate-600">观测值 |z| =</span>
                   <input type="range" id="pvZSlider" min="0" max="3" value="1.8" step="0.05" oninput="updatePValue()"
                     class="slider-input w-32">
-                  <span id="pvZVal" class="text-sm font-mono text-slate-700 w-10">1.80</span>
+                  <input type="number" id="pvZVal" min="0" max="3" step="0.05" value="1.8"
+                    oninput="syncNumericInput('pvZVal','pvZSlider',updatePValue,this.value)"
+                    class="param-value-input w-16">
                 </div>
                 <button onclick="resetPValue()"
                   class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
@@ -351,13 +377,17 @@
                             <span class="text-sm text-slate-600">α =</span>
                             <input type="range" id="errAlphaSlider" min="0.01" max="0.20" value="0.05" step="0.01"
                               oninput="updateErrors()" class="slider-input w-28">
-                            <span id="errAlphaVal" class="text-sm font-mono text-slate-700 w-10">0.05</span>
+                            <input type="number" id="errAlphaVal" min="0.01" max="0.20" step="0.01" value="0.05"
+                              oninput="syncNumericInput('errAlphaVal','errAlphaSlider',updateErrors,this.value)"
+                              class="param-value-input w-16">
                           </div>
                           <div class="flex items-center gap-2">
                             <span class="text-sm text-slate-600">真实 μ₁ =</span>
                             <input type="range" id="errMuSlider" min="0.2" max="2" value="0.8" step="0.1"
                               oninput="updateErrors()" class="slider-input w-28">
-                            <span id="errMuVal" class="text-sm font-mono text-slate-700 w-8">0.8</span>
+                            <input type="number" id="errMuVal" min="0.2" max="2" step="0.1" value="0.8"
+                              oninput="syncNumericInput('errMuVal','errMuSlider',updateErrors,this.value)"
+                              class="param-value-input w-16">
                           </div>
                           <button onclick="resetErrors()"
                             class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
@@ -401,7 +431,9 @@
                                   <span class="text-sm text-slate-600">α =</span>
                                   <input type="range" id="sideAlphaSlider" min="0.01" max="0.15" value="0.05"
                                     step="0.01" oninput="updateSideBySide()" class="slider-input w-28">
-                                  <span id="sideAlphaVal" class="text-sm font-mono text-slate-700 w-10">0.05</span>
+                                  <input type="number" id="sideAlphaVal" min="0.01" max="0.15" step="0.01" value="0.05"
+                                    oninput="syncNumericInput('sideAlphaVal','sideAlphaSlider',updateSideBySide,this.value)"
+                                    class="param-value-input w-16">
                                 </div>
                                 <button onclick="resetSideBySide()"
                                   class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
@@ -471,6 +503,23 @@
   </main>
 
   <script>
+    // ===== 数值输入框与滑块联动 =====
+    function clampVal(v, min, max) { return Math.min(Math.max(parseFloat(v), parseFloat(min)), parseFloat(max)); }
+    function decimalsOf(step) { var s = String(step); return s.indexOf('.') >= 0 ? s.split('.')[1].length : 0; }
+    var activeNumericInputId = null;
+    function syncNumericInput(inputId, sliderId, updateFn, value) {
+      if (value === '') return;
+      var slider = document.getElementById(sliderId);
+      var num = parseFloat(value);
+      if (isNaN(num)) return;
+      var clamped = clampVal(num, slider.min, slider.max);
+      slider.value = clamped;
+      activeNumericInputId = inputId;
+      if (updateFn) updateFn();
+      activeNumericInputId = null;
+      if (clamped !== num) document.getElementById(inputId).value = clamped.toFixed(decimalsOf(slider.step));
+    }
+
     function renderAllKatex() {
       document.querySelectorAll('.katex-render').forEach(function (el) {
         try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
@@ -503,8 +552,8 @@
       var alpha = parseFloat(document.getElementById('rejAlphaSlider').value);
       var stat = parseFloat(document.getElementById('rejStatSlider').value);
 
-      document.getElementById('rejAlphaVal').textContent = alpha.toFixed(2);
-      document.getElementById('rejStatVal').textContent = stat.toFixed(2);
+      if (activeNumericInputId !== 'rejAlphaVal') document.getElementById('rejAlphaVal').value = alpha.toFixed(2);
+      if (activeNumericInputId !== 'rejStatVal') document.getElementById('rejStatVal').value = stat.toFixed(2);
 
       var N = 300, xMin = -4, xMax = 4;
       var pdfData = [];
@@ -631,8 +680,8 @@
       var alpha = parseFloat(document.getElementById('pvAlphaSlider').value);
       var zObs = parseFloat(document.getElementById('pvZSlider').value);
 
-      document.getElementById('pvAlphaVal').textContent = alpha.toFixed(2);
-      document.getElementById('pvZVal').textContent = zObs.toFixed(2);
+      if (activeNumericInputId !== 'pvAlphaVal') document.getElementById('pvAlphaVal').value = alpha.toFixed(2);
+      if (activeNumericInputId !== 'pvZVal') document.getElementById('pvZVal').value = zObs.toFixed(2);
 
       var pVal = 2 * (1 - normalCDF(zObs));
       document.getElementById('pvResult').textContent = pVal.toFixed(4);
@@ -704,8 +753,8 @@
       var alpha = parseFloat(document.getElementById('errAlphaSlider').value);
       var mu1 = parseFloat(document.getElementById('errMuSlider').value);
 
-      document.getElementById('errAlphaVal').textContent = alpha.toFixed(2);
-      document.getElementById('errMuVal').textContent = mu1.toFixed(1);
+      if (activeNumericInputId !== 'errAlphaVal') document.getElementById('errAlphaVal').value = alpha.toFixed(2);
+      if (activeNumericInputId !== 'errMuVal') document.getElementById('errMuVal').value = mu1.toFixed(1);
 
       // H0: mu=0, H1: mu=mu1
       // 临界值 z_crit
@@ -772,7 +821,7 @@
 
     function updateSideBySide() {
       var alpha = parseFloat(document.getElementById('sideAlphaSlider').value);
-      document.getElementById('sideAlphaVal').textContent = alpha.toFixed(2);
+      if (activeNumericInputId !== 'sideAlphaVal') document.getElementById('sideAlphaVal').value = alpha.toFixed(2);
 
       var N = 300, xMin = -4, xMax = 4;
       var pdfData = [];

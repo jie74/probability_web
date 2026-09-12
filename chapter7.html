@@ -157,6 +157,24 @@
       cursor: pointer;
     }
 
+    .param-value-input {
+      width: 64px;
+      padding: 2px 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      outline: none;
+      font-size: 0.875rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #334155;
+      text-align: center;
+    }
+
+    .param-value-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
     /* 移动端适配 */
     @media (max-width: 767px) {
       .main-content {
@@ -262,8 +280,9 @@
           <div class="flex items-center gap-2">
             <span class="text-sm text-slate-600">重复次数：</span>
             <input type="range" id="peSimSlider" min="20" max="200" value="50" step="10"
-              oninput="document.getElementById('peSimVal').textContent=this.value;" class="slider-input w-32">
-            <span id="peSimVal" class="text-sm font-mono text-slate-700 w-10">50</span>
+              oninput="syncNumericInput('peSimVal','peSimSlider',null,this.value)" class="slider-input w-32">
+            <input type="number" id="peSimVal" min="20" max="200" step="10" value="50"
+              oninput="syncNumericInput('peSimVal','peSimSlider',null,this.value)" class="param-value-input w-20">
           </div>
           <button onclick="runPointEst()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors"
             style="background:#2563eb;">▶ 重新生成</button>
@@ -314,8 +333,9 @@
           <div class="flex items-center gap-2">
             <span class="text-sm text-slate-600">模拟组数：</span>
             <input type="range" id="ciSimSlider" min="10" max="100" value="30" step="5"
-              oninput="document.getElementById('ciSimVal').textContent=this.value;" class="slider-input w-32">
-            <span id="ciSimVal" class="text-sm font-mono text-slate-700 w-8">30</span>
+              oninput="syncNumericInput('ciSimVal','ciSimSlider',null,this.value)" class="slider-input w-32">
+            <input type="number" id="ciSimVal" min="10" max="100" step="5" value="30"
+              oninput="syncNumericInput('ciSimVal','ciSimSlider',null,this.value)" class="param-value-input w-16">
           </div>
           <button onclick="runCI()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors"
             style="background:#2563eb;">▶ 重新生成</button>
@@ -358,7 +378,8 @@
             <span class="text-sm text-slate-600">样本量 n =</span>
             <input type="range" id="ztNSlider" min="5" max="100" value="15" step="1" oninput="updateZT()"
               class="slider-input w-32">
-            <span id="ztNVal" class="text-sm font-mono text-slate-700 w-8">15</span>
+            <input type="number" id="ztNVal" min="5" max="100" step="1" value="15"
+              oninput="syncNumericInput('ztNVal','ztNSlider',updateZT,this.value)" class="param-value-input w-16">
           </div>
           <div class="flex items-center gap-2">
             <span class="text-sm text-slate-600">置信水平：</span>
@@ -437,6 +458,23 @@
   </main>
 
   <script>
+    // ===== 数值输入框与滑块联动 =====
+    function clampVal(v, min, max) { return Math.min(Math.max(parseFloat(v), parseFloat(min)), parseFloat(max)); }
+    function decimalsOf(step) { var s = String(step); return s.indexOf('.') >= 0 ? s.split('.')[1].length : 0; }
+    var activeNumericInputId = null;
+    function syncNumericInput(inputId, sliderId, updateFn, value) {
+      if (value === '') return;
+      var slider = document.getElementById(sliderId);
+      var num = parseFloat(value);
+      if (isNaN(num)) return;
+      var clamped = clampVal(num, slider.min, slider.max);
+      slider.value = clamped;
+      activeNumericInputId = inputId;
+      if (updateFn) updateFn();
+      activeNumericInputId = null;
+      if (clamped !== num) document.getElementById(inputId).value = clamped.toFixed(decimalsOf(slider.step));
+    }
+
     function renderAllKatex() {
       document.querySelectorAll('.katex-render').forEach(function (el) {
         try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
@@ -497,7 +535,7 @@
     function resetPointEst() {
       document.getElementById('peEstSelect').value = 'unbiased';
       document.getElementById('peSimSlider').value = 50;
-      document.getElementById('peSimVal').textContent = '50';
+      document.getElementById('peSimVal').value = '50';
       runPointEst();
     }
     runPointEst();
@@ -589,7 +627,7 @@
     function resetCI() {
       document.getElementById('ciLevelSelect').value = '0.95';
       document.getElementById('ciSimSlider').value = 30;
-      document.getElementById('ciSimVal').textContent = '30';
+      document.getElementById('ciSimVal').value = '30';
       runCI();
     }
     runCI();
@@ -600,7 +638,7 @@
     function updateZT() {
       var n = parseInt(document.getElementById('ztNSlider').value);
       var level = parseFloat(document.getElementById('ztLevelSelect').value);
-      document.getElementById('ztNVal').textContent = n;
+      if (activeNumericInputId !== 'ztNVal') document.getElementById('ztNVal').value = n;
 
       var alpha = 1 - level;
       // Z分位数近似

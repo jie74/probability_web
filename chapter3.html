@@ -63,6 +63,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
 .quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
 .slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
 .slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
+.param-value-input { width: 64px; padding: 2px 6px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; outline: none; font-size: 0.875rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #334155; text-align: center; }
+.param-value-input:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
 
 /* 移动端适配 */
 @media (max-width: 767px) {
@@ -187,17 +189,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">ρ =</span>
           <input type="range" id="rhoSlider" min="-0.95" max="0.95" value="0" step="0.05" oninput="updateBivarNormal()" class="slider-input w-36">
-          <span id="rhoVal" class="text-sm font-mono text-slate-700 w-10">0.00</span>
+          <input type="number" id="rhoVal" min="-0.95" max="0.95" value="0" step="0.05" oninput="syncRhoFromInput(this.value)" class="param-value-input">
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">σ₁ =</span>
           <input type="range" id="sigma1Slider" min="0.5" max="2.5" value="1" step="0.1" oninput="updateBivarNormal()" class="slider-input w-32">
-          <span id="sigma1Val" class="text-sm font-mono text-slate-700 w-8">1.0</span>
+          <input type="number" id="sigma1Val" min="0.5" max="2.5" value="1" step="0.1" oninput="syncSigma1FromInput(this.value)" class="param-value-input">
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">σ₂ =</span>
           <input type="range" id="sigma2Slider" min="0.5" max="2.5" value="1" step="0.1" oninput="updateBivarNormal()" class="slider-input w-32">
-          <span id="sigma2Val" class="text-sm font-mono text-slate-700 w-8">1.0</span>
+          <input type="number" id="sigma2Val" min="0.5" max="2.5" value="1" step="0.1" oninput="syncSigma2FromInput(this.value)" class="param-value-input">
         </div>
         <button onclick="resetBivarNormal()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
       </div>
@@ -233,19 +235,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC'
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">x ∈ [</span>
           <input type="range" id="xMinSlider" min="-3" max="2" value="-1" step="0.1" oninput="updateIntegral()" class="slider-input w-28">
-          <span id="xMinVal" class="text-sm font-mono text-slate-700 w-8">-1.0</span>
+          <input type="number" id="xMinVal" min="-3" max="2" value="-1" step="0.1" oninput="syncXMinFromInput(this.value)" class="param-value-input">
           <span class="text-sm text-slate-600">,</span>
           <input type="range" id="xMaxSlider" min="-1" max="3" value="1" step="0.1" oninput="updateIntegral()" class="slider-input w-28">
-          <span id="xMaxVal" class="text-sm font-mono text-slate-700 w-8">1.0</span>
+          <input type="number" id="xMaxVal" min="-1" max="3" value="1" step="0.1" oninput="syncXMaxFromInput(this.value)" class="param-value-input">
           <span class="text-sm text-slate-600">]</span>
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">y ∈ [</span>
           <input type="range" id="yMinSlider" min="-3" max="2" value="-1" step="0.1" oninput="updateIntegral()" class="slider-input w-28">
-          <span id="yMinVal" class="text-sm font-mono text-slate-700 w-8">-1.0</span>
+          <input type="number" id="yMinVal" min="-3" max="2" value="-1" step="0.1" oninput="syncYMinFromInput(this.value)" class="param-value-input">
           <span class="text-sm text-slate-600">,</span>
           <input type="range" id="yMaxSlider" min="-1" max="3" value="1" step="0.1" oninput="updateIntegral()" class="slider-input w-28">
-          <span id="yMaxVal" class="text-sm font-mono text-slate-700 w-8">1.0</span>
+          <input type="number" id="yMaxVal" min="-1" max="3" value="1" step="0.1" oninput="syncYMaxFromInput(this.value)" class="param-value-input">
           <span class="text-sm text-slate-600">]</span>
         </div>
         <button onclick="resetIntegral()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
@@ -454,14 +456,49 @@ function bivarNormalPDF(x, y, rho, s1, s2) {
   return Math.exp(-z/(2*(1-rho*rho))) / (2*Math.PI*s1*s2*Math.sqrt(1-rho*rho));
 }
 
+function clamp(val, min, max) {
+  return Math.min(Math.max(parseFloat(val), parseFloat(min)), parseFloat(max));
+}
+function decimalsOf(step) {
+  var s = String(step);
+  return s.indexOf('.') >= 0 ? s.split('.')[1].length : 0;
+}
+
+// 标记当前正在输入的数值框，避免更新时回写打断用户输入
+var activeValueInputId = null;
+
+function syncValueInput(inputId, sliderId, updateFn, value) {
+  if (value === '') return;
+  var slider = document.getElementById(sliderId);
+  var num = parseFloat(value);
+  if (isNaN(num)) return;
+  var clamped = clamp(num, slider.min, slider.max);
+  slider.value = clamped;
+  activeValueInputId = inputId;
+  updateFn();
+  activeValueInputId = null;
+  // 仅当输入值超出范围被限制时，才回写规范化后的值
+  if (clamped !== num) {
+    document.getElementById(inputId).value = clamped.toFixed(decimalsOf(slider.step));
+  }
+}
+
+function syncRhoFromInput(value) { syncValueInput('rhoVal', 'rhoSlider', updateBivarNormal, value); }
+function syncSigma1FromInput(value) { syncValueInput('sigma1Val', 'sigma1Slider', updateBivarNormal, value); }
+function syncSigma2FromInput(value) { syncValueInput('sigma2Val', 'sigma2Slider', updateBivarNormal, value); }
+function syncXMinFromInput(value) { syncValueInput('xMinVal', 'xMinSlider', updateIntegral, value); }
+function syncXMaxFromInput(value) { syncValueInput('xMaxVal', 'xMaxSlider', updateIntegral, value); }
+function syncYMinFromInput(value) { syncValueInput('yMinVal', 'yMinSlider', updateIntegral, value); }
+function syncYMaxFromInput(value) { syncValueInput('yMaxVal', 'yMaxSlider', updateIntegral, value); }
+
 function updateBivarNormal() {
   var rho = parseFloat(document.getElementById('rhoSlider').value);
   var s1 = parseFloat(document.getElementById('sigma1Slider').value);
   var s2 = parseFloat(document.getElementById('sigma2Slider').value);
 
-  document.getElementById('rhoVal').textContent = rho.toFixed(2);
-  document.getElementById('sigma1Val').textContent = s1.toFixed(1);
-  document.getElementById('sigma2Val').textContent = s2.toFixed(1);
+  if (activeValueInputId !== 'rhoVal') document.getElementById('rhoVal').value = rho.toFixed(2);
+  if (activeValueInputId !== 'sigma1Val') document.getElementById('sigma1Val').value = s1.toFixed(1);
+  if (activeValueInputId !== 'sigma2Val') document.getElementById('sigma2Val').value = s2.toFixed(1);
 
   var N = 50;
   var xs = [], ys = [], zs = [];
@@ -531,10 +568,10 @@ function updateIntegral() {
   var yMin = parseFloat(document.getElementById('yMinSlider').value);
   var yMax = parseFloat(document.getElementById('yMaxSlider').value);
 
-  document.getElementById('xMinVal').textContent = xMin.toFixed(1);
-  document.getElementById('xMaxVal').textContent = xMax.toFixed(1);
-  document.getElementById('yMinVal').textContent = yMin.toFixed(1);
-  document.getElementById('yMaxVal').textContent = yMax.toFixed(1);
+  if (activeValueInputId !== 'xMinVal') document.getElementById('xMinVal').value = xMin.toFixed(1);
+  if (activeValueInputId !== 'xMaxVal') document.getElementById('xMaxVal').value = xMax.toFixed(1);
+  if (activeValueInputId !== 'yMinVal') document.getElementById('yMinVal').value = yMin.toFixed(1);
+  if (activeValueInputId !== 'yMaxVal') document.getElementById('yMaxVal').value = yMax.toFixed(1);
 
   // 数值积分计算概率
   var steps = 80;

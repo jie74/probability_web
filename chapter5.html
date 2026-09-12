@@ -157,6 +157,24 @@
       cursor: pointer;
     }
 
+    .param-value-input {
+      width: 64px;
+      padding: 2px 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      outline: none;
+      font-size: 0.875rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #334155;
+      text-align: center;
+    }
+
+    .param-value-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
     /* 掷骰子实验画布 */
     .dice-canvas-wrap {
       position: relative;
@@ -253,13 +271,15 @@
           <div class="flex items-center gap-2">
             <label for="chebSigmaSlider" class="text-sm text-slate-600">标准差 σ</label>
             <input type="range" id="chebSigmaSlider" min="0.3" max="3" value="1" step="0.1" class="slider-input w-40">
-            <input id="chebSigmaValue" type="number" value="1.0" readonly
+            <input id="chebSigmaValue" type="number" min="0.3" max="3" step="0.1" value="1.0"
+              oninput="syncNumericInput('chebSigmaValue','chebSigmaSlider',updateChebyshev,this.value)"
               class="w-16 px-2 py-1 text-sm font-mono text-blue-700 bg-blue-50 border border-blue-200 rounded-md text-center">
           </div>
           <div class="flex items-center gap-2">
             <label for="chebEpsilonSlider" class="text-sm text-slate-600">偏差阈值 ε</label>
             <input type="range" id="chebEpsilonSlider" min="0.3" max="6" value="2" step="0.1" class="slider-input w-40">
-            <input id="chebEpsilonValue" type="number" value="2.0" readonly
+            <input id="chebEpsilonValue" type="number" min="0.3" max="6" step="0.1" value="2.0"
+              oninput="syncNumericInput('chebEpsilonValue','chebEpsilonSlider',updateChebyshev,this.value)"
               class="w-16 px-2 py-1 text-sm font-mono text-blue-700 bg-blue-50 border border-blue-200 rounded-md text-center">
           </div>
           <div class="flex items-center gap-2">
@@ -330,7 +350,8 @@
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">n =</span>
           <input type="range" id="llnSlider" min="10" max="5000" value="1000" step="10" oninput="updateLLNSlider()" class="slider-input w-40">
-          <span id="llnSliderVal" class="text-sm font-mono text-slate-700 w-14">1000</span>
+          <input type="number" id="llnSliderVal" min="10" max="5000" step="10" value="1000"
+            oninput="syncNumericInput('llnSliderVal','llnSlider',updateLLNSlider,this.value)" class="param-value-input w-20">
         </div>
         <button onclick="runLLN()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 开始模拟</button>
         <button onclick="resetLLN()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
@@ -370,7 +391,8 @@
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">每次骰子数 n =</span>
           <input type="range" id="diceNumSlider" min="1" max="10" value="3" step="1" oninput="updateDiceNumSlider()" class="slider-input w-32">
-          <span id="diceNumVal" class="text-sm font-mono text-slate-700 w-6">3</span>
+          <input type="number" id="diceNumVal" min="1" max="10" step="1" value="3"
+            oninput="syncNumericInput('diceNumVal','diceNumSlider',updateDiceNumSlider,this.value)" class="param-value-input w-16">
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">总投掷次数</span>
@@ -385,8 +407,9 @@
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">动画速度</span>
           <input type="range" id="diceSpeedSlider" min="1" max="100" value="50"
-            oninput="document.getElementById('diceSpeedVal').textContent=this.value" class="slider-input w-28">
-          <span id="diceSpeedVal" class="text-sm font-mono text-slate-700 w-8">50</span>
+            oninput="syncNumericInput('diceSpeedVal','diceSpeedSlider',null,this.value)" class="slider-input w-28">
+          <input type="number" id="diceSpeedVal" min="1" max="100" step="1" value="50"
+            oninput="syncNumericInput('diceSpeedVal','diceSpeedSlider',null,this.value)" class="param-value-input w-16">
         </div>
         <button id="diceRunBtn" onclick="runDiceSim()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 开始模拟</button>
         <button id="diceStopBtn" onclick="stopDiceSim()" class="px-4 py-1.5 text-sm text-white rounded-lg hidden" style="background:#e11d48;">⏹ 停止</button>
@@ -471,12 +494,14 @@
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">样本容量 n =</span>
           <input type="range" id="cltNSlider" min="1" max="50" value="5" step="1" oninput="updateCLTSlider()" class="slider-input w-36">
-          <span id="cltNSliderVal" class="text-sm font-mono text-slate-700 w-8">5</span>
+          <input type="number" id="cltNSliderVal" min="1" max="50" step="1" value="5"
+            oninput="syncNumericInput('cltNSliderVal','cltNSlider',updateCLTSlider,this.value)" class="param-value-input w-16">
         </div>
         <div class="flex items-center gap-2">
           <span class="text-sm text-slate-600">模拟次数 =</span>
           <input type="range" id="cltSimSlider" min="200" max="5000" value="1000" step="100" oninput="updateCLTSimSlider()" class="slider-input w-36">
-          <span id="cltSimVal" class="text-sm font-mono text-slate-700 w-12">1000</span>
+          <input type="number" id="cltSimVal" min="200" max="5000" step="100" value="1000"
+            oninput="syncNumericInput('cltSimVal','cltSimSlider',updateCLTSimSlider,this.value)" class="param-value-input w-20">
         </div>
         <button onclick="resetCLT()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
       </div>
@@ -536,6 +561,23 @@
 </main>
 
 <script>
+  // ===== 数值输入框与滑块联动 =====
+  function clampVal(v, min, max) { return Math.min(Math.max(parseFloat(v), parseFloat(min)), parseFloat(max)); }
+  function decimalsOf(step) { var s = String(step); return s.indexOf('.') >= 0 ? s.split('.')[1].length : 0; }
+  var activeNumericInputId = null;
+  function syncNumericInput(inputId, sliderId, updateFn, value) {
+    if (value === '') return;
+    var slider = document.getElementById(sliderId);
+    var num = parseFloat(value);
+    if (isNaN(num)) return;
+    var clamped = clampVal(num, slider.min, slider.max);
+    slider.value = clamped;
+    activeNumericInputId = inputId;
+    if (updateFn) updateFn();
+    activeNumericInputId = null;
+    if (clamped !== num) document.getElementById(inputId).value = clamped.toFixed(decimalsOf(slider.step));
+  }
+
   function renderAllKatex() {
     document.querySelectorAll('.katex-render').forEach(function (el) {
       try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
@@ -599,12 +641,12 @@
   }
 
   function updateLLNSlider() {
-    document.getElementById('llnSliderVal').textContent = document.getElementById('llnSlider').value;
+    if (activeNumericInputId !== 'llnSliderVal') document.getElementById('llnSliderVal').value = document.getElementById('llnSlider').value;
   }
 
   function resetLLN() {
     document.getElementById('llnSlider').value = 1000;
-    document.getElementById('llnSliderVal').textContent = '1000';
+    document.getElementById('llnSliderVal').value = '1000';
     document.getElementById('llnMean').textContent = '—';
     document.getElementById('llnTheory').textContent = '—';
     llnChart.setOption({ series: [{ data: [] }] });
@@ -675,20 +717,20 @@
   }
 
   function updateCLTSlider() {
-    document.getElementById('cltNSliderVal').textContent = document.getElementById('cltNSlider').value;
+    if (activeNumericInputId !== 'cltNSliderVal') document.getElementById('cltNSliderVal').value = document.getElementById('cltNSlider').value;
     runCLT();
   }
 
   function updateCLTSimSlider() {
-    document.getElementById('cltSimVal').textContent = document.getElementById('cltSimSlider').value;
+    if (activeNumericInputId !== 'cltSimVal') document.getElementById('cltSimVal').value = document.getElementById('cltSimSlider').value;
     runCLT();
   }
 
   function resetCLT() {
     document.getElementById('cltNSlider').value = 5;
-    document.getElementById('cltNSliderVal').textContent = '5';
+    document.getElementById('cltNSliderVal').value = '5';
     document.getElementById('cltSimSlider').value = 1000;
-    document.getElementById('cltSimVal').textContent = '1000';
+    document.getElementById('cltSimVal').value = '1000';
     runCLT();
   }
   runCLT();
@@ -722,7 +764,7 @@
 
   function updateDiceNumSlider() {
     var n = document.getElementById('diceNumSlider').value;
-    document.getElementById('diceNumVal').textContent = n;
+    if (activeNumericInputId !== 'diceNumVal') document.getElementById('diceNumVal').value = n;
     document.getElementById('diceStatN').textContent = n;
     document.getElementById('diceStatTheory').textContent = (n * 3.5).toFixed(2);
   }
@@ -844,7 +886,7 @@
       document.getElementById('diceTotalInput').value = 50000;
       document.getElementById('diceBatchInput').value = 500;
       document.getElementById('diceSpeedSlider').value = 50;
-      document.getElementById('diceSpeedVal').textContent = '50';
+      document.getElementById('diceSpeedVal').value = '50';
       document.getElementById('diceProgress').style.width = '0%';
       document.getElementById('diceStatRolls').textContent = '0';
       document.getElementById('diceStatActual').textContent = '—';
@@ -921,8 +963,8 @@
     if (leftBoundary > xMin) leftOutsideData = chebyshevFillData(xMin, leftBoundary, sigma, 0.5, 80);
     if (rightBoundary < xMax) rightOutsideData = chebyshevFillData(rightBoundary, xMax, sigma, 0.5, 80);
 
-    sigmaSlider.nextElementSibling.value = sigma.toFixed(1);
-    epsilonSlider.nextElementSibling.value = epsilon.toFixed(1);
+    if (activeNumericInputId !== 'chebSigmaValue') sigmaSlider.nextElementSibling.value = sigma.toFixed(1);
+    if (activeNumericInputId !== 'chebEpsilonValue') epsilonSlider.nextElementSibling.value = epsilon.toFixed(1);
     updateChebyshevFormula(sigma, epsilon, lowerBound, upperBound);
 
     chebyshevChart.setOption({
