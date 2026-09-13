@@ -131,7 +131,7 @@ tailwind.config = {
             <input type="text" id="eventA" class="event-input" value="患病" placeholder="如：患病 / 是垃圾邮件 / 是欺诈">
           </div>
           <div>
-            <label class="text-xs text-slate-500 block mb-1">A 的对立事件 ¬A</label>
+            <label class="text-xs text-slate-500 block mb-1">A 的对立事件 \(\overline{A}\)</label>
             <input type="text" id="eventNotA" class="event-input" value="健康" placeholder="如：健康 / 正常邮件 / 正常交易">
           </div>
           <div>
@@ -139,7 +139,7 @@ tailwind.config = {
             <input type="text" id="eventB" class="event-input" value="阳性" placeholder="如：阳性 / 被标记 / 触发警报">
           </div>
           <div>
-            <label class="text-xs text-slate-500 block mb-1">B 的对立事件 ¬B</label>
+            <label class="text-xs text-slate-500 block mb-1">B 的对立事件 \(\overline{B}\)</label>
             <input type="text" id="eventNotB" class="event-input" value="阴性" placeholder="如：阴性 / 未标记 / 未触发">
           </div>
         </div>
@@ -154,8 +154,8 @@ tailwind.config = {
       <div class="mb-5">
         <h3 class="text-sm font-semibold text-slate-700 mb-2">🎯 情境引入</h3>
         <p class="text-sm text-slate-600 leading-relaxed mb-3">
-          设事件 A ＝ <span class="ev-A font-semibold text-slate-700"></span>，其对立事件 ¬A ＝ <span class="ev-notA font-semibold text-slate-700"></span>；
-          事件 B ＝ <span class="ev-B font-semibold text-slate-700"></span>，其对立事件 ¬B ＝ <span class="ev-notB font-semibold text-slate-700"></span>。
+          设事件 A ＝ <span class="ev-A font-semibold text-slate-700"></span>，其对立事件 \(\overline{A}\) ＝ <span class="ev-notA font-semibold text-slate-700"></span>；
+          事件 B ＝ <span class="ev-B font-semibold text-slate-700"></span>，其对立事件 \(\overline{B}\) ＝ <span class="ev-notB font-semibold text-slate-700"></span>。
           已知先验概率 \(P(A)\)、似然 \(P(B|A)\) 以及 \(P(B|\overline{A})\)，可用全概率公式与贝叶斯公式由 B 的发生反推 A 的概率。
         </p>
         <blockquote class="pl-4 border-l-4 border-primary bg-primary-bg py-2 px-3 rounded-r-lg">
@@ -272,7 +272,7 @@ tailwind.config = {
         <h4 class="text-sm font-bold text-blue-900 mb-2">📌 核心结论</h4>
         <p class="text-sm text-slate-700 leading-relaxed" id="coreConclusion">
           检测阳性，实际患病只有<strong class="text-blue-700">—</strong>，远低于直觉。
-          <br>👉 误区根源：忽略了<strong>先验概率（基础率可能很低）</strong>，大量 ¬A 人群产生的“假 B”，拉高了 B 样本总数。
+          <br>👉 误区根源：忽略了<strong>先验概率（基础率可能很低）</strong>，大量 \(\overline{A}\) 人群产生的“假 B”，拉高了 B 样本总数。
         </p>
       </div>
 
@@ -280,6 +280,200 @@ tailwind.config = {
       <div class="exam-tip">
         <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
         <span class="text-sm text-yellow-700">全概率、贝叶斯为<strong>考试大题考点</strong>；注意条件概率分母不能丢。很多人直觉认为观察到 B ≈ A 一定成立，实际上当先验概率很低时，后验概率可能仍然很低。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 卡片：全概率公式（事件可替换） ===== -->
+  <section class="max-w-5xl mx-auto px-10">
+    <div class="card">
+      <h2 class="text-lg font-bold text-slate-800 mb-3">📦 全概率公式 — 事件替换器</h2>
+
+      <!-- 事件名称输入区 -->
+      <div class="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+        <h3 class="text-sm font-semibold text-emerald-800 mb-3">🏷️ 自定义事件名称（替换后所有标签与公式自动更新）</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">原因事件 A₁</label>
+            <input type="text" id="totA1" class="event-input" value="工作邮件" placeholder="如：工作邮件 / 晴天 / 仓库A">
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">原因事件 A₂</label>
+            <input type="text" id="totA2" class="event-input" value="广告邮件" placeholder="如：广告邮件 / 阴天 / 仓库B">
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">原因事件 A₃</label>
+            <input type="text" id="totA3" class="event-input" value="垃圾邮件" placeholder="如：垃圾邮件 / 雨天 / 仓库C">
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">结果事件 B</label>
+            <input type="text" id="totB" class="event-input" value="含链接" placeholder="如：含链接 / 出门拿伞 / 次品">
+          </div>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <button onclick="loadTotalPreset('email')" class="px-3 py-1 text-xs bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-emerald-500 hover:text-emerald-600 transition-colors">📧 邮件来源</button>
+          <button onclick="loadTotalPreset('weather')" class="px-3 py-1 text-xs bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-emerald-500 hover:text-emerald-600 transition-colors">☂️ 天气与拿伞</button>
+          <button onclick="loadTotalPreset('warehouse')" class="px-3 py-1 text-xs bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-emerald-500 hover:text-emerald-600 transition-colors">🏭 仓库进货</button>
+          <button onclick="loadTotalPreset('signal')" class="px-3 py-1 text-xs bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-emerald-500 hover:text-emerald-600 transition-colors">📡 信号传输</button>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">🎯 情境引入</h3>
+        <p class="text-sm text-slate-600 leading-relaxed mb-3">
+          设完备事件组 A₁ ＝ <span class="tot-A1 font-semibold text-slate-700"></span>、A₂ ＝ <span class="tot-A2 font-semibold text-slate-700"></span>、A₃ ＝ <span class="tot-A3 font-semibold text-slate-700"></span>，
+          它们互斥且覆盖全部可能（A₁∪A₂∪A₃＝Ω）。结果事件 B ＝ <span class="tot-B font-semibold text-slate-700"></span>。
+          已知各原因的先验概率 \(P(A_i)\) 与似然 \(P(B|A_i)\)，可用全概率公式求 B 发生的总概率。
+        </p>
+        <blockquote class="pl-4 border-l-4 border-emerald-500 bg-emerald-50 py-2 px-3 rounded-r-lg">
+          <p class="text-sm text-slate-700">
+            提问：<strong>事件 B（<span class="tot-B"></span>）发生的总概率 \(P(B)\) 是多少？</strong>
+          </p>
+        </blockquote>
+      </div>
+
+      <div class="mb-5">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📘 概念讲解</h3>
+        <ol class="list-decimal pl-6 space-y-2 text-sm text-slate-600 leading-relaxed">
+          <li>
+            <strong>完备事件组（划分）</strong>：<span class="tot-A1 font-semibold"></span>、<span class="tot-A2 font-semibold"></span>、<span class="tot-A3 font-semibold"></span> 两两互斥且并集为全集，任一结果只能经由其中一条“途径”发生。
+          </li>
+          <li>
+            <strong>先验概率 \(P(A_i)\)</strong>：各原因事件本身发生的概率，三者之和恒为 1。
+          </li>
+          <li>
+            <strong>似然 \(P(B|A_i)\)</strong>：在某个原因（<span class="tot-A1 font-semibold"></span> / <span class="tot-A2 font-semibold"></span> / <span class="tot-A3 font-semibold"></span>）发生的前提下，结果 <span class="tot-B font-semibold"></span> 发生的概率。
+          </li>
+        </ol>
+      </div>
+
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          <strong>全概率公式</strong>：把 B 的发生拆解为“经 A₁、经 A₂、经 A₃”等互斥途径，逐项加权求和，是“由因求果”的核心工具，也是贝叶斯公式的分母来源。
+        </p>
+      </div>
+
+      <!-- 折叠公式面板 -->
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div><span class="text-xs text-slate-400">完备事件组：</span><span class="katex-render" data-expr="\bigcup_{i=1}^{n}A_i=\Omega,\quad A_i\cap A_j=\varnothing\;(i\neq j)"></span></div>
+            <div><span class="text-xs text-slate-400">全概率公式：</span><span class="katex-render" data-expr="P(B)=\sum_{i=1}^{n}P(A_i)P(B|A_i)"></span></div>
+            <div><span class="text-xs text-slate-400">三项展开：</span><span class="katex-render" data-expr="P(B)=P(A_1)P(B|A_1)+P(A_2)P(B|A_2)+P(A_3)P(B|A_3)"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 可视化区域 -->
+      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 概率面积可视化</h3>
+
+      <div class="mb-4">
+        <h4 class="text-xs font-semibold text-slate-500 mb-2">① 先验概率 P(Aᵢ)（三项之和恒为 1，第三项自动补齐）</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">P(<span class="tot-A1"></span>)</label>
+            <div class="flex items-center gap-2">
+              <input type="range" id="totP1Slider" min="0" max="1" value="0.4" step="0.01" oninput="onTotP1Input()" class="slider-input flex-1">
+              <input type="number" id="totP1Num" min="0" max="1" step="0.01" value="0.4" oninput="syncTotalNum('totP1')" class="num-input">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">P(<span class="tot-A2"></span>)</label>
+            <div class="flex items-center gap-2">
+              <input type="range" id="totP2Slider" min="0" max="1" value="0.5" step="0.01" oninput="onTotP2Input()" class="slider-input flex-1">
+              <input type="number" id="totP2Num" min="0" max="1" step="0.01" value="0.5" oninput="syncTotalNum('totP2')" class="num-input">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">P(<span class="tot-A3"></span>)（自动）</label>
+            <div class="flex items-center gap-2">
+              <input type="range" id="totP3Slider" min="0" max="1" value="0.1" step="0.01" class="slider-input flex-1" disabled>
+              <input type="number" id="totP3Num" min="0" max="1" step="0.01" value="0.1" class="num-input" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h4 class="text-xs font-semibold text-slate-500 mb-2">② 似然 P(B|Aᵢ)（各原因前提下 B 发生的概率）</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">P(<span class="tot-B"></span>|<span class="tot-A1"></span>)</label>
+            <div class="flex items-center gap-2">
+              <input type="range" id="totB1Slider" min="0" max="1" value="0.3" step="0.01" oninput="updateTotalProb()" class="slider-input flex-1">
+              <input type="number" id="totB1Num" min="0" max="1" step="0.01" value="0.3" oninput="syncTotalNum('totB1')" class="num-input">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">P(<span class="tot-B"></span>|<span class="tot-A2"></span>)</label>
+            <div class="flex items-center gap-2">
+              <input type="range" id="totB2Slider" min="0" max="1" value="0.8" step="0.01" oninput="updateTotalProb()" class="slider-input flex-1">
+              <input type="number" id="totB2Num" min="0" max="1" step="0.01" value="0.8" oninput="syncTotalNum('totB2')" class="num-input">
+            </div>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 block mb-1">P(<span class="tot-B"></span>|<span class="tot-A3"></span>)</label>
+            <div class="flex items-center gap-2">
+              <input type="range" id="totB3Slider" min="0" max="1" value="0.9" step="0.01" oninput="updateTotalProb()" class="slider-input flex-1">
+              <input type="number" id="totB3Num" min="0" max="1" step="0.01" value="0.9" oninput="syncTotalNum('totB3')" class="num-input">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4 flex gap-3">
+        <button onclick="resetTotal()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-emerald-600 hover:text-emerald-600 transition-colors">🔄 重置</button>
+      </div>
+
+      <div class="bg-white rounded-lg border border-slate-200 p-4 mb-3">
+        <div class="text-center mb-2">
+          <span class="text-sm font-semibold text-slate-700">
+            全概率 P(<span class="tot-B"></span>) \(=\) <span id="totalProbVal" class="text-lg font-bold text-emerald-600">—</span>
+          </span>
+        </div>
+        <canvas id="totalCanvas" width="560" height="220" class="max-w-full mx-auto block"></canvas>
+        <div class="flex flex-wrap justify-center gap-x-6 gap-y-1 mt-3 text-xs text-slate-500">
+          <span>■ <span class="tot-A1"></span>（彩色为 <span class="tot-B"></span> 部分）</span>
+          <span>■ <span class="tot-A2"></span></span>
+          <span>■ <span class="tot-A3"></span></span>
+        </div>
+      </div>
+
+      <!-- 全概率公式与计算过程 -->
+      <div class="formula-panel">
+        <div class="formula-toggle" onclick="toggleFormula(this)">
+          <span class="arrow">▶</span>🧮 全概率公式与计算过程（点击展开/收起）
+        </div>
+        <div class="formula-body">
+          <div class="space-y-3">
+            <div>
+              <span class="text-xs text-slate-400">全概率公式：</span>
+              <span id="totalFormulaLatex" class="katex-render" data-expr=""></span>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400">代入当前数值计算：</span>
+              <span id="totalCalcLatex" class="katex-render" data-expr=""></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 核心结论 -->
+      <div class="rounded-lg border border-emerald-300 bg-emerald-50 p-4 mb-3">
+        <h4 class="text-sm font-bold text-emerald-900 mb-2">📌 核心结论</h4>
+        <p class="text-sm text-slate-700 leading-relaxed" id="totalConclusion">
+          事件 B 发生的总概率为<strong class="text-emerald-700">—</strong>。
+        </p>
+      </div>
+
+      <!-- 应试提示 -->
+      <div class="exam-tip">
+        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+        <span class="text-sm text-yellow-700">全概率公式的关键是<strong>找全“完备事件组”</strong>并保证先验概率之和为 1；每一途径都要先“乘以该原因的概率”再“乘以该原因下的条件概率”，逐项相加。</span>
       </div>
     </div>
   </section>
@@ -321,9 +515,9 @@ var PRESETS = {
 function getNames() {
   return {
     A: document.getElementById('eventA').value.trim() || 'A',
-    notA: document.getElementById('eventNotA').value.trim() || '¬A',
+    notA: document.getElementById('eventNotA').value.trim() || 'A\u0305',
     B: document.getElementById('eventB').value.trim() || 'B',
-    notB: document.getElementById('eventNotB').value.trim() || '¬B'
+    notB: document.getElementById('eventNotB').value.trim() || 'B\u0305'
   };
 }
 
@@ -497,12 +691,12 @@ function updateBayes() {
   ctx.fillStyle = '#fff';
   if (abH > 15) ctx.fillText('A∩B', leftX + aW/2, 20 + abH/2);
   if (notabH > 15) ctx.fillStyle = '#1e293b';
-  if (anotbH > 15) ctx.fillText('A∩¬B', leftX + aW/2, 20 + abH + anotbH/2);
+  if (anotbH > 15) ctx.fillText('A∩B\u0305', leftX + aW/2, 20 + abH + anotbH/2);
 
   ctx.fillStyle = '#fff';
-  if (notabH > 15) ctx.fillText('¬A∩B', leftX + aW + notAW/2, 20 + notabH/2);
+  if (notabH > 15) ctx.fillText('A\u0305∩B', leftX + aW + notAW/2, 20 + notabH/2);
   ctx.fillStyle = '#065f46';
-  if (notanotbH > 15) ctx.fillText('¬A∩¬B', leftX + aW + notAW/2, 20 + notabH + notanotbH/2);
+  if (notanotbH > 15) ctx.fillText('A\u0305∩B\u0305', leftX + aW + notAW/2, 20 + notabH + notanotbH/2);
 
   // 同步公式
   renderBayesFormula();
@@ -554,6 +748,219 @@ window.addEventListener('resize', function() {
 // 初始化
 renderAllKatex();
 updateBayes();
+
+// ===== 全概率公式事件替换器 =====
+var TOT_DEFAULTS = {
+  A1: '工作邮件', A2: '广告邮件', A3: '垃圾邮件', B: '含链接',
+  p1: 0.4, p2: 0.5, b1: 0.3, b2: 0.8, b3: 0.9
+};
+
+var TOT_PRESETS = {
+  email:     { A1: '工作邮件', A2: '广告邮件', A3: '垃圾邮件', B: '含链接', p1: 0.4, p2: 0.5, b1: 0.3, b2: 0.8, b3: 0.9 },
+  weather:   { A1: '晴天', A2: '阴天', A3: '雨天', B: '出门拿伞', p1: 0.5, p2: 0.3, b1: 0.1, b2: 0.4, b3: 0.95 },
+  warehouse: { A1: '仓库A', A2: '仓库B', A3: '仓库C', B: '次品', p1: 0.5, p2: 0.3, b1: 0.04, b2: 0.03, b3: 0.02 },
+  signal:    { A1: '发送0', A2: '发送1', A3: '发送2', B: '接收为信号0', p1: 0.4, p2: 0.35, b1: 0.9, b2: 0.1, b3: 0.05 }
+};
+
+function getTotalNames() {
+  return {
+    A1: document.getElementById('totA1').value.trim() || 'A₁',
+    A2: document.getElementById('totA2').value.trim() || 'A₂',
+    A3: document.getElementById('totA3').value.trim() || 'A₃',
+    B: document.getElementById('totB').value.trim() || 'B'
+  };
+}
+
+function refreshTotalSpans() {
+  var n = getTotalNames();
+  document.querySelectorAll('.tot-A1').forEach(function(el){ el.textContent = n.A1; });
+  document.querySelectorAll('.tot-A2').forEach(function(el){ el.textContent = n.A2; });
+  document.querySelectorAll('.tot-A3').forEach(function(el){ el.textContent = n.A3; });
+  document.querySelectorAll('.tot-B').forEach(function(el){ el.textContent = n.B; });
+}
+
+function loadTotalPreset(key) {
+  var p = TOT_PRESETS[key];
+  if (!p) return;
+  document.getElementById('totA1').value = p.A1;
+  document.getElementById('totA2').value = p.A2;
+  document.getElementById('totA3').value = p.A3;
+  document.getElementById('totB').value = p.B;
+  document.getElementById('totP1Slider').value = p.p1;
+  document.getElementById('totP2Slider').value = p.p2;
+  document.getElementById('totB1Slider').value = p.b1;
+  document.getElementById('totB2Slider').value = p.b2;
+  document.getElementById('totB3Slider').value = p.b3;
+  updateTotalProb();
+}
+
+var totalCanvas = document.getElementById('totalCanvas');
+var totalCtx = totalCanvas.getContext('2d');
+
+function onTotP1Input() {
+  var p1 = parseFloat(document.getElementById('totP1Slider').value);
+  var p2Slider = document.getElementById('totP2Slider');
+  var p2 = parseFloat(p2Slider.value);
+  if (p1 + p2 > 1) { p2 = Math.max(0, 1 - p1); p2Slider.value = p2; }
+  updateTotalProb();
+}
+function onTotP2Input() {
+  var p2 = parseFloat(document.getElementById('totP2Slider').value);
+  var p1Slider = document.getElementById('totP1Slider');
+  var p1 = parseFloat(p1Slider.value);
+  if (p1 + p2 > 1) { p1 = Math.max(0, 1 - p2); p1Slider.value = p1; }
+  updateTotalProb();
+}
+
+function syncTotalNum(prefix) {
+  var numEl = document.getElementById(prefix + 'Num');
+  var sliderEl = document.getElementById(prefix + 'Slider');
+  if (!numEl || !sliderEl) return;
+  var v = parseFloat(numEl.value);
+  if (isNaN(v)) return;
+  var min = parseFloat(sliderEl.min), max = parseFloat(sliderEl.max);
+  if (v < min) v = min;
+  if (v > max) v = max;
+  sliderEl.value = v;
+  if (prefix === 'totP1') onTotP1Input();
+  else if (prefix === 'totP2') onTotP2Input();
+  else updateTotalProb();
+}
+
+function updateTotalProb() {
+  refreshTotalSpans();
+  var n = getTotalNames();
+
+  var p1 = parseFloat(document.getElementById('totP1Slider').value);
+  var p2 = parseFloat(document.getElementById('totP2Slider').value);
+  var p3 = Math.max(0, 1 - p1 - p2);
+  var b1 = parseFloat(document.getElementById('totB1Slider').value);
+  var b2 = parseFloat(document.getElementById('totB2Slider').value);
+  var b3 = parseFloat(document.getElementById('totB3Slider').value);
+
+  setNum('totP1Num', p1, 3);
+  setNum('totP2Num', p2, 3);
+  document.getElementById('totP3Num').value = p3.toFixed(3);
+  document.getElementById('totP3Slider').value = p3;
+  setNum('totB1Num', b1, 3);
+  setNum('totB2Num', b2, 3);
+  setNum('totB3Num', b3, 3);
+
+  var probB = p1 * b1 + p2 * b2 + p3 * b3;
+  document.getElementById('totalProbVal').textContent = (probB * 100).toFixed(2) + '%';
+
+  drawTotalCanvas(p1, p2, p3, b1, b2, b3, n);
+  renderTotalFormula(n);
+  renderTotalCalc(n, p1, p2, p3, b1, b2, b3, probB);
+  updateTotalConclusion(n, probB);
+
+  var cards = document.querySelectorAll('.card');
+  if (window.renderKatexAuto && cards.length > 1) window.renderKatexAuto(cards[1]);
+}
+
+function drawTotalCanvas(p1, p2, p3, b1, b2, b3, n) {
+  var ctx = totalCtx;
+  var W = totalCanvas.width, H = totalCanvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  var totalW = W - 60;
+  var leftX = 30;
+  var barH = H - 70;
+  var topY = 20;
+
+  var probs = [p1, p2, p3];
+  var conds = [b1, b2, b3];
+  var names = [n.A1, n.A2, n.A3];
+  var colors = ['#3b82f6', '#f59e0b', '#8b5cf6'];
+
+  var x = leftX;
+  for (var i = 0; i < 3; i++) {
+    var w = totalW * probs[i];
+    var bh = barH * conds[i];
+
+    ctx.fillStyle = colors[i] + '33';
+    ctx.fillRect(x, topY, w, barH);
+    ctx.fillStyle = colors[i];
+    ctx.fillRect(x, topY, w, bh);
+
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x, topY, w, barH);
+
+    ctx.fillStyle = '#1e293b';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(names[i] + ' (' + (probs[i] * 100).toFixed(1) + '%)', x + w / 2, topY - 6);
+
+    if (bh > 14) {
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(n.B, x + w / 2, topY + bh / 2 + 4);
+    }
+
+    x += w;
+  }
+
+  ctx.fillStyle = '#475569';
+  ctx.font = '11px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('彩色 = ' + n.B + ' 发生部分；浅色 = ' + n.B + ' 未发生部分', leftX, H - 8);
+}
+
+function renderTotalFormula(n) {
+  var expr = 'P(\\text{' + n.B + '})=P(\\text{' + n.A1 + '})P(\\text{' + n.B + '}|\\text{' + n.A1 + '})+' +
+    'P(\\text{' + n.A2 + '})P(\\text{' + n.B + '}|\\text{' + n.A2 + '})+' +
+    'P(\\text{' + n.A3 + '})P(\\text{' + n.B + '}|\\text{' + n.A3 + '})';
+  var el = document.getElementById('totalFormulaLatex');
+  if (el) {
+    el.setAttribute('data-expr', expr);
+    try { katex.render(expr, el, { displayMode: false, throwOnError: false }); }
+    catch (e) { el.textContent = expr; }
+  }
+}
+
+function renderTotalCalc(n, p1, p2, p3, b1, b2, b3, probB) {
+  var part1 = p1 * b1, part2 = p2 * b2, part3 = p3 * b3;
+  var latex =
+    'P(\\text{' + n.B + '})=\\sum_{i=1}^{3}P(A_i)P(\\text{' + n.B + '}|A_i) \\\\' +
+    '=' + p1.toFixed(2) + '\\times ' + b1.toFixed(3) +
+    '+' + p2.toFixed(2) + '\\times ' + b2.toFixed(3) +
+    '+' + p3.toFixed(2) + '\\times ' + b3.toFixed(3) + ' \\\\' +
+    '=' + part1.toFixed(4) + '+' + part2.toFixed(4) + '+' + part3.toFixed(4) + ' \\\\' +
+    '=' + probB.toFixed(4) + ' \\approx ' + (probB * 100).toFixed(2) + '\\%';
+  var el = document.getElementById('totalCalcLatex');
+  if (el) {
+    el.setAttribute('data-expr', latex);
+    try { katex.render(latex, el, { displayMode: false, throwOnError: false }); }
+    catch (e) { el.textContent = latex; }
+  }
+}
+
+function updateTotalConclusion(n, probB) {
+  var el = document.getElementById('totalConclusion');
+  if (!el) return;
+  el.innerHTML =
+    '事件 <strong class="text-slate-800">' + n.B + '</strong> 发生的总概率为 <strong class="text-emerald-700">' + (probB * 100).toFixed(2) + '%</strong>。' +
+    '<br>👉 思路：把 ' + n.B + ' 拆成三种互斥途径（经由 ' + n.A1 + '、' + n.A2 + '、' + n.A3 + '）分别求和，即“先分解、后加权平均”。';
+}
+
+function resetTotal() {
+  document.getElementById('totP1Slider').value = TOT_DEFAULTS.p1;
+  document.getElementById('totP2Slider').value = TOT_DEFAULTS.p2;
+  document.getElementById('totB1Slider').value = TOT_DEFAULTS.b1;
+  document.getElementById('totB2Slider').value = TOT_DEFAULTS.b2;
+  document.getElementById('totB3Slider').value = TOT_DEFAULTS.b3;
+  updateTotalProb();
+}
+
+// 监听全概率事件名输入
+['totA1', 'totA2', 'totA3', 'totB'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('input', updateTotalProb);
+});
+
+// 初始化全概率替换器
+updateTotalProb();
 </script>
 
 </body>
