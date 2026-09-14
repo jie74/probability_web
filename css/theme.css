@@ -1,0 +1,344 @@
+/* ==================== 明暗主题（共享） ==================== */
+/* 用法：在每个页面 <head> 中，紧跟在 css/sidebar.css 之后引入本文件，并引入 js/theme.js：
+     <link rel="stylesheet" href="css/theme.css">
+     <script src="js/theme.js"></script>
+   原理：js/theme.js 会在 <html> 上添加/移除 class="dark"，本文件所有暗色规则
+   统一以 html.dark 作为前缀，优先级高于各页面的 Tailwind 工具类与自定义样式。 */
+
+/* ---------- 右上角切换按钮（所有主题通用） ---------- */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 60;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.theme-toggle:hover {
+  color: #2563eb;
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+.theme-toggle svg { width: 20px; height: 20px; display: block; }
+
+/* 亮色模式显示月亮（点击进入暗色）；暗色模式显示太阳（点击回到亮色） */
+.theme-toggle .icon-sun { display: none; }
+html.dark .theme-toggle .icon-moon { display: none; }
+html.dark .theme-toggle .icon-sun { display: block; }
+
+html.dark .theme-toggle {
+  background: #1e293b;
+  border-color: #334155;
+  color: #fbbf24;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+html.dark .theme-toggle:hover {
+  color: #fde68a;
+  border-color: #fbbf24;
+  background: #243044;
+}
+
+/* ==================== 暗色主题 ==================== */
+
+/* ---------- 页面底色与基础文字 ---------- */
+html.dark body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+html.dark .bg-slate-50 { background-color: #0f172a; }
+html.dark .bg-slate-100 { background-color: #1e293b; }
+html.dark .bg-slate-200 { background-color: #334155; }
+html.dark .hover\:bg-slate-200:hover { background-color: #334155; }
+html.dark .bg-white { background-color: #1e293b; }
+html.dark .bg-gray-50 { background-color: #0f172a; }
+html.dark .bg-gray-100 { background-color: #1e293b; }
+
+/* 首页 Hero 渐变 */
+html.dark .bg-gradient-to-b {
+  background-image: linear-gradient(to bottom, #0f172a 0%, #16213c 50%, #0f172a 100%);
+}
+html.dark .bg-gradient-to-br {
+  background-image: linear-gradient(to bottom right, #0f172a 0%, #16213c 50%, #0f172a 100%);
+}
+
+/* ---------- 文字层级 ---------- */
+html.dark .text-slate-900,
+html.dark .text-slate-800 { color: #f8fafc; }
+html.dark .text-slate-700 { color: #e2e8f0; }
+html.dark .text-slate-600 { color: #cbd5e1; }
+html.dark .text-slate-500 { color: #94a3b8; }
+html.dark .text-slate-400 { color: #64748b; }
+
+/* ---------- 边框与分隔线 ---------- */
+html.dark .border-slate-100,
+html.dark .border-slate-200 { border-color: #334155; }
+html.dark .border-slate-300 { border-color: #475569; }
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #334155; }
+
+/* ---------- 主色 primary / blue ---------- */
+html.dark .bg-primary-bg,
+html.dark .bg-blue-50 { background-color: rgba(37, 99, 235, 0.16); }
+html.dark .bg-blue-100 { background-color: rgba(37, 99, 235, 0.28); }
+html.dark .bg-blue-200 { background-color: rgba(37, 99, 235, 0.40); }
+html.dark .bg-blue-300 { background-color: rgba(37, 99, 235, 0.55); }
+html.dark .hover\:bg-blue-50:hover { background-color: rgba(37, 99, 235, 0.18); }
+html.dark .hover\:bg-blue-100:hover { background-color: rgba(37, 99, 235, 0.30); }
+html.dark .text-blue-900 { color: #bfdbfe; }
+html.dark .text-blue-700,
+html.dark .text-primary { color: #93c5fd; }
+html.dark .text-blue-600 { color: #60a5fa; }
+html.dark .hover\:text-blue-600:hover,
+html.dark .hover\:text-primary:hover { color: #60a5fa; }
+html.dark .border-blue-200 { border-color: rgba(37, 99, 235, 0.50); }
+html.dark .border-blue-300,
+html.dark .border-primary { border-color: #2563eb; }
+html.dark .hover\:border-blue-600:hover,
+html.dark .hover\:border-primary:hover { border-color: #3b82f6; }
+
+/* ---------- indigo（贝叶斯卡片） ---------- */
+html.dark .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.16); }
+html.dark .bg-indigo-100 { background-color: rgba(99, 102, 241, 0.28); }
+html.dark .border-indigo-200 { border-color: rgba(99, 102, 241, 0.50); }
+html.dark .text-indigo-600 { color: #818cf8; }
+html.dark .text-indigo-800 { color: #a5b4fc; }
+html.dark .hover\:border-indigo-500:hover { border-color: #6366f1; }
+html.dark .hover\:text-indigo-600:hover { color: #818cf8; }
+
+/* ---------- emerald（全概率卡片） ---------- */
+html.dark .bg-emerald-50 { background-color: rgba(16, 185, 129, 0.14); }
+html.dark .bg-emerald-100 { background-color: rgba(16, 185, 129, 0.24); }
+html.dark .border-emerald-200 { border-color: rgba(16, 185, 129, 0.45); }
+html.dark .border-emerald-300 { border-color: rgba(16, 185, 129, 0.60); }
+html.dark .border-emerald-500 { border-color: #10b981; }
+html.dark .text-emerald-600 { color: #34d399; }
+html.dark .text-emerald-700 { color: #6ee7b7; }
+html.dark .text-emerald-800,
+html.dark .text-emerald-900 { color: #a7f3d0; }
+html.dark .hover\:border-emerald-500:hover { border-color: #10b981; }
+html.dark .hover\:border-emerald-600:hover { border-color: #34d399; }
+html.dark .hover\:text-emerald-600:hover { color: #34d399; }
+
+/* ---------- green / lime / teal / cyan / violet / purple ---------- */
+html.dark .bg-green-100 { background-color: rgba(34, 197, 94, 0.24); }
+html.dark .text-green-600 { color: #4ade80; }
+html.dark .text-green-700 { color: #86efac; }
+html.dark .bg-lime-100 { background-color: rgba(132, 204, 22, 0.24); }
+html.dark .text-lime-600 { color: #a3e635; }
+html.dark .bg-teal-100 { background-color: rgba(20, 184, 166, 0.24); }
+html.dark .text-teal-600 { color: #2dd4bf; }
+html.dark .bg-cyan-100 { background-color: rgba(6, 182, 212, 0.24); }
+html.dark .text-cyan-600 { color: #22d3ee; }
+html.dark .bg-violet-100 { background-color: rgba(139, 92, 246, 0.24); }
+html.dark .text-violet-600 { color: #a78bfa; }
+html.dark .text-purple-600 { color: #c084fc; }
+
+/* ---------- red / orange ---------- */
+html.dark .bg-red-50 { background-color: rgba(239, 68, 68, 0.14); }
+html.dark .bg-red-100 { background-color: rgba(239, 68, 68, 0.24); }
+html.dark .border-red-200 { border-color: rgba(239, 68, 68, 0.50); }
+html.dark .text-red-500,
+html.dark .text-red-600 { color: #f87171; }
+html.dark .text-red-700 { color: #fca5a5; }
+html.dark .bg-orange-50 { background-color: rgba(249, 115, 22, 0.14); }
+html.dark .border-orange-200 { border-color: rgba(249, 115, 22, 0.50); }
+html.dark .text-orange-500,
+html.dark .text-orange-600 { color: #fb923c; }
+
+/* ---------- yellow（应试提示文字） ---------- */
+html.dark .text-yellow-800 { color: #fcd34d; }
+html.dark .text-yellow-700 { color: #fde68a; }
+
+/* ---------- 通用组件：卡片 / 面板 / 表单 ---------- */
+html.dark .card,
+html.dark .chapter-card,
+html.dark .module-card,
+html.dark .chart-container {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+html.dark .card:hover { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35); }
+html.dark .chapter-card:hover {
+  border-color: #2563eb;
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.28);
+}
+html.dark .module-card:hover {
+  border-color: #334155;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+html.dark .formula-panel {
+  background-color: #172033;
+  border-color: #334155;
+}
+html.dark .formula-toggle { color: #cbd5e1; }
+html.dark .formula-toggle:hover { background-color: #1e293b; }
+
+html.dark .exam-tip {
+  background-color: #422006;
+  border-left-color: #eab308;
+}
+
+html.dark .quiz-option { border-color: #334155; }
+html.dark .quiz-option:hover { border-color: #2563eb; background-color: rgba(37, 99, 235, 0.16); }
+html.dark .quiz-option.selected { border-color: #2563eb; background-color: rgba(37, 99, 235, 0.16); }
+html.dark .quiz-option.correct { border-color: #16a34a; background-color: rgba(22, 163, 74, 0.16); }
+html.dark .quiz-option.wrong { border-color: #dc2626; background-color: rgba(220, 38, 38, 0.16); }
+
+html.dark .slider-input { background-color: #334155; }
+html.dark .num-input,
+html.dark .param-value-input,
+html.dark .event-input {
+  background-color: #0f172a;
+  color: #93c5fd;
+  border-color: #475569;
+}
+html.dark .dice-canvas-wrap {
+  background-color: #172033;
+  border-color: #334155;
+}
+
+/* ---------- chapter2：泊松 / 二项 / 几何 ---------- */
+html.dark .poisson-control-card,
+html.dark .poisson-formula-card,
+html.dark .poisson-chart-card,
+html.dark .binomial-control-card,
+html.dark .binomial-formula-card,
+html.dark .binomial-chart-card,
+html.dark .geometric-control-card,
+html.dark .geometric-formula-card,
+html.dark .geometric-chart-card {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+html.dark .poisson-formula-title,
+html.dark .binomial-formula-title,
+html.dark .geometric-formula-title { color: #e2e8f0; }
+html.dark .poisson-formula-line,
+html.dark .binomial-formula-line,
+html.dark .geometric-formula-line { color: #cbd5e1; }
+html.dark .poisson-formula-divider,
+html.dark .binomial-formula-divider,
+html.dark .geometric-formula-divider { background-color: #334155; }
+html.dark .poisson-formula-example,
+html.dark .binomial-formula-example,
+html.dark .geometric-formula-example { background-color: #172033; }
+html.dark .poisson-number-input,
+html.dark .binomial-number-input,
+html.dark .geometric-number-input {
+  background-color: #0f172a;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+html.dark .poisson-slider,
+html.dark .binomial-slider,
+html.dark .geometric-slider { background-color: #334155; }
+html.dark .poisson-reset-btn,
+html.dark .binomial-reset-btn,
+html.dark .geometric-reset-btn {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #cbd5e1;
+}
+html.dark .poisson-reset-btn:hover,
+html.dark .binomial-reset-btn:hover,
+html.dark .geometric-reset-btn:hover {
+  border-color: #2563eb;
+  color: #93c5fd;
+  background-color: rgba(37, 99, 235, 0.16);
+}
+html.dark .poisson-chart-footer,
+html.dark .binomial-chart-footer,
+html.dark .geometric-chart-footer {
+  color: #94a3b8;
+  border-top-color: #334155;
+}
+
+/* ---------- mindmap 思维导图页面 ---------- */
+html.dark .container {
+  background-color: #1e293b;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.50);
+}
+html.dark .container h2 { color: #e2e8f0; }
+html.dark #mindmap { background-color: #1e293b; }
+html.dark .mindmap-controls button {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #cbd5e1;
+}
+html.dark .mindmap-controls button:hover,
+html.dark .mindmap-controls button:focus-visible {
+  background-color: rgba(37, 99, 235, 0.20);
+  border-color: #3b82f6;
+}
+html.dark .mindmap-context-menu {
+  background-color: #1e293b;
+  border-color: #475569;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.50);
+}
+html.dark .mindmap-context-menu button { color: #cbd5e1; }
+html.dark .mindmap-context-menu button:hover,
+html.dark .mindmap-context-menu button:focus-visible { background-color: rgba(37, 99, 235, 0.20); }
+html.dark .markmap-node text { fill: #cbd5e1; }
+html.dark .markmap-node[data-depth="0"] text { fill: #f1f5f9; }
+html.dark .markmap-node[data-depth="1"] text { fill: #7dd3fc; }
+html.dark .error { background-color: rgba(239, 68, 68, 0.14); color: #fca5a5; }
+
+/* 思维导图右上角控件下移，避免与右上角主题切换按钮重叠 */
+.mindmap-controls { top: 64px !important; }
+
+/* ---------- 侧边栏（覆盖 css/sidebar.css） ---------- */
+html.dark .sidebar {
+  background: linear-gradient(180deg, #0f172a 0%, #131f38 50%, #0f172a 100%);
+  border-right-color: #334155;
+}
+html.dark .sidebar-nav-item { color: #cbd5e1; }
+html.dark .sidebar-nav-item:hover { background-color: rgba(37, 99, 235, 0.20); color: #93c5fd; }
+html.dark .sidebar-nav-item.active { background-color: #2563eb; color: #ffffff; }
+html.dark .sidebar-nav-item .chapter-num { background-color: #334155; color: #cbd5e1; }
+html.dark .sidebar-nav-item:hover .chapter-num { background-color: #2563eb; color: #ffffff; }
+html.dark .sidebar-nav-item.active .chapter-num { background-color: rgba(255, 255, 255, 0.30); color: #ffffff; }
+html.dark .sidebar::-webkit-scrollbar-thumb { background: #475569; }
+html.dark .sidebar::-webkit-scrollbar-thumb:hover { background: #64748b; }
+html.dark .sidebar-toggle {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+html.dark .sidebar-toggle:hover {
+  background: rgba(37, 99, 235, 0.20);
+  color: #93c5fd;
+  border-color: #2563eb;
+}
+html.dark .sidebar-reopen {
+  background: #1e293b;
+  border-color: #334155;
+  color: #60a5fa;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+html.dark .sidebar-reopen:hover { background: #2563eb; color: #ffffff; border-color: #2563eb; }
+
+/* ---------- 移动端 ---------- */
+@media (max-width: 767px) {
+  .theme-toggle {
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+  }
+  .theme-toggle svg { width: 18px; height: 18px; }
+}
