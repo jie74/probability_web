@@ -6,8 +6,8 @@
 <title>概率论与数理统计交互式可视化平台</title>
 <link rel="icon" type="image/png" href="logo.png">
 
-<!-- TailwindCSS CDN -->
-<script src="https://cdn.tailwindcss.com"></script>
+<!-- TailwindCSS（本地 vendor） -->
+<script src="vendor/tailwind.min.js"></script>
 <script>
 tailwind.config = {
   theme: {
@@ -23,20 +23,22 @@ tailwind.config = {
 }
 </script>
 
-<!-- KaTeX CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<!-- KaTeX CSS（版本与各章节页保持一致：0.16） -->
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
 <!-- KaTeX JS -->
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script src="vendor/katex/katex.min.js"></script>
+<script src="vendor/katex/auto-render.min.js"></script>
 
-<!-- ECharts CDN -->
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<!-- ECharts（本地 vendor，版本与各章节页保持一致：5.4） -->
+<script src="vendor/echarts.min.js"></script>
 
-<!-- Plotly.js CDN -->
-<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<!-- Plotly.js（本地 vendor） -->
+<script src="vendor/plotly.min.js"></script>
 
 <!-- 共享侧边栏样式 -->
 <link rel="stylesheet" href="css/sidebar.css">
+<link rel="stylesheet" href="css/theme.css">
+<script src="js/theme.js"></script>
 
 <style>
   /* 全局样式 */
@@ -596,7 +598,7 @@ tailwind.config = {
       <div class="mt-8 p-4 bg-slate-50 rounded-lg border border-slate-200">
         <h4 class="text-sm font-semibold text-slate-800 mb-2">技术说明</h4>
         <ul class="text-xs text-slate-500 space-y-1.5 leading-relaxed">
-          <li>• 本网站为纯静态HTML页面，所有资源通过CDN加载，无需安装任何依赖。</li>
+          <li>• 本网站为纯静态HTML页面，全部依赖（TailwindCSS / KaTeX / ECharts / Plotly）都已放在本地 vendor 目录，无需安装任何依赖，离线也能浏览。</li>
           <li>• 数学公式使用 <strong>KaTeX</strong> 渲染，加载速度快，显示清晰。</li>
           <li>• 2D图表使用 <strong>ECharts</strong> 绘制，3D曲面和等高线使用 <strong>Plotly.js</strong> 绘制。</li>
           <li>• 页面样式基于 <strong>TailwindCSS</strong> 构建，PC端优先设计。</li>

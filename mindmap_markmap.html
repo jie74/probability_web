@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>概率论思维导图</title>
   <link rel="icon" type="image/png" href="logo.png">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-view@0.15.4/dist/browser/index.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <script src="vendor/tailwind.min.js"></script>
   <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/theme.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -43,10 +44,32 @@
       margin-bottom: 12px;
     }
 
-    #mindmap {
-      background: #fff;
+    #view-stage {
       height: calc(100% - 50px);
       position: relative;
+      width: 100%;
+    }
+
+    /* 两套视图叠放在同一舞台内，靠 visibility 切换：这样隐藏时元素仍保留
+       布局尺寸，切回来 Markmap / d3 都能拿到正确的容器大小。 */
+    .view-panel {
+      height: 100%;
+      pointer-events: none;
+      position: absolute;
+      visibility: hidden;
+      width: 100%;
+    }
+
+    .view-panel.active {
+      pointer-events: auto;
+      visibility: visible;
+    }
+
+    #mindmap,
+    #kgraph {
+      background: #fff;
+      display: block;
+      height: 100%;
       width: 100%;
       z-index: 0;
     }
@@ -136,6 +159,260 @@
       margin-top: 20px;
       padding: 16px;
     }
+
+    /* ---------- 左上角视图切换 ---------- */
+    .container-header {
+      align-items: center;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .container-header h2 {
+      margin-bottom: 0;
+    }
+
+    .view-switch {
+      background: #fff;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      display: inline-flex;
+      flex: none;
+      overflow: hidden;
+    }
+
+    .view-switch button {
+      background: transparent;
+      border: 0;
+      color: #4a5568;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      line-height: 1;
+      padding: 8px 12px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .view-switch button + button {
+      border-left: 1px solid #cbd5e0;
+    }
+
+    .view-switch button:hover,
+    .view-switch button:focus-visible {
+      background: #ebf8ff;
+      color: #2b6cb0;
+      outline: none;
+    }
+
+    .view-switch button.active {
+      background: #3182ce;
+      color: #fff;
+    }
+
+    .mindmap-controls[hidden] {
+      display: none;
+    }
+
+    /* ---------- 知识图谱（d3 力导向图） ---------- */
+    .kg-link {
+      stroke-linecap: round;
+    }
+
+    .kg-node circle {
+      cursor: pointer;
+      stroke: #fff;
+      stroke-width: 1.5px;
+      transition: stroke-width 0.15s ease;
+    }
+
+    .kg-node:hover circle {
+      stroke: #1a202c;
+      stroke-width: 2.5px;
+    }
+
+    .kg-node--collapsed circle {
+      stroke: #4a5568;
+      stroke-dasharray: 3 2;
+    }
+
+    .kg-node text {
+      fill: #2d3748;
+      font-size: 12px;
+      font-weight: 500;
+      paint-order: stroke;
+      pointer-events: none;
+      stroke: #fff;
+      stroke-linejoin: round;
+      stroke-width: 3px;
+      user-select: none;
+    }
+
+    /* ---------- 知识图谱右侧信息栏 ---------- */
+    .kg-panel {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+      max-height: calc(100% - 32px);
+      overflow: auto;
+      padding: 14px 16px;
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      width: 320px;
+      z-index: 5;
+    }
+
+    .kg-panel[hidden] {
+      display: none;
+    }
+
+    .kg-panel-close {
+      background: transparent;
+      border: 0;
+      color: #a0aec0;
+      cursor: pointer;
+      font: inherit;
+      font-size: 16px;
+      line-height: 1;
+      padding: 2px 4px;
+      position: absolute;
+      right: 8px;
+      top: 8px;
+    }
+
+    .kg-panel-close:hover,
+    .kg-panel-close:focus-visible {
+      color: #2b6cb0;
+      outline: none;
+    }
+
+    /* 祖先 → 当前节点的路径 */
+    .kg-panel-path {
+      color: #718096;
+      font-size: 12px;
+      line-height: 1.8;
+      margin-bottom: 10px;
+      padding-right: 18px;
+      word-break: break-word;
+    }
+
+    .kg-panel-path .kg-crumb-arrow {
+      color: #a0aec0;
+      margin: 0 4px;
+    }
+
+    .kg-panel-path .kg-crumb-current {
+      color: #2b6cb0;
+      font-weight: 600;
+    }
+
+    .kg-panel-title {
+      color: #1a202c;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .kg-panel-body {
+      border-top: 1px solid #edf2f7;
+      color: #2d3748;
+      font-size: 13px;
+      line-height: 1.8;
+      padding-top: 10px;
+      word-break: break-word;
+    }
+
+    .kg-panel-body .katex-display {
+      margin: 6px 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .kg-panel-meta {
+      color: #a0aec0;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    /* ---------- 暗色主题补充 ---------- */
+    html.dark .view-switch {
+      background-color: #1e293b;
+      border-color: #475569;
+    }
+
+    html.dark .view-switch button {
+      color: #cbd5e1;
+    }
+
+    html.dark .view-switch button + button {
+      border-left-color: #475569;
+    }
+
+    html.dark .view-switch button:hover,
+    html.dark .view-switch button:focus-visible {
+      background-color: rgba(37, 99, 235, 0.20);
+      color: #93c5fd;
+    }
+
+    html.dark .view-switch button.active {
+      background-color: #2563eb;
+      color: #fff;
+    }
+
+    html.dark #kgraph {
+      background-color: #1e293b;
+    }
+
+    html.dark .kg-link {
+      stroke-opacity: 0.55;
+    }
+
+    html.dark .kg-node text {
+      fill: #e2e8f0;
+      stroke: #1e293b;
+    }
+
+    html.dark .kg-node circle {
+      stroke: #1e293b;
+    }
+
+    html.dark .kg-panel {
+      background-color: #1e293b;
+      border-color: #334155;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    html.dark .kg-panel-close {
+      color: #64748b;
+    }
+
+    html.dark .kg-panel-close:hover,
+    html.dark .kg-panel-close:focus-visible {
+      color: #93c5fd;
+    }
+
+    html.dark .kg-panel-path {
+      color: #94a3b8;
+    }
+
+    html.dark .kg-panel-path .kg-crumb-current {
+      color: #7dd3fc;
+    }
+
+    html.dark .kg-panel-title {
+      color: #f1f5f9;
+    }
+
+    html.dark .kg-panel-body {
+      border-top-color: #334155;
+      color: #cbd5e1;
+    }
+
+    html.dark .kg-panel-meta {
+      color: #64748b;
+    }
   </style>
 </head>
 <body>
@@ -144,32 +421,450 @@
 
   <main class="main-content">
     <div class="container">
-      <h2>概率论思维导图</h2>
-    <div class="mindmap-controls" aria-label="Mind map expansion controls">
-      <button type="button" data-expand-level="0">全部收起</button>
-      <button type="button" data-expand-level="-1">全部展开</button>
-      <button type="button" data-expand-level="1">展开到 1 级</button>
-      <button type="button" data-expand-level="2">展开到 2 级</button>
-      <button type="button" data-expand-level="3">展开到 3 级</button>
-    </div>
-      <svg id="mindmap"></svg>
-      <div id="mindmap-context-menu" class="mindmap-context-menu" role="menu">
-        <button type="button" data-context-action="expand" role="menuitem">
-          展开所有子主题
-        </button>
-        <button type="button" data-context-action="collapse" role="menuitem">
-          折叠所有子主题
-        </button>
+      <div class="container-header">
+        <div class="view-switch" id="view-switch" role="tablist" aria-label="视图切换">
+          <button type="button" data-view="mindmap" class="active" role="tab" aria-selected="true">
+            思维导图
+          </button>
+          <button type="button" data-view="graph" role="tab" aria-selected="false">
+            知识图谱
+          </button>
+        </div>
+        <h2 id="container-title">概率论思维导图</h2>
+      </div>
+      <div class="mindmap-controls" id="mindmap-controls" aria-label="Mind map expansion controls">
+        <button type="button" data-expand-level="0">全部收起</button>
+        <button type="button" data-expand-level="-1">全部展开</button>
+        <button type="button" data-expand-level="1">展开到 1 级</button>
+        <button type="button" data-expand-level="2">展开到 2 级</button>
+        <button type="button" data-expand-level="3">展开到 3 级</button>
+      </div>
+      <div class="mindmap-controls" id="graph-controls" aria-label="知识图谱控件" hidden>
+        <button type="button" data-graph-action="reset">重置视图</button>
+        <button type="button" data-graph-action="level-max">全部展开</button>
+        <button type="button" data-graph-action="level-0">全部收起</button>
+        <button type="button" data-graph-action="level-1">展开到 1 级</button>
+        <button type="button" data-graph-action="level-2">展开到 2 级</button>
+      </div>
+      <div id="view-stage">
+        <div class="view-panel active" id="panel-mindmap">
+          <svg id="mindmap"></svg>
+        </div>
+        <div class="view-panel" id="panel-graph">
+          <svg id="kgraph"></svg>
+          <aside id="kg-panel" class="kg-panel" aria-live="polite" hidden>
+            <button type="button" class="kg-panel-close" id="kg-panel-close" aria-label="关闭信息栏">
+              ×
+            </button>
+            <div class="kg-panel-path" id="kg-panel-path"></div>
+            <h3 class="kg-panel-title" id="kg-panel-title"></h3>
+            <div class="kg-panel-body" id="kg-panel-body"></div>
+            <div class="kg-panel-meta" id="kg-panel-meta"></div>
+          </aside>
+        </div>
+        <div id="mindmap-context-menu" class="mindmap-context-menu" role="menu">
+          <button type="button" data-context-action="expand" role="menuitem">
+            展开所有子主题
+          </button>
+          <button type="button" data-context-action="collapse" role="menuitem">
+            折叠所有子主题
+          </button>
+        </div>
       </div>
     </div>
   </main>
 
   <script src="js/d3.v7.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="vendor/katex/katex.min.js"></script>
   <script src="js/markmap-lib.js"></script>
   <script src="js/markmap-view.js"></script>
   <script src="js/katex-setup.js"></script>
   <script>
+    (function initPage() {
+    // ---------- 左上角视图切换：思维导图（默认）/ 知识图谱 ----------
+    const viewButtons = Array.from(document.querySelectorAll('#view-switch button'));
+    const titleEl = document.querySelector('#container-title');
+    const panels = {
+      mindmap: document.querySelector('#panel-mindmap'),
+      graph: document.querySelector('#panel-graph')
+    };
+    const controlBars = {
+      mindmap: document.querySelector('#mindmap-controls'),
+      graph: document.querySelector('#graph-controls')
+    };
+    // 键名必须与按钮上的 data-view 保持一致，否则切换判断会误判。
+    const viewState = { view: 'mindmap', mindmap: null, graph: null };
+
+    const renderViewState = () => {
+      const { view } = viewState;
+
+      Object.entries(panels).forEach(([name, panel]) => {
+        panel.classList.toggle('active', name === view);
+      });
+
+      viewButtons.forEach((button) => {
+        const active = button.dataset.view === view;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+
+      controlBars.mindmap.hidden = view !== 'mindmap';
+      controlBars.graph.hidden = view !== 'graph';
+      titleEl.textContent = view === 'graph' ? '概率论知识图谱' : '概率论思维导图';
+
+      if (view === 'graph') {
+        viewState.graph?.activate();
+      } else {
+        viewState.mindmap?.activate();
+      }
+    };
+
+    viewButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const next = button.dataset.view;
+        // 图谱尚未构建完成（例如数据加载失败）时先停留在思维导图。
+        if (next === viewState.view || !viewState[next]) return;
+        viewState.view = next;
+        renderViewState();
+      });
+    });
+
+    // ---------- 知识图谱：用 d3 力导向图呈现同一份大纲 ----------
+    const KG_PALETTE = [
+      '#2b6cb0', '#2f855a', '#b7791f', '#c53030',
+      '#6b46c1', '#0f766e', '#b83280', '#4a5568'
+    ];
+
+    function createKnowledgeGraph(source) {
+      const svgEl = document.querySelector('#kgraph');
+      const panelEl = document.querySelector('#kg-panel');
+      const panelPathEl = document.querySelector('#kg-panel-path');
+      const panelTitleEl = document.querySelector('#kg-panel-title');
+      const panelBodyEl = document.querySelector('#kg-panel-body');
+      const panelMetaEl = document.querySelector('#kg-panel-meta');
+      // 容器缺失时直接放弃图谱，避免后续测量撞上空引用。
+      if (!svgEl || !panelEl || !panelPathEl || !panelTitleEl || !panelBodyEl || !panelMetaEl) {
+        return null;
+      }
+
+      const htmlToText = (html, stripMath) => {
+        const holder = document.createElement('div');
+        holder.innerHTML = html;
+        let text = holder.textContent;
+        if (stripMath) {
+          // 公式在 content 里可能是渲染好的 .katex 元素，也可能仍是
+          // $...$ / \[...\] 原文，两种形式都去掉，标签就只剩关键词。
+          holder.querySelectorAll('.katex, .katex-display, math').forEach((el) => el.remove());
+          text = holder.textContent
+            .replace(/\$\$?[\s\S]*?\$\$?/g, ' ')
+            .replace(/\\\[[\s\S]*?\\\]/g, ' ');
+        }
+        return text.replace(/\s+/g, ' ').trim();
+      };
+
+      // 把 Markmap 的树转换成图谱节点：保留层级关系，并给每个分支分配颜色。
+      let sequence = 0;
+      let branchCount = 0;
+      const buildTree = (raw, depth, parent) => {
+        const html = typeof raw.content === 'string' ? raw.content : '';
+        // 大纲节点多是「名称 + 公式」，去掉公式后更接近关键词，标签更短。
+        const plain = htmlToText(html, true) || htmlToText(html, false) || '（未命名）';
+        const node = {
+          id: sequence++,
+          depth,
+          parent,
+          html,
+          plain,
+          label: plain.length > 14 ? `${plain.slice(0, 14)}…` : plain,
+          color: parent ? parent.color : '#4a5568',
+          // 默认只铺开前两级，避免一次性渲染上百个节点。
+          collapsed: depth >= 2,
+          children: []
+        };
+        if (depth === 1) {
+          node.color = KG_PALETTE[branchCount % KG_PALETTE.length];
+          branchCount += 1;
+        }
+        node.children = (raw.children || []).map((child) => buildTree(child, depth + 1, node));
+        return node;
+      };
+
+      const tree = buildTree(source, 0, null);
+      const radiusOf = (item) =>
+        item.depth === 0 ? 15 : item.depth === 1 ? 9 : item.depth === 2 ? 6 : 4.5;
+
+      const svg = d3.select(svgEl);
+      const rootGroup = svg.append('g');
+      const linkLayer = rootGroup.append('g').attr('class', 'kg-links');
+      const nodeLayer = rootGroup.append('g').attr('class', 'kg-nodes');
+
+      const size = () => {
+        const rect = svgEl.getBoundingClientRect();
+        return { w: Math.max(rect.width, 320), h: Math.max(rect.height, 240) };
+      };
+
+      const zoom = d3
+        .zoom()
+        .scaleExtent([0.15, 4])
+        .on('zoom', (event) => {
+          rootGroup.attr('transform', event.transform);
+        });
+      svg.call(zoom).on('dblclick.zoom', null);
+
+      const simulation = d3
+        .forceSimulation()
+        .force(
+          'link',
+          d3
+            .forceLink()
+            .id((item) => item.id)
+            .distance((link) => (link.source.depth === 0 ? 130 : 72))
+            .strength(0.6)
+        )
+        .force('charge', d3.forceManyBody().strength((item) => (item.depth <= 1 ? -700 : -170)))
+        .force('collide', d3.forceCollide().radius((item) => radiusOf(item) + 26))
+        .force('center', d3.forceCenter(size().w / 2, size().h / 2));
+
+      let visibleNodes = [];
+      let pendingFit = false;
+
+      // 只收集当前「展开」状态下的节点与连线。
+      const collect = () => {
+        const nodes = [];
+        const links = [];
+        const walk = (item) => {
+          nodes.push(item);
+          if (item.collapsed) return;
+          item.children.forEach((child) => {
+            links.push({ source: item, target: child });
+            walk(child);
+          });
+        };
+        walk(tree);
+        return { nodes, links };
+      };
+
+      // 祖先链：从根节点一路到当前节点。
+      const pathOf = (item) => {
+        const chain = [];
+        let current = item;
+        while (current) {
+          chain.unshift(current);
+          current = current.parent;
+        }
+        return chain;
+      };
+
+      const shorten = (text, max = 10) => (text.length > max ? `${text.slice(0, max)}…` : text);
+
+      // 悬停节点时把路径、标题、完整内容写进右侧信息栏。
+      const showPanel = (item) => {
+        const chain = pathOf(item);
+
+        panelPathEl.textContent = '';
+        chain.forEach((ancestor, index) => {
+          if (index > 0) {
+            const arrow = document.createElement('span');
+            arrow.className = 'kg-crumb-arrow';
+            arrow.textContent = '→';
+            panelPathEl.appendChild(arrow);
+          }
+          const crumb = document.createElement('span');
+          if (index === chain.length - 1) crumb.className = 'kg-crumb-current';
+          crumb.textContent = shorten(ancestor.plain);
+          crumb.title = ancestor.plain;
+          panelPathEl.appendChild(crumb);
+        });
+
+        panelTitleEl.textContent = item.plain;
+        panelBodyEl.innerHTML = item.html || item.plain;
+        const depthLabel = item.depth === 0 ? '根节点' : `第 ${item.depth} 层`;
+        panelMetaEl.textContent = `${depthLabel} · 子节点 ${item.children.length} 个 · 点击节点可展开或收起`;
+        panelEl.hidden = false;
+      };
+
+      const panelCloseEl = document.querySelector('#kg-panel-close');
+      if (panelCloseEl) {
+        panelCloseEl.addEventListener('click', () => {
+          panelEl.hidden = true;
+        });
+      }
+
+      const fitToContent = (duration = 500) => {
+        const points = visibleNodes.filter((item) => item.x != null && item.y != null);
+        if (!points.length) return;
+        const { w, h } = size();
+        // 右侧信息栏可见时让出一块空间，避免节点被信息栏压住。
+        const usableWidth = Math.max(320, w - (panelEl.hidden ? 0 : 352));
+        const pad = 70;
+        const minX = Math.min(...points.map((item) => item.x)) - pad;
+        const maxX = Math.max(...points.map((item) => item.x)) + pad;
+        const minY = Math.min(...points.map((item) => item.y)) - pad;
+        const maxY = Math.max(...points.map((item) => item.y)) + pad;
+        const scale = Math.min(
+          1.4,
+          Math.max(0.15, Math.min(usableWidth / (maxX - minX), h / (maxY - minY)))
+        );
+        const transform = d3.zoomIdentity
+          .translate(
+            usableWidth / 2 - ((minX + maxX) / 2) * scale,
+            h / 2 - ((minY + maxY) / 2) * scale
+          )
+          .scale(scale);
+        if (duration > 0) {
+          svg.transition().duration(duration).call(zoom.transform, transform);
+        } else {
+          svg.call(zoom.transform, transform);
+        }
+      };
+
+      const render = () => {
+        const { nodes, links } = collect();
+        visibleNodes = nodes;
+        const { w, h } = size();
+
+        // 新展开的节点从父节点附近「生长」出来，避免满屏乱飞。
+        nodes.forEach((item) => {
+          if (item.x != null) return;
+          const base = item.parent && item.parent.x != null ? item.parent : null;
+          item.x = (base ? base.x : w / 2) + (Math.random() - 0.5) * 40;
+          item.y = (base ? base.y : h / 2) + (Math.random() - 0.5) * 40;
+        });
+
+        const link = linkLayer
+          .selectAll('line')
+          .data(links, (d) => `${d.source.id}->${d.target.id}`)
+          .join('line')
+          .attr('class', 'kg-link')
+          .attr('stroke', (d) => d.target.color)
+          .attr('stroke-opacity', 0.4);
+
+        const node = nodeLayer
+          .selectAll('g.kg-node')
+          .data(nodes, (d) => d.id)
+          .join(
+            (enter) => {
+              const group = enter.append('g').attr('class', 'kg-node');
+              group.append('circle');
+              group.append('text').attr('dy', '0.35em');
+              return group;
+            },
+            (update) => update,
+            (exit) => exit.transition().duration(200).style('opacity', 0).remove()
+          );
+
+        node
+          .attr('class', (d) =>
+            d.collapsed && d.children.length ? 'kg-node kg-node--collapsed' : 'kg-node'
+          )
+          .on('click', (event, d) => {
+            if (!d.children.length) return;
+            d.collapsed = !d.collapsed;
+            render();
+          })
+          .call(
+            d3
+              .drag()
+              .on('start', (event, d) => {
+                if (!event.active) simulation.alphaTarget(0.25).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+              })
+              .on('drag', (event, d) => {
+                d.fx = event.x;
+                d.fy = event.y;
+              })
+              .on('end', (event, d) => {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+              })
+          )
+          .on('mouseenter', (event, d) => showPanel(d));
+
+        node
+          .select('circle')
+          .attr('r', (d) => radiusOf(d))
+          .attr('fill', (d) => d.color)
+          .attr('fill-opacity', (d) => (d.children.length ? 1 : 0.5));
+
+        node
+          .select('text')
+          .attr('x', (d) => radiusOf(d) + 5)
+          .attr('font-size', (d) => (d.depth === 0 ? 15 : d.depth === 1 ? 13 : 12))
+          .attr('font-weight', (d) => (d.depth <= 1 ? 600 : 500))
+          .attr('fill', (d) => (d.depth === 0 ? '#1a202c' : d.depth === 1 ? d.color : '#4a5568'))
+          .text((d) => d.label);
+
+        simulation.nodes(nodes);
+        simulation.force('link').links(links);
+        simulation.force('center', d3.forceCenter(w / 2, h / 2));
+        simulation.on('tick', () => {
+          link
+            .attr('x1', (d) => d.source.x)
+            .attr('y1', (d) => d.source.y)
+            .attr('x2', (d) => d.target.x)
+            .attr('y2', (d) => d.target.y);
+          node.attr('transform', (d) => `translate(${d.x},${d.y})`);
+        });
+        simulation.alpha(0.8).restart();
+      };
+
+      // level 表示可见的最大深度：0 只留中心，1 显示章，2 显示节。
+      const setLevel = (level) => {
+        (function walk(item) {
+          item.collapsed = item.depth >= level;
+          item.children.forEach(walk);
+        })(tree);
+        render();
+        pendingFit = true;
+      };
+
+      simulation.on('end', () => {
+        if (!pendingFit) return;
+        pendingFit = false;
+        fitToContent(600);
+      });
+
+      document.querySelectorAll('#graph-controls [data-graph-action]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const action = button.dataset.graphAction;
+          if (action === 'reset') {
+            fitToContent(500);
+            return;
+          }
+          if (action === 'level-max') {
+            setLevel(Number.POSITIVE_INFINITY);
+            return;
+          }
+          setLevel(Number(action.split('-')[1]));
+        });
+      });
+
+      if (window.ResizeObserver) {
+        new ResizeObserver(() => {
+          try {
+            const { w, h } = size();
+            simulation.force('center', d3.forceCenter(w / 2, h / 2));
+            simulation.alpha(0.3).restart();
+          } catch (error) {
+            console.error('知识图谱尺寸更新失败:', error);
+          }
+        }).observe(svgEl);
+      }
+
+      render();
+
+      return {
+        tree,
+        activate: () => {
+          fitToContent(400);
+          pendingFit = true;
+          simulation.alpha(0.35).restart();
+        }
+      };
+    }
+
     (async function renderMindmap() {
       const markdownPath = './概率论思维导图.md';
 
@@ -187,26 +882,60 @@
         const markdown = await response.text();
         const transformer = new Transformer();
         const getRoot = () => transformer.transform(markdown).root;
-        const mindmap = Markmap.create(
-          '#mindmap',
-          {
-            initialExpandLevel: 1,
-            autoFit: false,
-            // 普通左键仅展开/收起当前节点，不递归影响后代。
-            toggleRecursively: false
-          },
-          getRoot()
-        );
 
-        // KaTeX 字体是异步加载的。首次测量如果发生在字体加载前，
-        // 长公式会得到偏小的 foreignObject 宽度，字体加载后尾部就会
-        // 被裁剪。字体就绪后重新测量节点，确保公式宽度完整。
-        if (document.fonts && document.fonts.ready) {
-          await document.fonts.ready;
-          await new Promise((resolve) => requestAnimationFrame(resolve));
-          mindmap.setData(getRoot());
-          await mindmap.fit();
-        }
+        // 这里刻意不用 Markmap.create：它内部会 fire-and-forget 地调用 fit()，
+        // 一旦 svg 拿不到尺寸或字体资源异常，就会抛出没人接的错误。手动创建
+        // 实例，并让所有 fit 调用都走 safeFit() 兜底。
+        const mindmap = new Markmap('#mindmap', {
+          initialExpandLevel: 1,
+          autoFit: false,
+          // 普通左键仅展开/收起当前节点，不递归影响后代。
+          toggleRecursively: false
+        });
+
+        // setData / fit 都可能因为资源未就绪或容器尺寸异常而失败，统一收口，
+        // 避免抛出没人接的错误影响后续初始化。
+        const callSafely = (label, fn) => {
+          try {
+            const result = fn();
+            if (result && typeof result.catch === 'function') {
+              result.catch((error) => console.error(`${label}失败:`, error));
+            }
+          } catch (error) {
+            console.error(`${label}失败:`, error);
+          }
+        };
+
+        const safeSetData = (data, options) =>
+          callSafely('思维导图数据更新', () => (options ? mindmap.setData(data, options) : mindmap.setData(data)));
+
+        const safeFit = () =>
+          callSafely('思维导图适配', () => {
+            if (!mindmap.svg || !mindmap.svg.node()) return null;
+            return mindmap.fit();
+          });
+
+        safeSetData(getRoot());
+        safeFit();
+
+        // KaTeX 字体是异步加载的：首次测量若发生在字体加载前，长公式会得到
+        // 偏小的 foreignObject 宽度，字体加载后尾部就会被裁剪，所以字体就绪
+        // 后需要重新测量一次。这一步不 await（放到后台执行）：字体或 CDN 资源
+        // 一旦不可用，等待会一直挂起，后面的知识图谱初始化和视图切换也会被拖住。
+        (async () => {
+          try {
+            if (!document.fonts || !document.fonts.ready) return;
+            await Promise.race([
+              document.fonts.ready,
+              new Promise((resolve) => setTimeout(resolve, 1500))
+            ]);
+            await new Promise((resolve) => requestAnimationFrame(resolve));
+            safeSetData(getRoot());
+            safeFit();
+          } catch (error) {
+            console.error('思维导图字体测量重试失败:', error);
+          }
+        })();
 
         // Markmap 的节点点击会直接调用 toggleNode()，但该路径不会像
         // 按钮展开那样在布局完成后重新 fit。延迟到浏览器完成布局后
@@ -216,7 +945,7 @@
           cancelAnimationFrame(fitFrame);
           fitFrame = requestAnimationFrame(() => {
             fitFrame = requestAnimationFrame(() => {
-              mindmap.fit();
+              safeFit();
             });
           });
         };
@@ -283,7 +1012,7 @@
           // 折叠时当前节点及后代全部收起。
           contextNode.payload = { ...(contextNode.payload || {}), fold };
           setDescendantsFold(contextNode, fold);
-          mindmap.renderData(contextNode);
+          callSafely('思维导图局部重绘', () => mindmap.renderData(contextNode));
           hideContextMenu();
           scheduleFit();
         });
@@ -298,10 +1027,27 @@
         document.querySelectorAll('[data-expand-level]').forEach((button) => {
           button.addEventListener('click', () => {
             const level = Number(button.dataset.expandLevel);
-            mindmap.setData(getRoot(), { initialExpandLevel: level });
-            mindmap.fit();
+            safeSetData(getRoot(), { initialExpandLevel: level });
+            safeFit();
           });
         });
+        viewState.mindmap = {
+          activate: () => {
+            // 面板刚从隐藏转为可见时浏览器可能还没完成一次布局，
+            // 延后一帧再适配，避免 fit 计算到旧尺寸。
+            requestAnimationFrame(safeFit);
+          }
+        };
+
+        // 知识图谱复用同一份大纲数据；单独兜底，避免影响思维导图。
+        try {
+          viewState.graph = createKnowledgeGraph(getRoot());
+        } catch (graphError) {
+          console.error('知识图谱初始化失败:', graphError);
+          viewState.graph = null;
+        }
+
+        renderViewState();
         console.log('思维导图渲染成功');
       } catch (error) {
         console.error('思维导图渲染失败:', error);
@@ -310,6 +1056,7 @@
           `<div class="error"><strong>思维导图加载失败</strong><br>${error.message}</div>`
         );
       }
+    })();
     })();
   </script>
 </body>

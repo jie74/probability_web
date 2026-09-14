@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>二维随机变量及其分布 — 概率论与数理统计可视化平台</title>
 <link rel="icon" type="image/png" href="logo.png">
-<!-- TailwindCSS CDN（与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
-<script src="https://cdn.tailwindcss.com"></script>
+<!-- TailwindCSS（本地 vendor，与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+<script src="vendor/tailwind.min.js"></script>
 <script>
 tailwind.config = {
   theme: {
@@ -21,13 +21,15 @@ tailwind.config = {
   }
 }
 </script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.css">
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/katex@0.16/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script src="vendor/katex/katex.min.js"></script>
+<script src="vendor/katex/auto-render.min.js"></script>
 <script src="js/katex-setup.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4/dist/echarts.min.js"></script>
-<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<script src="vendor/echarts.min.js"></script>
+<script src="vendor/plotly.min.js"></script>
 <link rel="stylesheet" href="css/sidebar.css">
+<link rel="stylesheet" href="css/theme.css">
+<script src="js/theme.js"></script>
 <style>
 html { scroll-behavior: smooth; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8fafc; }
