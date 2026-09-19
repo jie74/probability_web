@@ -30,6 +30,7 @@
   <script src="vendor/plotly.min.js"></script>
   <link rel="stylesheet" href="css/sidebar.css">
   <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/coze-widget.css">
   <script src="js/theme.js"></script>
   <style>
     html {
@@ -1018,6 +1019,24 @@
       </div>
     </section>
 
+    <!-- ===== 分布速查表入口（跳转） ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <a href="appendix.html"
+        class="card flex items-center justify-between gap-4 no-underline py-3 hover:border-blue-300"
+        style="border-left:4px solid #2563eb;">
+        <div class="flex items-center gap-3">
+          <span class="text-xl">📊</span>
+          <div>
+            <div class="text-sm font-bold text-slate-800">概率论附表 · 分布查表</div>
+            <div class="text-xs text-slate-500 mt-0.5">
+              附表1 泊松分布、附表2 标准正态分布、附表3 χ² 分布、附表4 F 分布，四表一页查完
+            </div>
+          </div>
+        </div>
+        <span class="text-sm text-blue-600 whitespace-nowrap">查表 →</span>
+      </a>
+    </section>
+
     <!-- ===== 卡片1：离散分布交互式（已注释，功能已整合到上方专用交互式卡片）===== -->
     <!--
   <section class="max-w-5xl mx-auto px-10">
@@ -1260,6 +1279,24 @@
           <span class="text-sm text-yellow-700">正态标准化<strong>期末考试必考</strong>。记住：先标准化再查表，\(\Phi(-z)=1-\Phi(z)\)。</span>
         </div>
       </div>
+    </section>
+
+    <!-- ===== 附表2 标准正态分布表入口（跳转） ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <a href="appendix.html#normal"
+        class="card flex items-center justify-between gap-4 no-underline py-3 hover:border-blue-300"
+        style="border-left:4px solid #2563eb;">
+        <div class="flex items-center gap-3">
+          <span class="text-xl">📋</span>
+          <div>
+            <div class="text-sm font-bold text-slate-800">附表2 · 标准正态分布表</div>
+            <div class="text-xs text-slate-500 mt-0.5">
+              标准化后的 Z 值直接查 Φ(x)，x = 0.0 ~ 3.4，精确到第二位小数
+            </div>
+          </div>
+        </div>
+        <span class="text-sm text-blue-600 whitespace-nowrap">查表 →</span>
+      </a>
     </section>
 
     <!-- ===== 卡片4：分布函数性质演示 ===== -->
@@ -2960,6 +2997,7 @@
     });
   </script>
 
+<script src="js/coze-widget.js"></script>
 </body>
 
 </html>

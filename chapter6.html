@@ -30,6 +30,7 @@
   <script src="vendor/plotly.min.js"></script>
   <link rel="stylesheet" href="css/sidebar.css">
   <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/coze-widget.css">
   <script src="js/theme.js"></script>
   <style>
     html {
@@ -384,6 +385,42 @@
             分布恒右偏。</span>
         </div>
       </div>
+    </section>
+
+    <!-- ===== 附表3 χ² 分布表入口（跳转） ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <a href="appendix.html#chisq"
+        class="card flex items-center justify-between gap-4 no-underline py-3 hover:border-blue-300"
+        style="border-left:4px solid #2563eb;">
+        <div class="flex items-center gap-3">
+          <span class="text-xl">📋</span>
+          <div>
+            <div class="text-sm font-bold text-slate-800">附表3 · χ² 分布表</div>
+            <div class="text-xs text-slate-500 mt-0.5">
+              自由度 n = 1 ~ 40，α = 0.995 ~ 0.005 的上 / 下侧分位数一张表查完
+            </div>
+          </div>
+        </div>
+        <span class="text-sm text-blue-600 whitespace-nowrap">查表 →</span>
+      </a>
+    </section>
+
+    <!-- ===== 附表4 F 分布表入口（跳转） ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <a href="appendix.html#f"
+        class="card flex items-center justify-between gap-4 no-underline py-3 hover:border-blue-300"
+        style="border-left:4px solid #2563eb;">
+        <div class="flex items-center gap-3">
+          <span class="text-xl">📋</span>
+          <div>
+            <div class="text-sm font-bold text-slate-800">附表4 · F 分布表</div>
+            <div class="text-xs text-slate-500 mt-0.5">
+              α = 0.10 / 0.05 / 0.025 / 0.01，行 = n₂（分母自由度），列 = n₁（分子自由度）
+            </div>
+          </div>
+        </div>
+        <span class="text-sm text-blue-600 whitespace-nowrap">查表 →</span>
+      </a>
     </section>
 
     <!-- ===== 卡片3：样本均值抽样分布模拟 ===== -->
@@ -810,6 +847,7 @@
     runRepSampling();
   </script>
 
+<script src="js/coze-widget.js"></script>
 </body>
 
 </html>
