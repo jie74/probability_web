@@ -5,11 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>概率论附表 · 泊松 / 正态 / χ² / F 分布查表</title>
-  <link rel="icon"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f4e79'/%3E%3Ctext x='32' y='46' font-size='36' font-family='Georgia,serif' fill='%23f8f5ee' text-anchor='middle'%3E%CF%87%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="logo.png">
   <link rel="preconnect" href="https://miaoda.feishu.cn">
   <link rel="stylesheet"
     href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="css/coze-widget.css">
+  <script src="vendor/katex/katex.min.js" defer></script>
+  <script src="vendor/katex/auto-render.min.js" defer></script>
+  <script src="js/katex-setup.js" defer></script>
   <style>
     :root {
       --bg: #f4f1e9;
@@ -178,7 +182,15 @@
       font-weight: 900;
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 10px;
+    }
+
+    .panel-head h2 .phi-fig {
+      flex: 0 0 auto;
+      width: 150px;
+      height: auto;
+      margin-left: 2px;
     }
 
     .panel-head h2 .no {
@@ -200,6 +212,7 @@
     .formula {
       display: inline-block;
       margin-top: 6px;
+      line-height: 1.9;
       background: var(--accent-soft);
       border: 1px solid #cbd9e8;
       border-radius: 6px;
@@ -427,6 +440,10 @@
       .panel-head h2 {
         font-size: 17px
       }
+
+      .panel-head h2 .phi-fig {
+        width: 110px
+      }
     }
 
     @media (max-width:400px) {
@@ -467,8 +484,9 @@
     <section class="panel active" id="panel-poisson" role="tabpanel">
       <div class="panel-head">
         <h2><span class="no">附表 1</span>泊松分布表</h2>
-        <p>表中数值为累积概率 P{X ≤ x}，其中 X ~ P(λ)。λ 值见表头，x 见首列。</p>
-        <span class="formula">P{X ≤ x} = Σ<sub>k=0</sub><sup>x</sup> λ<sup>k</sup>e<sup>−λ</sup> / k!</span>
+        <p>表中数值为累积概率 <span class="katex-render" data-expr="P\{X\le x\}"></span>，其中 <span class="katex-render"
+            data-expr="X\sim P(\lambda)"></span>。λ 值见表头，x 见首列。</p>
+        <span class="formula katex-render" data-expr="P\{X\le x\}=\sum_{k=0}^{x}\frac{\lambda^{k}e^{-\lambda}}{k!}"></span>
       </div>
       <div id="poisson-blocks"></div>
     </section>
@@ -476,9 +494,38 @@
     <!-- ===== 视图：附表2 标准正态分布 ===== -->
     <section class="panel" id="panel-normal" role="tabpanel">
       <div class="panel-head">
-        <h2><span class="no">附表 2</span>标准正态分布表</h2>
-        <p>表中数值为 Φ(x) = P{X ≤ x}，X ~ N(0, 1)。x 的一位小数见首列，第二位小数见表头。</p>
-        <span class="formula">Φ(x) = ∫<sub>−∞</sub><sup>x</sup> (1 / √2π) e<sup>−t²/2</sup> dt</span>
+        <h2><span class="no">附表 2</span>标准正态分布表
+          <svg class="phi-fig" viewBox="0 0 320 155" role="img" title="阴影面积即 Φ(x) = P{X ≤ x}"
+            aria-label="标准正态分布 Φ(x) 示意图：x 左侧阴影面积为 Φ(x)">
+            <defs>
+              <pattern id="phi-hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="7" stroke="#444" stroke-width="1.1" />
+              </pattern>
+              <marker id="phi-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L7,3 L0,6 Z" fill="#222" />
+              </marker>
+              <clipPath id="phi-clip">
+                <rect x="0" y="0" width="232" height="130" />
+              </clipPath>
+            </defs>
+            <g clip-path="url(#phi-clip)">
+              <path d="M8,123 C70,120 100,95 130,55 C142,37 150,30 160,30 C170,30 178,37 190,55 C220,95 250,120 312,123 L312,127 L8,127 Z"
+                fill="url(#phi-hatch)" />
+            </g>
+            <path d="M8,123 C70,120 100,95 130,55 C142,37 150,30 160,30 C170,30 178,37 190,55 C220,95 250,120 312,123"
+              fill="none" stroke="#222" stroke-width="2" />
+            <line x1="8" y1="127" x2="312" y2="127" stroke="#222" stroke-width="1.4" marker-end="url(#phi-arrow)" />
+            <line x1="160" y1="130" x2="160" y2="6" stroke="#222" stroke-width="1.4" marker-end="url(#phi-arrow)" />
+            <line x1="232" y1="116" x2="232" y2="133" stroke="#222" stroke-width="1.4" />
+            <text x="232" y="147" font-size="15" font-style="italic" text-anchor="middle" fill="#222">x</text>
+            <line x1="244" y1="62" x2="222" y2="88" stroke="#222" stroke-width="1.2" />
+            <text x="250" y="60" font-size="16" font-style="italic" fill="#222">Φ(x)</text>
+          </svg>
+        </h2>
+        <p>表中数值为 <span class="katex-render" data-expr="\Phi(x)=P\{X\le x\}"></span>，<span class="katex-render"
+            data-expr="X\sim N(0,1)"></span>。x 的一位小数见首列，第二位小数见表头。右图中阴影面积即 <span class="katex-render"
+            data-expr="\Phi(x)=P\{X\le x\}"></span>。</p>
+        <span class="formula katex-render" data-expr="\Phi(x)=\int_{-\infty}^{x}\frac{1}{\sqrt{2\pi}}e^{-t^{2}/2}\,dt"></span>
       </div>
       <div class="table-wrap tall" id="normal-wrap"></div>
     </section>
@@ -486,22 +533,99 @@
     <!-- ===== 视图：附表3 卡方分布 ===== -->
     <section class="panel" id="panel-chisq" role="tabpanel">
       <div class="panel-head">
-        <h2><span class="no">附表 3</span>χ² 分布表</h2>
-        <p>χ²<sub>α</sub>(n) 为自由度 n 的 χ² 分布分位数。左半列为下侧分位数（P{χ² ≤ x} = α），右半列为上侧分位数（P{χ² &gt; x} = α）。</p>
+        <h2><span class="no">附表 3</span>χ² 分布表
+          <svg class="phi-fig" viewBox="0 0 320 155" role="img" title="右侧阴影面积为 α"
+            aria-label="χ² 分布上侧分位数示意图：χ²α(n) 右侧阴影面积为 α">
+            <defs>
+              <pattern id="chisq-hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="7" stroke="#444" stroke-width="1.1" />
+              </pattern>
+              <marker id="chisq-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L7,3 L0,6 Z" fill="#222" />
+              </marker>
+              <clipPath id="chisq-clip">
+                <rect x="180" y="0" width="140" height="130" />
+              </clipPath>
+            </defs>
+            <!-- 右尾阴影区域（面积 = α） -->
+            <g clip-path="url(#chisq-clip)">
+              <path d="M20,125 C28,85 42,42 68,40 C100,39 130,65 165,85 C200,102 250,112 310,117 L310,125 L20,125 Z"
+                fill="url(#chisq-hatch)" />
+            </g>
+            <!-- 曲线 -->
+            <path d="M20,125 C28,85 42,42 68,40 C100,39 130,65 165,85 C200,102 250,112 310,117"
+              fill="none" stroke="#222" stroke-width="2" />
+            <!-- 坐标轴 -->
+            <line x1="12" y1="125" x2="315" y2="125" stroke="#222" stroke-width="1.4" marker-end="url(#chisq-arrow)" />
+            <line x1="20" y1="128" x2="20" y2="6" stroke="#222" stroke-width="1.4" marker-end="url(#chisq-arrow)" />
+            <!-- 分界线 -->
+            <line x1="180" y1="92" x2="180" y2="133" stroke="#222" stroke-width="1.4" />
+            <text x="180" y="149" font-size="14" font-style="italic" text-anchor="middle" fill="#222">χ<tspan
+                dy="-5" font-size="10">2</tspan><tspan dy="9" font-size="10">α</tspan><tspan dy="-4">(n)</tspan></text>
+            <!-- α 标注 -->
+            <line x1="272" y1="84" x2="252" y2="108" stroke="#222" stroke-width="1.2" />
+            <text x="276" y="82" font-size="15" font-style="italic" fill="#222">α</text>
+          </svg>
+        </h2>
+        <p><span class="katex-render" data-expr="\chi^{2}_{\alpha}(n)"></span> 为自由度 n 的 χ² 分布分位数。左半列为下侧分位数（<span
+            class="katex-render" data-expr="P\{\chi^{2}\le x\}=\alpha"></span>），右半列为上侧分位数（<span class="katex-render"
+            data-expr="P\{\chi^{2}&gt; x\}=\alpha"></span>）。右图中 <span class="katex-render"
+            data-expr="\chi^{2}_{\alpha}(n)"></span> 右侧的阴影面积即为 α。</p>
+        <span class="formula katex-render"
+          data-expr="f(x)=\frac{1}{2^{n/2}\Gamma(n/2)}x^{n/2-1}e^{-x/2},\quad x&gt;0"></span>
       </div>
       <div class="table-wrap tall" id="chisq-wrap"></div>
       <div class="notes">
         <h3>n &gt; 40 的近似公式</h3>
-        当自由度 n 较大时，可用近似 χ²<sub>α</sub>(n) ≈ ½ ( z<sub>α</sub> + √(2n − 1) )²，其中 z<sub>α</sub> 为标准正态分布的上侧 α 分位数。
+        当自由度 n 较大时，可用近似 <span class="katex-render"
+          data-expr="\chi^{2}_{\alpha}(n)\approx\frac{1}{2}\bigl(z_{\alpha}+\sqrt{2n-1}\bigr)^{2}"></span>，其中 <span
+          class="katex-render" data-expr="z_{\alpha}"></span> 为标准正态分布的上侧 α 分位数。
       </div>
     </section>
 
     <!-- ===== 视图：附表4 F分布 ===== -->
     <section class="panel" id="panel-f" role="tabpanel">
       <div class="panel-head">
-        <h2><span class="no">附表 4</span>F 分布表</h2>
-        <p>表中数值为 F<sub>α</sub>(n₁, n₂)，满足 P{F ≤ F<sub>α</sub>(n₁, n₂)} = 1 − α。<strong>行 = n₂（分母自由度），列 =
-            n₁（分子自由度）</strong>。自由度覆盖 1~30、40、60、120 及 ∞。</p>
+        <h2><span class="no">附表 4</span>F 分布表
+          <svg class="phi-fig" viewBox="0 0 320 155" role="img" title="右侧阴影面积为 α"
+            aria-label="F 分布上侧分位数示意图：Fα(n₁, n₂) 右侧阴影面积为 α">
+            <defs>
+              <pattern id="f-hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="7" stroke="#444" stroke-width="1.1" />
+              </pattern>
+              <marker id="f-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                <path d="M0,0 L7,3 L0,6 Z" fill="#222" />
+              </marker>
+              <clipPath id="f-clip">
+                <rect x="175" y="0" width="145" height="130" />
+              </clipPath>
+            </defs>
+            <!-- 右尾阴影区域（面积 = α） -->
+            <g clip-path="url(#f-clip)">
+              <path d="M20,125 C25,95 35,55 60,48 C90,42 120,70 160,90 C210,110 260,117 310,120 L310,125 L20,125 Z"
+                fill="url(#f-hatch)" />
+            </g>
+            <!-- 曲线 -->
+            <path d="M20,125 C25,95 35,55 60,48 C90,42 120,70 160,90 C210,110 260,117 310,120"
+              fill="none" stroke="#222" stroke-width="2" />
+            <!-- 坐标轴 -->
+            <line x1="12" y1="125" x2="315" y2="125" stroke="#222" stroke-width="1.4" marker-end="url(#f-arrow)" />
+            <line x1="20" y1="128" x2="20" y2="6" stroke="#222" stroke-width="1.4" marker-end="url(#f-arrow)" />
+            <!-- 分界线 -->
+            <line x1="175" y1="88" x2="175" y2="133" stroke="#222" stroke-width="1.4" />
+            <text x="175" y="149" font-size="14" font-style="italic" text-anchor="middle" fill="#222">F<tspan
+                dy="4" font-size="10">α</tspan><tspan dy="-4">(n</tspan><tspan dy="3" font-size="10">1</tspan><tspan
+                dy="-3">, n</tspan><tspan dy="3" font-size="10">2</tspan><tspan dy="-3">)</tspan></text>
+            <!-- α 标注 -->
+            <line x1="270" y1="80" x2="248" y2="104" stroke="#222" stroke-width="1.2" />
+            <text x="274" y="78" font-size="15" font-style="italic" fill="#222">α</text>
+          </svg>
+        </h2>
+        <p>表中数值为 <span class="katex-render" data-expr="F_{\alpha}(n_{1},n_{2})"></span>，满足 <span class="katex-render"
+            data-expr="P\{F\le F_{\alpha}(n_{1},n_{2})\}=1-\alpha"></span>。<strong>行 = n₂（分母自由度），列 = n₁（分子自由度）</strong>。自由度覆盖
+          1~30、40、60、120 及 ∞。右图中 <span class="katex-render" data-expr="F_{\alpha}(n_{1},n_{2})"></span> 右侧的阴影面积即为 α。</p>
+        <span class="formula katex-render"
+          data-expr="F=\frac{X/n_{1}}{Y/n_{2}},\quad X\sim\chi^{2}(n_{1}),\ Y\sim\chi^{2}(n_{2})"></span>
       </div>
       <div class="subtabs" id="f-subtabs" role="tablist" aria-label="显著性水平切换"></div>
       <div id="f-panels"></div>
@@ -713,6 +837,30 @@
   </script>
 
   <script>
+    /* ===== KaTeX 渲染（附表公式与正文行内公式） ===== */
+    function renderAllKatex() {
+      if (typeof katex === 'undefined') return;
+      document.querySelectorAll('.katex-render').forEach(function (el) {
+        if (el.getAttribute('data-rendered') === '1') return;
+        var expr = el.getAttribute('data-expr') || '';
+        try {
+          katex.render(expr, el, { displayMode: false, throwOnError: false });
+          el.setAttribute('data-rendered', '1');
+        } catch (e) {
+          el.textContent = expr;
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderAllKatex);
+    } else {
+      renderAllKatex();
+    }
+    window.addEventListener('load', renderAllKatex);
+  </script>
+
+  <script>
     function goBack() {
       if (window.history.length > 1) {
         window.history.back();
@@ -721,6 +869,10 @@
       }
     }
   </script>
+
+<!-- Coze 智能体：右侧可折叠抽屉（公共脚本自动注入 DOM 并初始化） -->
+<script src="js/coze-widget.js"></script>
+
 </body>
 
 </html>

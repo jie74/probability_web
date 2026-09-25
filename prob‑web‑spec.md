@@ -4,19 +4,20 @@
 > 技术栈：静态网页，无后端；TailwindCSS + KaTeX(公式) + ECharts(2D图表) + Plotly.js(3D曲面/等高线) + 原生Canvas(手绘图与动画) + markmap(思维导图) + d3(v7，知识图谱)；全部依赖本地引入，无外部 CDN 请求
 > 目标用户：本科课堂、学生自学；兼顾概念理解 + 应试考点提示
 
-## 页面清单（共12个页面 + 1个数据文件）
+## 页面清单（共12个 HTML 页面 + 1个数据文件）
 | 页面 | 类型 | 说明 |
 |---|---|---|
 | index.html | 首页 | 章节导航 + 核心公式速览 + 应试重点 + 使用说明 |
 | chapter1.html | 章节 | 随机事件及其概率（3卡：抛硬币 / 韦恩图 / 贝叶斯） |
-| chapter2.html | 章节 | 一维随机变量及其分布（5卡，含离散分布专题面板与总结表） |
+| chapter2.html | 章节 | 一维随机变量及其分布（含离散分布专题面板、分布速查表入口与总结表） |
 | chapter3.html | 章节 | 二维随机变量及其分布（4卡，含 Plotly 3D 曲面） |
 | chapter4.html | 章节 | 随机变量的数字特征（4卡，含性质对照表） |
 | chapter5.html | 章节 | 大数定律及中心极限定理（4卡，含切比雪夫与掷骰子动画） |
 | chapter6.html | 章节 | 样本及抽样分布（3卡） |
 | chapter7.html | 章节 | 参数估计（3卡） |
 | chapter8.html | 章节 | 假设检验（4卡） |
-| **mindmap_markmap.html** | **工具（新增）** | 全书思维导图，可折叠、可缩放、右键递归展开 |
+| **appendix.html** | **工具（新增）** | 概率论附表：泊松 / 正态 / χ² / F 分布查表（侧边栏「分布速查表」入口指向此页） |
+| **mindmap_markmap.html** | **工具（新增）** | 全书思维导图 + 知识图谱双视图（折叠/缩放/右键递归展开/悬停看路径） |
 | **bayes_replacer.html** | **工具（新增）** | 贝叶斯/全概率事件替换器，事件名可自定义 + 4个预设场景 |
 | **概率论思维导图.md** | **数据（新增）** | 思维导图内容源，被 mindmap 页 fetch 读取 |
 
@@ -24,11 +25,12 @@
 1. **目录结构改为扁平**：取消 `pages/` 子目录，所有 html 与 `css/`、`js/` 同级，`file://` 双击即可运行。
 2. **抽出3个公共文件**：`css/sidebar.css`、`js/sidebar.js`、`js/katex-setup.js`。侧边导航成为唯一数据源，不在页面里写死 `<a>`。
 3. **侧边栏升级**：分「课程章节 / 学习工具」两组；支持折叠收起，状态存 localStorage；移动端覆盖层 + 滑动关闭；折叠时派发 resize 让图表自适应。
-4. **新增2个工具页 + 1个数据文件**（思维导图、事件替换器）。
+4. **新增3个工具页 + 1个数据文件**（分布速查表、思维导图、事件替换器）。
 5. **卡片增加两个可选区块**：🧮实时计算过程折叠面板（把当前参数代入公式逐步推导）、📌核心结论框（点明直觉误区）。
 6. **控件规范化**：需要精确输入的参数统一配「滑块 + 数值输入框」双向联动；按钮做视觉分级（蓝色实心=执行，白底描边=重置）。
 7. **新增卡片**：chapter2 六大分布总结表、chapter4 期望方差性质表、chapter5 切比雪夫不等式与掷骰子动画、chapter8 单双侧并排对比、index 公式速览与应试重点区。
 8. **自测题统一为每页3道**，点击即判分并给解析，允许反复重答，不做计分与持久化。
+9. **全站接入 AI 助教**：新增公共文件 `css/coze-widget.css` + `js/coze-widget.js`，每个页面右下角提供「🤖 概率论 AI 助教」可折叠抽屉（Coze Web SDK），详见文末【全站 AI 助教】。
 
 ---
 
@@ -110,6 +112,10 @@ tailwind.config = { theme: { extend: { colors: {
 
 4. js/d3.v7.min.js、js/markmap-lib.js、js/markmap-view.js
    - 仅思维导图页面使用，本地引入（markmap CDN 不稳定）
+
+5. css/coze-widget.css + js/coze-widget.js   AI 助教抽屉（全站共用）
+   - 自动注入悬浮按钮 / 遮罩 / 抽屉 DOM，动态加载 Coze Web SDK 并初始化
+   - 页面接入仅需两行：head 引 css，body 末尾引 js（详见文末【全站 AI 助教】）
 ```
 
 【公式渲染的两种写法（页面内必须同时支持）】
@@ -1020,6 +1026,39 @@ chapter1 卡片3 的**通用化扩展工具**。把疾病检测案例里写死�
 
 ## 复用约定
 本页不含自测题（它是工具而非章节），但完全沿用 `.card` / `.formula-panel` / `.exam-tip` / `.slider-input` / `.num-input` 视觉体系与侧边栏，视觉上与章节页一致。
+
+---
+
+# 【新增】全站 AI 助教｜右侧可折叠抽屉（Coze 智能体）
+
+## 功能定位
+全站统一的 AI 答疑入口：右下角悬浮按钮 → 右侧滑出抽屉 → 内嵌 Coze 智能体对话。学生可随时追问知识点、题目与公式（如「贝叶斯和全概率公式的关系，有什么区别？」），回答支持 LaTeX 公式渲染。适用于任意页面（首页 / 章节页 / 工具页），不打断当前阅读。
+
+## 接入方式
+- 公共文件：`css/coze-widget.css`（抽屉 / 遮罩 / 悬浮按钮样式）、`js/coze-widget.js`（注入 DOM → 动态加载 SDK → 读取 token → 初始化）
+- 每个页面只需两行：head 里 `<link rel="stylesheet" href="css/coze-widget.css">`，body 末尾 `<script src="js/coze-widget.js"></script>`
+- **已接入**：index.html、chapter1~8.html、appendix.html、bayes_replacer.html、mindmap_markmap.html
+
+## 可配置项（`window.CozeWidgetConfig`，写在脚本之前即可覆盖默认值）
+| 字段 | 默认值 | 说明 |
+|---|---|---|
+| projectId | 7687082916731486217 | Coze 项目 ID |
+| title / subtitle | 🤖 概率论 AI 助教 / 随时追问知识点、题目与公式 | 抽屉标题与副标题 |
+| icon | logo.png | 悬浮按钮图标 |
+| envPath / envKey | .env / COZE_TOKEN | token 所在文件与键名 |
+| token | 空 | 直接指定 token（优先级最高） |
+| sdkSrc | lf-cdn.coze.cn 的 coze web-sdk UMD 地址 | Coze Web SDK 地址 |
+| width / disabled | 400 / false | 抽屉宽度（px）、临时禁用开关 |
+
+## token 来源与运行约束
+- 优先级：`config.token` → `window.COZE_TOKEN` → `.env[envKey]` → 构建时注入的 `js/env.js`
+- 本地在 `.env` 写 `COZE_TOKEN=pat_xxx`，脚本用 `fetch(envPath)` 读取（`cache: "no-store"`）
+- ⚠️ **浏览器在 `file://` 下无法 fetch 本地文件**，因此含 AI 助教的页面必须通过 HTTP 打开（本地静态服务器或 GitHub Pages）；部署环境没有 `.env` 时，可改为构建时生成 `js/env.js`（内容形如 `window.COZE_TOKEN = "pat_xxx";`）
+- 鉴权失败（401）/ 令牌过期 / 网络异常时，页面右下角弹出诊断面板（解析 JWT 给出 token 类型与 `connector_id`，附自检清单）；SDK 就绪后自动移除
+- `.env` 里是访问令牌，**不要提交到公开仓库**：应加入 `.gitignore`，仓库内只保留占位符
+
+## 效果
+![AI 助教](images/fig6_agent.png)
 
 ---
 

@@ -1,0 +1,48 @@
+name: Deploy to GitHub Pages
+
+# 部署时把 COZE_TOKEN 注入到 js/env.js，供 js/coze-widget.js 读取。
+# 注意：Actions 变量只在工作流运行期间存在，必须在此处显式写入产物。
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # 必须声明 environment，才能读到 github-pages 环境下的变量
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 注入 Coze token
+        env:
+          # 环境变量用 vars.*；若改用 Secret，则改成 secrets.COZE_TOKEN
+          TOKEN_VALUE: ${{ vars.COZE_TOKEN }}
+        run: |
+          mkdir -p js
+          printf 'window.COZE_TOKEN = "%s";\n' "$TOKEN_VALUE" > js/env.js
+
+      - name: 上传静态站点
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+          # 如果仓库根目录不是站点根（例如代码在 website/ 子目录），
+          # 请把这里的 path 改成 ./website
+
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

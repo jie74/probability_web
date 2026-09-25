@@ -204,6 +204,18 @@
       });
   }
 
+  /* 部署环境（如 GitHub Pages）没有 .env 时，回退到构建时注入的 js/env.js，
+     该文件内容形如：window.COZE_TOKEN = "pat_xxx"; */
+  function loadEnvJs() {
+    return new Promise(function (resolve) {
+      var s = document.createElement("script");
+      s.src = "js/env.js";
+      s.onload = function () { resolve(true); };
+      s.onerror = function () { resolve(false); };
+      document.body.appendChild(s);
+    });
+  }
+
   /* ============ 5. 动态加载 SDK 并初始化 ============ */
   function loadSdk(src) {
     return new Promise(function (resolve) {
@@ -262,9 +274,19 @@
     window.cozeWebSDK.init(options);
   }
 
-  loadEnv().then(function (env) {
-    var token = cfg.token || window.COZE_TOKEN ||
+  function resolveToken(env) {
+    return cfg.token || window.COZE_TOKEN ||
       env[cfg.envKey] || env[cfg.envKey.toUpperCase()] || env[cfg.envKey.toLowerCase()] || "";
-    loadSdk(cfg.sdkSrc).then(function () { init(token); });
+  }
+
+  loadEnv().then(function (env) {
+    if (resolveToken(env)) {
+      loadSdk(cfg.sdkSrc).then(function () { init(resolveToken(env)); });
+      return;
+    }
+    // 本地/部署环境都没有 .env 时，尝试加载部署时注入的 js/env.js
+    loadEnvJs().then(function () {
+      loadSdk(cfg.sdkSrc).then(function () { init(resolveToken({})); });
+    });
   });
 })();

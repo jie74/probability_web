@@ -1,0 +1,6 @@
+# 本地环境变量（含 Coze token 等密钥，切勿提交）
+.env
+
+# 部署工作流构建时生成的注入文件（同样含 token，勿提交）
+js/env.js
+test_coze.py

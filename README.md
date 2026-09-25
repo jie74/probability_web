@@ -38,6 +38,10 @@ A **fully static, zero external-request** visualization website for Probability 
 
 ![全概率面积可视化](images/fig5_bayes_replacer.png)
 
+**AI 助教（Coze 智能体）** — 全站右下角的可折叠抽屉「🤖 概率论 AI 助教」，随时追问知识点、题目与公式；例如追问「贝叶斯和全概率公式的关系，有什么区别？」，助教按定义 / 联系 / 区别分层作答并渲染公式
+
+![AI 助教](images/fig6_agent.png)
+
 ## 目录结构
 
 ```

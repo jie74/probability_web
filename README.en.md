@@ -38,6 +38,10 @@ A **fully static, zero external-request** visualization website for Probability 
 
 ![Total probability area chart](images/fig5_bayes_replacer.png)
 
+**AI teaching assistant (Coze agent) / AI 助教** — A collapsible drawer at the bottom-right of every page ("🤖 概率论 AI 助教") for asking about knowledge points, problems and formulas at any time; e.g. asking how Bayes' formula relates to and differs from the total-probability formula, it answers by definition / connection / difference with rendered formulas
+
+![AI teaching assistant](images/fig6_agent.png)
+
 ## Directory Structure / 目录结构
 
 ```

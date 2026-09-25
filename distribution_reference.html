@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分布速查表 — 概率论与数理统计可视化平台</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <!-- TailwindCSS（本地 vendor，与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+  <script src="vendor/tailwind.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb',
+            'primary-light': '#3b82f6',
+            'primary-dark': '#1d4ed8',
+            'primary-bg': '#eff6ff',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="vendor/katex/auto-render.min.js"></script>
+  <script src="js/katex-setup.js"></script>
+  <script src="vendor/echarts.min.js"></script>
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/theme.js"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f8fafc;
+    }
+
+    .main-content {
+      margin-left: 256px;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: all 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    /* ---------- 分布索引 ---------- */
+    .ref-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
+    .ref-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      text-decoration: none;
+      display: block;
+      transition: all 0.2s;
+    }
+
+    a.ref-item:hover {
+      background: #eff6ff;
+      border-color: #93c5fd;
+      transform: translateY(-1px);
+    }
+
+    .ref-item--ready {
+      background: #eff6ff;
+      border-color: #93c5fd;
+    }
+
+    .ref-item-title {
+      color: #1e293b;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .ref-item-sub {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .ref-item--todo {
+      background: #f8fafc;
+      border-style: dashed;
+      cursor: default;
+    }
+
+    .ref-item--todo .ref-item-title {
+      color: #94a3b8;
+    }
+
+    /* ---------- 速查表 ---------- */
+    .ref-table {
+      border-collapse: collapse;
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .ref-table th,
+    .ref-table td {
+      border: 1px solid #cbd5e0;
+      padding: 8px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .ref-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 600;
+      white-space: nowrap;
+      width: 132px;
+    }
+
+    .ref-block {
+      margin-top: 20px;
+    }
+
+    .ref-block-title {
+      color: #334155;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .ref-formula {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      overflow-x: auto;
+    }
+
+    .exam-tip {
+      background: #fffbeb;
+      border-left: 4px solid #eab308;
+      border-radius: 8px;
+      margin-top: 16px;
+      padding: 12px 16px;
+    }
+
+    .slider-input {
+      -webkit-appearance: none;
+      appearance: none;
+      background: #e2e8f0;
+      border-radius: 6px;
+      cursor: pointer;
+      height: 6px;
+      outline: none;
+    }
+
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      background: #2563eb;
+      border-radius: 50%;
+      cursor: pointer;
+      height: 16px;
+      width: 16px;
+    }
+
+    .slider-input::-moz-range-thumb {
+      background: #2563eb;
+      border: 0;
+      border-radius: 50%;
+      cursor: pointer;
+      height: 16px;
+      width: 16px;
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 767px) {
+      .main-content {
+        margin-left: 0 !important;
+      }
+
+      section {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 1.35rem !important;
+      }
+
+      h2 {
+        font-size: 1.05rem !important;
+      }
+
+      .slider-input {
+        width: 100% !important;
+        max-width: 200px;
+      }
+
+      button {
+        font-size: 0.8rem !important;
+        padding: 6px 12px !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+  <div id="sidebar-container"></div>
+  <script src="js/sidebar.js"></script>
+
+  <!-- ==================== 主内容区域 ==================== -->
+  <main class="main-content">
+
+    <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">速查表</span>
+        <a href="chapter2.html" class="text-xs text-slate-400 no-underline hover:text-blue-600 transition-colors">← 返回第 2 章</a>
+      </div>
+      <h1 class="text-2xl font-bold text-slate-900 mb-2">分布速查表</h1>
+      <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
+        常用分布的集中速查：记号与参数、取值范围、分布律 / 概率密度、期望与方差、典型应用、易错点。
+        做题时按分布名直接翻查，省去来回翻书。
+      </p>
+    </section>
+
+    <!-- ===== 分布索引 ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <div class="card">
+        <h2 class="text-lg font-bold text-slate-800 mb-3">🗂️ 分布索引</h2>
+        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+          已收录的分布可直接点击跳转；灰色虚线卡片是已规划、待补充的条目。
+        </p>
+        <div class="ref-grid">
+          <a href="#poisson" class="ref-item ref-item--ready">
+            <div class="ref-item-title">泊松分布</div>
+            <div class="ref-item-sub">P(λ) · 离散型 · 已收录</div>
+          </a>
+          <div class="ref-item ref-item--todo">
+            <div class="ref-item-title">二项分布</div>
+            <div class="ref-item-sub">B(n,p) · 离散型 · 待补充</div>
+          </div>
+          <div class="ref-item ref-item--todo">
+            <div class="ref-item-title">几何分布</div>
+            <div class="ref-item-sub">G(p) · 离散型 · 待补充</div>
+          </div>
+          <div class="ref-item ref-item--todo">
+            <div class="ref-item-title">均匀分布</div>
+            <div class="ref-item-sub">U(a,b) · 连续型 · 待补充</div>
+          </div>
+          <div class="ref-item ref-item--todo">
+            <div class="ref-item-title">指数分布</div>
+            <div class="ref-item-sub">E(λ) · 连续型 · 待补充</div>
+          </div>
+          <div class="ref-item ref-item--todo">
+            <div class="ref-item-title">正态分布</div>
+            <div class="ref-item-sub">N(μ,σ²) · 连续型 · 待补充</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 泊松分布 ===== -->
+    <section class="max-w-5xl mx-auto px-10" id="poisson">
+      <div class="card">
+        <h2 class="text-lg font-bold text-slate-800 mb-3">🎯 泊松分布 Poisson Distribution</h2>
+
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 一句话理解</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            描述<strong>单位时间（或单位面积、单位体积）内稀有事件发生次数</strong>的分布。
+            事件必须满足：独立发生、发生速率恒定、同一瞬间不会发生两次。
+            参数 \(\lambda\) 就是单位时间内的平均发生次数。
+          </p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="ref-table">
+            <tbody>
+              <tr>
+                <th>记号</th>
+                <td><span class="katex-render" data-expr="X\sim P(\lambda)"></span>
+                  <span class="text-xs text-slate-400 ml-2">（也写作 \(X\sim \pi(\lambda)\)）</span>
+                </td>
+              </tr>
+              <tr>
+                <th>参数</th>
+                <td><span class="katex-render" data-expr="\lambda>0"></span>
+                  <span class="text-xs text-slate-400 ml-2">单位时间内的平均发生次数</span>
+                </td>
+              </tr>
+              <tr>
+                <th>取值</th>
+                <td><span class="katex-render" data-expr="k=0,1,2,\dots"></span>
+                  <span class="text-xs text-slate-400 ml-2">非负整数，无上界</span>
+                </td>
+              </tr>
+              <tr>
+                <th>分布律</th>
+                <td><span class="katex-render" data-expr="P\{X=k\}=\dfrac{\lambda^k}{k!}e^{-\lambda},\quad k=0,1,2,\dots"></span>
+                </td>
+              </tr>
+              <tr>
+                <th>分布函数</th>
+                <td><span class="katex-render" data-expr="F(x)=\sum_{k=0}^{\lfloor x\rfloor}\dfrac{\lambda^k}{k!}e^{-\lambda}"></span>
+                </td>
+              </tr>
+              <tr>
+                <th>期望 / 方差</th>
+                <td><span class="katex-render" data-expr="E(X)=\lambda,\qquad D(X)=\lambda"></span>
+                  <span class="text-xs text-slate-400 ml-2">期望 = 方差，是它最显著的标志</span>
+                </td>
+              </tr>
+              <tr>
+                <th>最可能值</th>
+                <td>使 \(P\{X=k\}\) 最大的 <span class="katex-render" data-expr="k"></span>：
+                  <span class="katex-render" data-expr="\lambda\notin\mathbb{Z}\;\Rightarrow\; k=\lfloor\lambda\rfloor"></span>；
+                  <span class="katex-render" data-expr="\lambda\in\mathbb{Z}\;\Rightarrow\; k=\lambda\ \text{和}\ k=\lambda-1"></span>
+                </td>
+              </tr>
+              <tr>
+                <th>典型应用</th>
+                <td>单位时间内电话呼入次数、放射性粒子衰变数、产品缺陷数、排队系统到达人数、稀有事件发生次数</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 递推与性质 -->
+        <div class="ref-block">
+          <h3 class="ref-block-title">🔁 递推公式（算概率最省力的方式）</h3>
+          <div class="ref-formula">
+            <span class="katex-render" data-expr="\frac{P\{X=k\}}{P\{X=k-1\}}=\frac{\lambda}{k}\quad\Longrightarrow\quad P\{X=k\}=P\{X=k-1\}\cdot\frac{\lambda}{k}"></span>
+          </div>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+            先算 \(P\{X=0\}=e^{-\lambda}\)，再按上式逐个往后推，不用算阶乘，也不会溢出。
+          </p>
+        </div>
+
+        <div class="ref-block">
+          <h3 class="ref-block-title">➕ 可加性（前提：相互独立）</h3>
+          <div class="ref-formula">
+            <span class="katex-render" data-expr="X\sim P(\lambda_1),\; Y\sim P(\lambda_2),\ X,Y\ \text{独立}\;\Longrightarrow\; X+Y\sim P(\lambda_1+\lambda_2)"></span>
+          </div>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+            更一般地，\(n\) 个独立泊松随机变量之和仍服从泊松分布，参数为各自参数之和。
+          </p>
+        </div>
+
+        <div class="ref-block">
+          <h3 class="ref-block-title">🔗 与二项分布的关系：泊松定理</h3>
+          <div class="ref-formula">
+            <span class="katex-render"
+              data-expr="\lim_{n\to\infty}C_n^k p_n^k (1-p_n)^{n-k}=\dfrac{\lambda^k}{k!}e^{-\lambda}\quad (np_n\to\lambda)"></span>
+          </div>
+          <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+            实用判据：\(n\ge 20\)（最好 \(\ge 100\)）、\(p\le 0.05\)（最好 \(\le 0.1\)）、\(\lambda=np\) 适中（一般 &lt; 10）时，
+            可用 \(P(\lambda)\) 近似 \(B(n,p)\)，取 \(\lambda=np\)。
+          </p>
+        </div>
+
+        <!-- 交互图 -->
+        <div class="ref-block">
+          <h3 class="text-sm font-semibold text-slate-700 mb-3">🎛️ 分布律随 \(\lambda\) 变化</h3>
+          <div class="flex flex-wrap items-center gap-4 mb-4">
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-slate-600">λ =</span>
+              <input type="range" id="lambdaSlider" min="0.5" max="10" step="0.5" value="3"
+                oninput="renderPoisson()" class="slider-input w-40">
+              <span id="lambdaVal" class="text-sm font-mono text-slate-700 w-10">3.0</span>
+            </div>
+            <button onclick="resetLambda()"
+              class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
+              重置</button>
+          </div>
+
+          <div id="poissonChart" style="width:100%;height:320px;"></div>
+
+          <div class="flex flex-wrap items-center gap-6 mt-3 text-sm">
+            <span class="text-slate-600">E(X) = <strong id="poissonMean" class="text-blue-600">3.00</strong></span>
+            <span class="text-slate-600">D(X) = <strong id="poissonVar" class="text-blue-600">3.00</strong></span>
+            <span class="text-slate-600">最可能值 k = <strong id="poissonMode" class="text-blue-600">3</strong></span>
+          </div>
+        </div>
+
+        <div class="exam-tip">
+          <span class="font-bold text-yellow-800 text-sm">💡 易错点：</span>
+          <span class="text-sm text-yellow-700">
+            ① 泊松分布是<strong>计数</strong>分布，\(\lambda\) 既是期望也是方差，别把 \(D(X)\) 写成 \(\lambda^2\)；
+            ② 写分布律时 \(e^{-\lambda}\) 是常数项，别漏掉；
+            ③ 可加性<strong>必须要求相互独立</strong>；
+            ④ 泊松分布本身<strong>没有</strong>无记忆性，无记忆性是指数分布的标志（泊松过程中相邻事件的时间间隔服从指数分布）；
+            ⑤ 用泊松近似二项时要写清 \(\lambda=np\)，并注意 \(p\) 足够小。
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-5xl mx-auto px-10 pb-10">
+      <p class="text-xs text-slate-400 text-center leading-relaxed">
+        速查表持续补充中 · 当前收录：泊松分布 ·
+        <a href="chapter2.html" class="text-blue-600 no-underline hover:underline">回到第 2 章</a>
+      </p>
+    </section>
+
+  </main>
+
+  <script>
+    // ===== KaTeX 渲染 =====
+    function renderAllKatex() {
+      document.querySelectorAll('.katex-render').forEach(function (el) {
+        try {
+          katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false });
+        } catch (e) { el.textContent = el.getAttribute('data-expr'); }
+      });
+    }
+    renderAllKatex();
+
+    // ===== 泊松分布律图 =====
+    var poissonChart = echarts.init(document.getElementById('poissonChart'));
+
+    // 用递推算概率：P(X=0)=e^{-λ}，P(X=k)=P(X=k-1)·λ/k，避免阶乘溢出
+    function poissonPoints(lambda) {
+      var maxK = Math.max(8, Math.ceil(lambda + 4 * Math.sqrt(lambda)));
+      var points = [];
+      var p = Math.exp(-lambda);
+      for (var k = 0; k <= maxK; k += 1) {
+        points.push({ k: k, p: p });
+        p = (p * lambda) / (k + 1);
+      }
+      return points;
+    }
+
+    function poissonMode(lambda) {
+      return Number.isInteger(lambda) ? lambda + ' 和 ' + (lambda - 1) : String(Math.floor(lambda));
+    }
+
+    function renderPoisson() {
+      var lambda = parseFloat(document.getElementById('lambdaSlider').value);
+      var points = poissonPoints(lambda);
+
+      document.getElementById('lambdaVal').textContent = lambda.toFixed(1);
+      document.getElementById('poissonMean').textContent = lambda.toFixed(2);
+      document.getElementById('poissonVar').textContent = lambda.toFixed(2);
+      document.getElementById('poissonMode').textContent = poissonMode(lambda);
+
+      poissonChart.setOption({
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
+          formatter: function (params) {
+            var item = params[0];
+            return 'k = ' + item.axisValue + '<br>P{X=k} = ' + Number(item.data).toFixed(4);
+          }
+        },
+        grid: { left: 58, right: 24, top: 28, bottom: 42 },
+        xAxis: {
+          type: 'category',
+          name: 'k',
+          nameLocation: 'end',
+          data: points.map(function (point) { return point.k; }),
+          axisTick: { alignWithLabel: true },
+          axisLabel: { color: '#64748b' }
+        },
+        yAxis: {
+          type: 'value',
+          name: 'P{X=k}',
+          nameTextStyle: { color: '#64748b' },
+          axisLabel: { color: '#64748b', formatter: function (value) { return value.toFixed(2); } },
+          splitLine: { lineStyle: { color: '#e2e8f0' } }
+        },
+        series: [{
+          type: 'bar',
+          data: points.map(function (point) { return point.p; }),
+          barWidth: '55%',
+          itemStyle: { color: '#2563eb', borderRadius: [4, 4, 0, 0] },
+          markLine: {
+            silent: true,
+            symbol: 'none',
+            label: {
+              formatter: 'E(X)=λ',
+              position: 'insideEndTop',
+              color: '#ef4444',
+              fontSize: 11
+            },
+            lineStyle: { color: '#ef4444', type: 'dashed', width: 1.5 },
+            data: [{ xAxis: Math.min(points.length - 1, Math.round(lambda)) }]
+          }
+        }]
+      }, true);
+    }
+
+    function resetLambda() {
+      document.getElementById('lambdaSlider').value = 3;
+      renderPoisson();
+    }
+
+    renderPoisson();
+
+    window.addEventListener('resize', function () {
+      poissonChart.resize();
+    });
+  </script>
+
+</body>
+
+</html>
