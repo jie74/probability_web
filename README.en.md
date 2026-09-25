@@ -16,6 +16,24 @@ A **fully static, zero external-request** visualization website for Probability 
 - **Formula rendering**: KaTeX renders inline body formulas and structured formula slots, and supports dynamic rewriting (e.g. the Bayesian "live formula").
 - **Collapsible side navigation**: Grouped into "Chapters / Tools"; collapse state persisted in localStorage; overlay mode with responsive adaptation on mobile.
 
+## Screenshots / 网站示例
+
+**Home / 首页** — Hero section, chapter navigation and course intro
+
+![Home](images/fig1_home.png)
+
+**Chapter 5 · Law of Large Numbers & CLT / 大数定律及中心极限定理** — Interactive Chebyshev inequality demo: adjust σ and ε with sliders to compare the conservative bound with the true normal probability
+
+![Law of Large Numbers & CLT](images/fig2_limit_theorems.png)
+
+**Mind map tool / 思维导图** — Full-book knowledge tree rendered by markmap, with collapse / zoom / recursive expand and KaTeX-rendered formulas
+
+![Mind map](images/fig3_mindmap.png)
+
+**Probability appendix / 概率论附表** — Poisson / standard Normal / χ² / F lookup tables
+
+![Probability appendix](images/fig4_distribution_tables.png)
+
 ## Directory Structure / 目录结构
 
 ```
