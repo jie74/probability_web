@@ -16,6 +16,24 @@ A **fully static, zero external-request** visualization website for Probability 
 - **公式渲染**：KaTeX 渲染正文行内公式与结构化公式位，支持动态重写（如贝叶斯「活公式」）。
 - **可折叠侧边导航**：分「课程章节 / 学习工具」两组，折叠状态持久化于 localStorage，移动端覆盖层自适应。
 
+## 网站示例 / Screenshots
+
+**首页** — Hero 区、章节导航与课程介绍
+
+![首页](images/fig1_home.png)
+
+**第5章 · 大数定律及中心极限定理** — 切比雪夫不等式交互演示：滑块调节 σ 与 ε，实时对比切比雪夫保守界与正态真实概率
+
+![大数定律及中心极限定理](images/fig2_limit_theorems.png)
+
+**思维导图工具** — markmap 渲染全书知识树，支持折叠 / 缩放 / 递归展开，节点内公式由 KaTeX 渲染
+
+![思维导图](images/fig3_mindmap.png)
+
+**概率论附表** — 泊松 / 标准正态 / χ² / F 分布查表工具
+
+![概率论附表](images/fig4_distribution_tables.png)
+
 ## 目录结构
 
 ```
