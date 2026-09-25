@@ -47,6 +47,7 @@
     '    <div class="px-5 mt-4 mb-2">' +
     '      <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">学习工具</span>' +
     '    </div>' +
+    '    <a href="appendix.html" class="sidebar-nav-item"><span class="chapter-num">📊</span><span>分布速查表</span></a>' +
     '    <a href="mindmap_markmap.html" class="sidebar-nav-item"><span class="chapter-num">🧠</span><span>思维导图</span></a>' +
     '  </nav>' +
     '  <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200">' +
