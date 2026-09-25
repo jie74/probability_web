@@ -34,6 +34,10 @@ A **fully static, zero external-request** visualization website for Probability 
 
 ![概率论附表](images/fig4_distribution_tables.png)
 
+**全概率公式 · 马赛克面积可视化** — 多个先验事件按面积分解 B 的发生概率，滑块调节先验与条件概率，实时代入公式逐步计算
+
+![全概率面积可视化](images/fig5_bayes_replacer.png)
+
 ## 目录结构
 
 ```
