@@ -34,6 +34,10 @@ A **fully static, zero external-request** visualization website for Probability 
 
 ![Probability appendix](images/fig4_distribution_tables.png)
 
+**Total probability formula · mosaic area chart / 全概率公式 · 马赛克面积可视化** — Decompose P(B) by prior events as areas; adjust priors and conditionals with sliders and watch the step-by-step derivation update live
+
+![Total probability area chart](images/fig5_bayes_replacer.png)
+
 ## Directory Structure / 目录结构
 
 ```
