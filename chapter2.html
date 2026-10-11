@@ -1037,6 +1037,54 @@
       </a>
     </section>
 
+    <!-- ===== 卡片：泊松近似二项分布对比 ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <div class="card">
+        <h2 class="text-lg font-bold text-slate-800 mb-3">⚖️ 泊松近似二项分布对比（λ = np）</h2>
+
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            当二项分布 <strong>n 很大、p 很小</strong>，且 <strong>λ = np 适中</strong>时，二项分布 B(n, p) 可用泊松分布 P(λ) 近似：
+            <span class="katex-render"
+              data-expr="C_n^k p^k (1-p)^{n-k} \approx \frac{\lambda^k e^{-\lambda}}{k!},\quad \lambda=np"></span>
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-5 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">n =</span>
+            <input type="range" id="approxNSlider" min="10" max="600" value="100" step="1" oninput="updateApprox()"
+              class="slider-input w-40">
+            <input type="number" id="approxNInput" min="10" max="600" value="100" step="1"
+              oninput="syncApproxNFromInput(this.value)" class="param-value-input">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">p =</span>
+            <input type="range" id="approxPSlider" min="0.01" max="0.5" value="0.05" step="0.01"
+              oninput="updateApprox()" class="slider-input w-40">
+            <input type="number" id="approxPInput" min="0.01" max="0.5" value="0.05" step="0.01"
+              oninput="syncApproxPFromInput(this.value)" class="param-value-input">
+          </div>
+          <div class="flex items-center gap-2 text-sm">
+            <span class="text-slate-600">λ = np = <strong id="approxLambdaVal"
+                class="text-blue-600">5.000</strong></span>
+          </div>
+          <button onclick="resetApprox()"
+            class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
+            重置</button>
+        </div>
+
+        <div id="approxChart" style="width:100%;height:400px;"></div>
+
+        <div class="exam-tip">
+          <span class="font-bold text-yellow-800 text-sm">💡 近似条件：</span>
+          <span class="text-sm text-yellow-700">一般要求 n 较大、p 较小（n ≥ 20 且 p ≤ 0.05 时近似效果较好），且 λ = np 不宜过大。试着把 p
+            调大，观察两条曲线逐渐分离。</span>
+        </div>
+      </div>
+    </section>
+
     <!-- ===== 卡片1：离散分布交互式（已注释，功能已整合到上方专用交互式卡片）===== -->
     <!--
   <section class="max-w-5xl mx-auto px-10">
@@ -2960,6 +3008,148 @@
     // 初始化几何分布
     drawGeometricFull();
 
+    // ===== 泊松近似二项分布对比 =====
+    var approxChart = echarts.init(document.getElementById('approxChart'));
+
+    function drawApprox() {
+      var n = parseInt(document.getElementById('approxNSlider').value);
+      var p = parseFloat(document.getElementById('approxPSlider').value);
+      var lambda = n * p;
+
+      var xMax = Math.max(15, Math.ceil(lambda + 6 * Math.sqrt(lambda)));
+      if (xMax > n) xMax = n;
+      if (xMax < 8) xMax = 8;
+
+      var binomData = [];
+      var poissonData = [];
+      for (var k = 0; k <= xMax; k++) {
+        binomData.push([k, binomPMF(k, n, p)]);
+        poissonData.push([k, poissonPMF(k, lambda)]);
+      }
+
+      var yMax = 0;
+      for (var i = 0; i < binomData.length; i++) {
+        yMax = Math.max(yMax, binomData[i][1], poissonData[i][1]);
+      }
+      yMax = Math.ceil(yMax * 1.15 * 1000) / 1000;
+
+      var barWidth = Math.max(3, Math.min(24, Math.floor(600 / (xMax + 1))));
+      var interval = Math.max(1, Math.ceil(xMax / 20));
+
+      approxChart.setOption({
+        legend: {
+          data: ['二项分布 B(n,p)', '泊松分布 P(λ)'],
+          top: 0,
+          textStyle: { fontSize: 12, color: '#475569' }
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
+          formatter: function (params) {
+            var arr = [];
+            for (var i = 0; i < params.length; i++) {
+              if (params[i].data && params[i].data.length) arr.push(params[i]);
+            }
+            if (!arr.length) return '';
+            var kVal = arr[0].data[0];
+            var s = 'k = ' + kVal;
+            for (var j = 0; j < arr.length; j++) {
+              s += '<br/>' + arr[j].marker + arr[j].seriesName + ': ' + (arr[j].data[1] * 100).toFixed(3) + '%';
+            }
+            return s;
+          }
+        },
+        grid: { left: 55, right: 30, top: 40, bottom: 45 },
+        xAxis: {
+          type: 'value',
+          name: '发生次数 k',
+          nameLocation: 'middle',
+          nameGap: 25,
+          nameTextStyle: { fontSize: 12, color: '#64748b' },
+          min: -0.5,
+          max: xMax + 0.5,
+          interval: interval,
+          axisLabel: { fontSize: 11, color: '#64748b' },
+          splitLine: { show: false },
+          axisLine: { lineStyle: { color: '#cbd5e1' } },
+          axisTick: { lineStyle: { color: '#cbd5e1' } }
+        },
+        yAxis: {
+          type: 'value',
+          name: '概率',
+          nameTextStyle: { fontSize: 12, color: '#64748b' },
+          min: 0,
+          max: yMax,
+          axisLabel: {
+            fontSize: 11,
+            color: '#64748b',
+            formatter: function (v) { return (v * 100).toFixed(0) + '%'; }
+          },
+          splitLine: { lineStyle: { color: '#f1f5f9' } },
+          axisLine: { show: false },
+          axisTick: { show: false }
+        },
+        series: [
+          {
+            name: '二项分布 B(n,p)',
+            type: 'bar',
+            data: binomData,
+            barWidth: barWidth,
+            itemStyle: { color: '#3b82f6', borderRadius: [2, 2, 0, 0], opacity: 0.85 },
+            z: 2
+          },
+          {
+            name: '泊松分布 P(λ)',
+            type: 'line',
+            data: poissonData,
+            symbol: 'circle',
+            symbolSize: 6,
+            lineStyle: { color: '#ef4444', width: 2 },
+            itemStyle: { color: '#ef4444', borderColor: '#fff', borderWidth: 1 },
+            z: 5
+          }
+        ]
+      }, true);
+
+      document.getElementById('approxLambdaVal').textContent = lambda.toFixed(3);
+    }
+
+    function updateApprox() {
+      var n = parseInt(document.getElementById('approxNSlider').value);
+      var p = parseFloat(document.getElementById('approxPSlider').value);
+      document.getElementById('approxNInput').value = n;
+      document.getElementById('approxPInput').value = p.toFixed(2);
+      drawApprox();
+    }
+
+    function syncApproxNFromInput(val) {
+      var n = parseInt(val);
+      if (isNaN(n)) n = 10;
+      n = Math.max(10, Math.min(600, n));
+      document.getElementById('approxNSlider').value = n;
+      document.getElementById('approxNInput').value = n;
+      drawApprox();
+    }
+
+    function syncApproxPFromInput(val) {
+      var p = parseFloat(val);
+      if (isNaN(p)) p = 0.01;
+      p = Math.max(0.01, Math.min(0.5, p));
+      document.getElementById('approxPSlider').value = p;
+      document.getElementById('approxPInput').value = p.toFixed(2);
+      drawApprox();
+    }
+
+    function resetApprox() {
+      document.getElementById('approxNSlider').value = 100;
+      document.getElementById('approxNInput').value = 100;
+      document.getElementById('approxPSlider').value = 0.05;
+      document.getElementById('approxPInput').value = '0.05';
+      drawApprox();
+    }
+
+    drawApprox();
+
     // ===== 专用分布卡片切换逻辑 =====
     var distKnowledgeMap = {
       binomial: '<h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3><p class="text-sm text-slate-600 leading-relaxed">二项分布描述<strong>n次独立重复伯努利试验中成功次数</strong>的概率分布。期望 \\(E(X)=np\\)，方差 \\(D(X)=np(1-p)\\)。当 n 很大 p 很小时，可用泊松分布近似（λ = np）。</p>',
@@ -2994,10 +3184,11 @@
       poissonChart.resize();
       binomialChart.resize();
       geometricChart.resize();
+      approxChart.resize();
     });
   </script>
 
-<script src="js/coze-widget.js"></script>
+  <script src="js/coze-widget.js"></script>
 </body>
 
 </html>
