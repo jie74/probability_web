@@ -265,129 +265,7 @@
       </p>
     </section>
 
-    <!-- ===== 卡片1：二维离散联合分布热力图 ===== -->
-    <section class="max-w-5xl mx-auto px-10">
-      <div class="card">
-        <h2 class="text-lg font-bold text-slate-800 mb-3">🔥 二维离散联合分布热力图</h2>
-
-        <div class="mb-4">
-          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
-          <p class="text-sm text-slate-600 leading-relaxed">
-            联合分布 \(P(X=x_i,Y=y_j)\) 描述二维离散随机变量同时取特定值的概率。
-            求X边缘分布和Y边缘分布，行内相加，列内相加。求X就对所有的y可能加起来，求Y就对所有的x可能加起来。
-          </p>
-          <p class="text-sm text-red-500 mt-1 font-medium">⚠ 注意：仅知道边缘分布，不能推出联合分布。</p>
-        </div>
-
-        <div class="formula-panel">
-          <div class="formula-toggle" onclick="toggleFormula(this)">
-            <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
-          </div>
-          <div class="formula-body">
-            <div class="space-y-3">
-              <div><span class="text-xs text-slate-400">边缘分布：</span><span class="katex-render"
-                  data-expr="P(X=x_i)=\sum_j P(X=x_i,Y=y_j)"></span></div>
-              <div><span class="text-xs text-slate-400">边缘分布：</span><span class="katex-render"
-                  data-expr="P(Y=y_j)=\sum_i P(X=x_i,Y=y_j)"></span></div>
-              <div><span class="text-xs text-slate-400">条件分布：</span><span class="katex-render"
-                  data-expr="P(X=x_i|Y=y_j)=\frac{P(X=x_i,Y=y_j)}{P(Y=y_j)}"></span></div>
-              <div><span class="text-xs text-slate-400">独立判定：</span><span class="katex-render"
-                  data-expr="P(X=x_i,Y=y_j)=P(X=x_i)P(Y=y_j),\;\forall i,j"></span></div>
-            </div>
-          </div>
-        </div>
-
-        <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 联合分布热力图</h3>
-
-        <div class="flex gap-3 mb-4">
-          <button onclick="calcMarginal()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors"
-            style="background:#2563eb;">📊 计算边缘分布</button>
-          <button onclick="resetJoint()"
-            class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
-            重置</button>
-        </div>
-
-        <div class="heatmap-wrapper">
-          <div id="jointHeatmap" style="width:100%;height:400px;"></div>
-        </div>
-
-        <div class="exam-tip">
-          <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
-          <span class="text-sm text-yellow-700">大题<strong>经常考由联合求边缘</strong>。注意：求X边缘和Y边缘，行内相加，列内相加，别搞反方向。</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== 卡片2：二维正态3D曲面 & 等高线 ===== -->
-    <section class="max-w-5xl mx-auto px-10">
-      <div class="card">
-        <h2 class="text-lg font-bold text-slate-800 mb-3">🌐 二维正态分布 — 3D曲面与等高线</h2>
-
-        <div class="mb-4">
-          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
-          <p class="text-sm text-slate-600 leading-relaxed">
-            二维连续联合密度，可用三维曲面表示；<strong>相关系数 \(\rho\)</strong> 刻画 X 与 Y 之间的线性关联程度。
-            \(\rho > 0\) 正相关，\(\rho < 0\) 负相关，\(\rho=0\) 不线性相关。 </p>
-        </div>
-
-        <div class="formula-panel">
-          <div class="formula-toggle" onclick="toggleFormula(this)">
-            <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
-          </div>
-          <div class="formula-body">
-            <div class="space-y-3">
-              <div><span class="text-xs text-slate-400">二维正态：</span><span class="katex-render"
-                  data-expr="(X,Y)\sim N(\mu_1,\mu_2,\sigma_1^2,\sigma_2^2,\rho)"></span></div>
-              <div><span class="text-xs text-slate-400">密度函数：</span><span class="katex-render"
-                  data-expr="f(x,y)=\frac{1}{2\pi\sigma_1\sigma_2\sqrt{1-\rho^2}}\exp\left[-\frac{1}{2(1-\rho^2)}\left(\frac{(x-\mu_1)^2}{\sigma_1^2}-2\rho\frac{(x-\mu_1)(y-\mu_2)}{\sigma_1\sigma_2}+\frac{(y-\mu_2)^2}{\sigma_2^2}\right)\right]"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 二维正态可视化</h3>
-
-        <div class="flex flex-wrap items-center gap-4 mb-4">
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-slate-600">ρ =</span>
-            <input type="range" id="rhoSlider" min="-0.95" max="0.95" value="0" step="0.05"
-              oninput="updateBivarNormal()" class="slider-input w-36">
-            <input type="number" id="rhoVal" min="-0.95" max="0.95" value="0" step="0.05"
-              oninput="syncRhoFromInput(this.value)" class="param-value-input">
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-slate-600">σ₁ =</span>
-            <input type="range" id="sigma1Slider" min="0.5" max="2.5" value="1" step="0.1" oninput="updateBivarNormal()"
-              class="slider-input w-32">
-            <input type="number" id="sigma1Val" min="0.5" max="2.5" value="1" step="0.1"
-              oninput="syncSigma1FromInput(this.value)" class="param-value-input">
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-sm text-slate-600">σ₂ =</span>
-            <input type="range" id="sigma2Slider" min="0.5" max="2.5" value="1" step="0.1" oninput="updateBivarNormal()"
-              class="slider-input w-32">
-            <input type="number" id="sigma2Val" min="0.5" max="2.5" value="1" step="0.1"
-              oninput="syncSigma2FromInput(this.value)" class="param-value-input">
-          </div>
-          <button onclick="resetBivarNormal()"
-            class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
-            重置</button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div id="bivar3D" style="width:100%;height:380px;"></div>
-          <div id="bivarContour" style="width:100%;height:380px;"></div>
-        </div>
-
-        <div class="exam-tip">
-          <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
-          <span class="text-sm text-yellow-700">二维正态分布中，<strong>\(\rho = 0 \iff X, Y\) 独立</strong>。但普通分布不成立：\(\rho = 0\)
-            只代表不线性相关，不一定独立。</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== 卡片3：二维概率积分区域 ===== -->
+    <!-- ===== 卡片1：二维概率积分区域 ===== -->
     <section class="max-w-5xl mx-auto px-10">
       <div class="card">
         <h2 class="text-lg font-bold text-slate-800 mb-3">📐 二维概率积分区域</h2>
@@ -491,6 +369,128 @@
         <div class="exam-tip">
           <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
           <span class="text-sm text-yellow-700">考试二重积分求概率，注意<strong>积分上下限</strong>。先画图确定积分区域，再确定积分次序（先x后y或先y后x）。</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 卡片2：二维离散联合分布热力图 ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <div class="card">
+        <h2 class="text-lg font-bold text-slate-800 mb-3">🔥 二维离散联合分布热力图</h2>
+
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            联合分布 \(P(X=x_i,Y=y_j)\) 描述二维离散随机变量同时取特定值的概率。
+            求X边缘分布和Y边缘分布，行内相加，列内相加。求X就对所有的y可能加起来，求Y就对所有的x可能加起来。
+          </p>
+          <p class="text-sm text-red-500 mt-1 font-medium">⚠ 注意：仅知道边缘分布，不能推出联合分布。</p>
+        </div>
+
+        <div class="formula-panel">
+          <div class="formula-toggle" onclick="toggleFormula(this)">
+            <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+          </div>
+          <div class="formula-body">
+            <div class="space-y-3">
+              <div><span class="text-xs text-slate-400">边缘分布：</span><span class="katex-render"
+                  data-expr="P(X=x_i)=\sum_j P(X=x_i,Y=y_j)"></span></div>
+              <div><span class="text-xs text-slate-400">边缘分布：</span><span class="katex-render"
+                  data-expr="P(Y=y_j)=\sum_i P(X=x_i,Y=y_j)"></span></div>
+              <div><span class="text-xs text-slate-400">条件分布：</span><span class="katex-render"
+                  data-expr="P(X=x_i|Y=y_j)=\frac{P(X=x_i,Y=y_j)}{P(Y=y_j)}"></span></div>
+              <div><span class="text-xs text-slate-400">独立判定：</span><span class="katex-render"
+                  data-expr="P(X=x_i,Y=y_j)=P(X=x_i)P(Y=y_j),\;\forall i,j"></span></div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 联合分布热力图</h3>
+
+        <div class="flex gap-3 mb-4">
+          <button onclick="calcMarginal()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors"
+            style="background:#2563eb;">📊 计算边缘分布</button>
+          <button onclick="resetJoint()"
+            class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
+            重置</button>
+        </div>
+
+        <div class="heatmap-wrapper">
+          <div id="jointHeatmap" style="width:100%;height:400px;"></div>
+        </div>
+
+        <div class="exam-tip">
+          <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+          <span class="text-sm text-yellow-700">大题<strong>经常考由联合求边缘</strong>。注意：求X边缘和Y边缘，行内相加，列内相加，别搞反方向。</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 卡片3：二维正态3D曲面 & 等高线 ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <div class="card">
+        <h2 class="text-lg font-bold text-slate-800 mb-3">🌐 二维正态分布 — 3D曲面与等高线</h2>
+
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            二维连续联合密度，可用三维曲面表示；<strong>相关系数 \(\rho\)</strong> 刻画 X 与 Y 之间的线性关联程度。
+            \(\rho > 0\) 正相关，\(\rho < 0\) 负相关，\(\rho=0\) 不线性相关。 </p>
+        </div>
+
+        <div class="formula-panel">
+          <div class="formula-toggle" onclick="toggleFormula(this)">
+            <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+          </div>
+          <div class="formula-body">
+            <div class="space-y-3">
+              <div><span class="text-xs text-slate-400">二维正态：</span><span class="katex-render"
+                  data-expr="(X,Y)\sim N(\mu_1,\mu_2,\sigma_1^2,\sigma_2^2,\rho)"></span></div>
+              <div><span class="text-xs text-slate-400">密度函数：</span><span class="katex-render"
+                  data-expr="f(x,y)=\frac{1}{2\pi\sigma_1\sigma_2\sqrt{1-\rho^2}}\exp\left[-\frac{1}{2(1-\rho^2)}\left(\frac{(x-\mu_1)^2}{\sigma_1^2}-2\rho\frac{(x-\mu_1)(y-\mu_2)}{\sigma_1\sigma_2}+\frac{(y-\mu_2)^2}{\sigma_2^2}\right)\right]"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 二维正态可视化</h3>
+
+        <div class="flex flex-wrap items-center gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">ρ =</span>
+            <input type="range" id="rhoSlider" min="-0.95" max="0.95" value="0" step="0.05"
+              oninput="updateBivarNormal()" class="slider-input w-36">
+            <input type="number" id="rhoVal" min="-0.95" max="0.95" value="0" step="0.05"
+              oninput="syncRhoFromInput(this.value)" class="param-value-input">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">σ₁ =</span>
+            <input type="range" id="sigma1Slider" min="0.5" max="2.5" value="1" step="0.1" oninput="updateBivarNormal()"
+              class="slider-input w-32">
+            <input type="number" id="sigma1Val" min="0.5" max="2.5" value="1" step="0.1"
+              oninput="syncSigma1FromInput(this.value)" class="param-value-input">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">σ₂ =</span>
+            <input type="range" id="sigma2Slider" min="0.5" max="2.5" value="1" step="0.1" oninput="updateBivarNormal()"
+              class="slider-input w-32">
+            <input type="number" id="sigma2Val" min="0.5" max="2.5" value="1" step="0.1"
+              oninput="syncSigma2FromInput(this.value)" class="param-value-input">
+          </div>
+          <button onclick="resetBivarNormal()"
+            class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
+            重置</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div id="bivar3D" style="width:100%;height:380px;"></div>
+          <div id="bivarContour" style="width:100%;height:380px;"></div>
+        </div>
+
+        <div class="exam-tip">
+          <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+          <span class="text-sm text-yellow-700">二维正态分布中，<strong>\(\rho = 0 \iff X, Y\) 独立</strong>。但普通分布不成立：\(\rho = 0\)
+            只代表不线性相关，不一定独立。</span>
         </div>
       </div>
     </section>
