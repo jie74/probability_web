@@ -1,760 +1,1100 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>二维随机变量及其分布 — 概率论与数理统计可视化平台</title>
-<link rel="icon" type="image/png" href="logo.png">
-<!-- TailwindCSS（本地 vendor，与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
-<script src="vendor/tailwind.min.js"></script>
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        primary: '#2563eb',
-        'primary-light': '#3b82f6',
-        'primary-dark': '#1d4ed8',
-        'primary-bg': '#eff6ff',
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>二维随机变量及其分布 — 概率论与数理统计可视化平台</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <!-- TailwindCSS（本地 vendor，与 index.html 一致，支持 sidebar.js 动态注入的 class） -->
+  <script src="vendor/tailwind.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb',
+            'primary-light': '#3b82f6',
+            'primary-dark': '#1d4ed8',
+            'primary-bg': '#eff6ff',
+          }
+        }
       }
     }
-  }
-}
-</script>
-<link rel="stylesheet" href="vendor/katex/katex.min.css">
-<script src="vendor/katex/katex.min.js"></script>
-<script src="vendor/katex/auto-render.min.js"></script>
-<script src="js/katex-setup.js"></script>
-<script src="vendor/echarts.min.js"></script>
-<script src="vendor/plotly.min.js"></script>
-<link rel="stylesheet" href="css/sidebar.css">
-<link rel="stylesheet" href="css/theme.css">
-<link rel="stylesheet" href="css/coze-widget.css">
-<script src="js/theme.js"></script>
-<style>
-html { scroll-behavior: smooth; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #f8fafc; }
-.main-content { margin-left: 256px; min-height: 100vh; }
-.card {
-  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 24px;
-  margin-bottom: 24px; transition: all 0.2s;
-}
-.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
-.formula-panel {
-  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 12px; overflow: hidden;
-}
-.formula-toggle {
-  display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer;
-  font-size: 14px; font-weight: 500; color: #475569; user-select: none;
-  transition: background 0.15s;
-}
-.formula-toggle:hover { background: #f1f5f9; }
-.formula-toggle .arrow { transition: transform 0.2s; font-size: 12px; }
-.formula-toggle.open .arrow { transform: rotate(90deg); }
-.formula-body { display: none; padding: 0 16px 16px 16px; }
-.formula-body.show { display: block; }
-.exam-tip {
-  background: #fef9c3; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px 16px; margin-top: 16px;
-}
-.quiz-option {
-  display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px;
-  border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.15s; font-size: 14px;
-}
-.quiz-option:hover { border-color: #93c5fd; background: #eff6ff; }
-.quiz-option.selected { border-color: #2563eb; background: #eff6ff; }
-.quiz-option.correct { border-color: #16a34a; background: #f0fdf4; }
-.quiz-option.wrong { border-color: #dc2626; background: #fef2f2; }
-.slider-input { -webkit-appearance: none; height: 6px; border-radius: 4px; background: #e2e8f0; outline: none; }
-.slider-input::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #2563eb; cursor: pointer; }
-.param-value-input { width: 64px; padding: 2px 6px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; outline: none; font-size: 0.875rem; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: #334155; text-align: center; }
-.param-value-input:focus { border-color: #2563eb; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
+  </script>
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="vendor/katex/auto-render.min.js"></script>
+  <script src="js/katex-setup.js"></script>
+  <script src="vendor/echarts.min.js"></script>
+  <script src="vendor/plotly.min.js"></script>
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/coze-widget.css">
+  <script src="js/theme.js"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
 
-/* 移动端适配 */
-@media (max-width: 767px) {
-  .main-content { margin-left: 0 !important; }
-  section { padding-left: 16px !important; padding-right: 16px !important; }
-  .card { padding: 16px; }
-  h1 { font-size: 1.35rem !important; }
-  h2 { font-size: 1.05rem !important; }
-  .slider-input { width: 100% !important; max-width: 200px; }
-  .flex-wrap.items-center.gap-4 { gap: 8px !important; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f8fafc;
+    }
 
-  /* 热力图移动端：可横向滚动 */
-  .heatmap-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin: 0 -16px;
-    padding: 0 16px;
-  }
-  #jointHeatmap { height: 320px !important; min-width: 500px; }
-  #bivar3D, #bivarContour { height: 280px !important; }
-  #integralChart { height: 280px !important; }
-  #indepScatter, #indepMarginal { height: 240px !important; }
+    .main-content {
+      margin-left: 256px;
+      min-height: 100vh;
+    }
 
-  button { font-size: 0.8rem !important; padding: 6px 12px !important; }
-}
-</style>
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: all 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .formula-panel {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .formula-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: #475569;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .formula-toggle:hover {
+      background: #f1f5f9;
+    }
+
+    .formula-toggle .arrow {
+      transition: transform 0.2s;
+      font-size: 12px;
+    }
+
+    .formula-toggle.open .arrow {
+      transform: rotate(90deg);
+    }
+
+    .formula-body {
+      display: none;
+      padding: 0 16px 16px 16px;
+    }
+
+    .formula-body.show {
+      display: block;
+    }
+
+    .exam-tip {
+      background: #fef9c3;
+      border-left: 4px solid #eab308;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 16px;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 14px;
+    }
+
+    .quiz-option:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
+
+    .quiz-option.selected {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .quiz-option.correct {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .quiz-option.wrong {
+      border-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    .slider-input {
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 4px;
+      background: #e2e8f0;
+      outline: none;
+    }
+
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #2563eb;
+      cursor: pointer;
+    }
+
+    .param-value-input {
+      width: 64px;
+      padding: 2px 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      outline: none;
+      font-size: 0.875rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #334155;
+      text-align: center;
+    }
+
+    .param-value-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 767px) {
+      .main-content {
+        margin-left: 0 !important;
+      }
+
+      section {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 1.35rem !important;
+      }
+
+      h2 {
+        font-size: 1.05rem !important;
+      }
+
+      .slider-input {
+        width: 100% !important;
+        max-width: 200px;
+      }
+
+      .flex-wrap.items-center.gap-4 {
+        gap: 8px !important;
+      }
+
+      /* 热力图移动端：可横向滚动 */
+      .heatmap-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -16px;
+        padding: 0 16px;
+      }
+
+      #jointHeatmap {
+        height: 320px !important;
+        min-width: 500px;
+      }
+
+      #bivar3D,
+      #bivarContour {
+        height: 280px !important;
+      }
+
+      #integralChart {
+        height: 280px !important;
+      }
+
+      #indepScatter,
+      #indepMarginal {
+        height: 240px !important;
+      }
+
+      button {
+        font-size: 0.8rem !important;
+        padding: 6px 12px !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
-<div id="sidebar-container"></div>
-<script src="js/sidebar.js"></script>
+  <!-- ==================== 侧边导航栏（由 js/sidebar.js 动态注入） ==================== -->
+  <div id="sidebar-container"></div>
+  <script src="js/sidebar.js"></script>
 
-<main class="main-content">
+  <main class="main-content">
 
-  <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
-    <div class="flex items-center gap-3 mb-2">
-      <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第3章</span>
-      <span class="text-xs text-slate-400">模块一 · 概率论</span>
-    </div>
-    <h1 class="text-2xl font-bold text-slate-900 mb-2">二维随机变量及其分布</h1>
-    <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
-      核心：联合分布、边缘分布、条件分布；二维正态；随机变量独立性。
-      应试重点：会求边缘分布；独立判定；二维正态相关系数 \(\rho\) 含义。
-    </p>
-  </section>
-
-  <!-- ===== 卡片1：二维离散联合分布热力图 ===== -->
-  <section class="max-w-5xl mx-auto px-10">
-    <div class="card">
-      <h2 class="text-lg font-bold text-slate-800 mb-3">🔥 二维离散联合分布热力图</h2>
-
-      <div class="mb-4">
-        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
-        <p class="text-sm text-slate-600 leading-relaxed">
-          联合分布 \(P(X=x_i,Y=y_j)\) 描述二维离散随机变量同时取特定值的概率。
-          求X边缘分布和Y边缘分布，行内相加，列内相加。求X就对所有的y可能加起来，求Y就对所有的x可能加起来。
-        </p>
-        <p class="text-sm text-red-500 mt-1 font-medium">⚠ 注意：仅知道边缘分布，不能推出联合分布。</p>
+    <section class="max-w-5xl mx-auto px-10 pt-10 pb-4">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="px-3 py-1 text-xs font-bold text-white rounded-full" style="background:#2563eb;">第3章</span>
+        <span class="text-xs text-slate-400">模块一 · 概率论</span>
       </div>
+      <h1 class="text-2xl font-bold text-slate-900 mb-2">二维随机变量及其分布</h1>
+      <p class="text-sm text-slate-500 leading-relaxed max-w-3xl">
+        核心：联合分布、边缘分布、条件分布；二维正态；随机变量独立性。
+        应试重点：会求边缘分布；独立判定；二维正态相关系数 \(\rho\) 含义。
+      </p>
+    </section>
 
-      <div class="formula-panel">
-        <div class="formula-toggle" onclick="toggleFormula(this)">
-          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+    <!-- ===== 卡片1：二维离散联合分布热力图 ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <div class="card">
+        <h2 class="text-lg font-bold text-slate-800 mb-3">🔥 二维离散联合分布热力图</h2>
+
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            联合分布 \(P(X=x_i,Y=y_j)\) 描述二维离散随机变量同时取特定值的概率。
+            求X边缘分布和Y边缘分布，行内相加，列内相加。求X就对所有的y可能加起来，求Y就对所有的x可能加起来。
+          </p>
+          <p class="text-sm text-red-500 mt-1 font-medium">⚠ 注意：仅知道边缘分布，不能推出联合分布。</p>
         </div>
-        <div class="formula-body">
-          <div class="space-y-3">
-            <div><span class="text-xs text-slate-400">边缘分布：</span><span class="katex-render" data-expr="P(X=x_i)=\sum_j P(X=x_i,Y=y_j)"></span></div>
-            <div><span class="text-xs text-slate-400">边缘分布：</span><span class="katex-render" data-expr="P(Y=y_j)=\sum_i P(X=x_i,Y=y_j)"></span></div>
-            <div><span class="text-xs text-slate-400">条件分布：</span><span class="katex-render" data-expr="P(X=x_i|Y=y_j)=\frac{P(X=x_i,Y=y_j)}{P(Y=y_j)}"></span></div>
-            <div><span class="text-xs text-slate-400">独立判定：</span><span class="katex-render" data-expr="P(X=x_i,Y=y_j)=P(X=x_i)P(Y=y_j),\;\forall i,j"></span></div>
+
+        <div class="formula-panel">
+          <div class="formula-toggle" onclick="toggleFormula(this)">
+            <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+          </div>
+          <div class="formula-body">
+            <div class="space-y-3">
+              <div><span class="text-xs text-slate-400">边缘分布：</span><span class="katex-render"
+                  data-expr="P(X=x_i)=\sum_j P(X=x_i,Y=y_j)"></span></div>
+              <div><span class="text-xs text-slate-400">边缘分布：</span><span class="katex-render"
+                  data-expr="P(Y=y_j)=\sum_i P(X=x_i,Y=y_j)"></span></div>
+              <div><span class="text-xs text-slate-400">条件分布：</span><span class="katex-render"
+                  data-expr="P(X=x_i|Y=y_j)=\frac{P(X=x_i,Y=y_j)}{P(Y=y_j)}"></span></div>
+              <div><span class="text-xs text-slate-400">独立判定：</span><span class="katex-render"
+                  data-expr="P(X=x_i,Y=y_j)=P(X=x_i)P(Y=y_j),\;\forall i,j"></span></div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 联合分布热力图</h3>
+        <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 联合分布热力图</h3>
 
-      <div class="flex gap-3 mb-4">
-        <button onclick="calcMarginal()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">📊 计算边缘分布</button>
-        <button onclick="resetJoint()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
-      </div>
-
-      <div class="heatmap-wrapper">
-        <div id="jointHeatmap" style="width:100%;height:400px;"></div>
-      </div>
-
-      <div class="exam-tip">
-        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
-        <span class="text-sm text-yellow-700">大题<strong>经常考由联合求边缘</strong>。注意：求X边缘和Y边缘，行内相加，列内相加，别搞反方向。</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 卡片2：二维正态3D曲面 & 等高线 ===== -->
-  <section class="max-w-5xl mx-auto px-10">
-    <div class="card">
-      <h2 class="text-lg font-bold text-slate-800 mb-3">🌐 二维正态分布 — 3D曲面与等高线</h2>
-
-      <div class="mb-4">
-        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
-        <p class="text-sm text-slate-600 leading-relaxed">
-          二维连续联合密度，可用三维曲面表示；<strong>相关系数 \(\rho\)</strong> 刻画 X 与 Y 之间的线性关联程度。
-          \(\rho > 0\) 正相关，\(\rho < 0\) 负相关，\(\rho = 0\) 不线性相关。
-        </p>
-      </div>
-
-      <div class="formula-panel">
-        <div class="formula-toggle" onclick="toggleFormula(this)">
-          <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+        <div class="flex gap-3 mb-4">
+          <button onclick="calcMarginal()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors"
+            style="background:#2563eb;">📊 计算边缘分布</button>
+          <button onclick="resetJoint()"
+            class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
+            重置</button>
         </div>
-        <div class="formula-body">
-          <div class="space-y-3">
-            <div><span class="text-xs text-slate-400">二维正态：</span><span class="katex-render" data-expr="(X,Y)\sim N(\mu_1,\mu_2,\sigma_1^2,\sigma_2^2,\rho)"></span></div>
-            <div><span class="text-xs text-slate-400">密度函数：</span><span class="katex-render" data-expr="f(x,y)=\frac{1}{2\pi\sigma_1\sigma_2\sqrt{1-\rho^2}}\exp\left[-\frac{1}{2(1-\rho^2)}\left(\frac{(x-\mu_1)^2}{\sigma_1^2}-2\rho\frac{(x-\mu_1)(y-\mu_2)}{\sigma_1\sigma_2}+\frac{(y-\mu_2)^2}{\sigma_2^2}\right)\right]"></span></div>
+
+        <div class="heatmap-wrapper">
+          <div id="jointHeatmap" style="width:100%;height:400px;"></div>
+        </div>
+
+        <div class="exam-tip">
+          <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+          <span class="text-sm text-yellow-700">大题<strong>经常考由联合求边缘</strong>。注意：求X边缘和Y边缘，行内相加，列内相加，别搞反方向。</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 卡片2：二维正态3D曲面 & 等高线 ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <div class="card">
+        <h2 class="text-lg font-bold text-slate-800 mb-3">🌐 二维正态分布 — 3D曲面与等高线</h2>
+
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            二维连续联合密度，可用三维曲面表示；<strong>相关系数 \(\rho\)</strong> 刻画 X 与 Y 之间的线性关联程度。
+            \(\rho > 0\) 正相关，\(\rho < 0\) 负相关，\(\rho=0\) 不线性相关。 </p>
+        </div>
+
+        <div class="formula-panel">
+          <div class="formula-toggle" onclick="toggleFormula(this)">
+            <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+          </div>
+          <div class="formula-body">
+            <div class="space-y-3">
+              <div><span class="text-xs text-slate-400">二维正态：</span><span class="katex-render"
+                  data-expr="(X,Y)\sim N(\mu_1,\mu_2,\sigma_1^2,\sigma_2^2,\rho)"></span></div>
+              <div><span class="text-xs text-slate-400">密度函数：</span><span class="katex-render"
+                  data-expr="f(x,y)=\frac{1}{2\pi\sigma_1\sigma_2\sqrt{1-\rho^2}}\exp\left[-\frac{1}{2(1-\rho^2)}\left(\frac{(x-\mu_1)^2}{\sigma_1^2}-2\rho\frac{(x-\mu_1)(y-\mu_2)}{\sigma_1\sigma_2}+\frac{(y-\mu_2)^2}{\sigma_2^2}\right)\right]"></span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 二维正态可视化</h3>
+        <h3 class="text-sm font-semibold text-slate-700 mt-5 mb-3">🎛️ 二维正态可视化</h3>
 
-      <div class="flex flex-wrap items-center gap-4 mb-4">
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-slate-600">ρ =</span>
-          <input type="range" id="rhoSlider" min="-0.95" max="0.95" value="0" step="0.05" oninput="updateBivarNormal()" class="slider-input w-36">
-          <input type="number" id="rhoVal" min="-0.95" max="0.95" value="0" step="0.05" oninput="syncRhoFromInput(this.value)" class="param-value-input">
+        <div class="flex flex-wrap items-center gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">ρ =</span>
+            <input type="range" id="rhoSlider" min="-0.95" max="0.95" value="0" step="0.05"
+              oninput="updateBivarNormal()" class="slider-input w-36">
+            <input type="number" id="rhoVal" min="-0.95" max="0.95" value="0" step="0.05"
+              oninput="syncRhoFromInput(this.value)" class="param-value-input">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">σ₁ =</span>
+            <input type="range" id="sigma1Slider" min="0.5" max="2.5" value="1" step="0.1" oninput="updateBivarNormal()"
+              class="slider-input w-32">
+            <input type="number" id="sigma1Val" min="0.5" max="2.5" value="1" step="0.1"
+              oninput="syncSigma1FromInput(this.value)" class="param-value-input">
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">σ₂ =</span>
+            <input type="range" id="sigma2Slider" min="0.5" max="2.5" value="1" step="0.1" oninput="updateBivarNormal()"
+              class="slider-input w-32">
+            <input type="number" id="sigma2Val" min="0.5" max="2.5" value="1" step="0.1"
+              oninput="syncSigma2FromInput(this.value)" class="param-value-input">
+          </div>
+          <button onclick="resetBivarNormal()"
+            class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
+            重置</button>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-slate-600">σ₁ =</span>
-          <input type="range" id="sigma1Slider" min="0.5" max="2.5" value="1" step="0.1" oninput="updateBivarNormal()" class="slider-input w-32">
-          <input type="number" id="sigma1Val" min="0.5" max="2.5" value="1" step="0.1" oninput="syncSigma1FromInput(this.value)" class="param-value-input">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div id="bivar3D" style="width:100%;height:380px;"></div>
+          <div id="bivarContour" style="width:100%;height:380px;"></div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-slate-600">σ₂ =</span>
-          <input type="range" id="sigma2Slider" min="0.5" max="2.5" value="1" step="0.1" oninput="updateBivarNormal()" class="slider-input w-32">
-          <input type="number" id="sigma2Val" min="0.5" max="2.5" value="1" step="0.1" oninput="syncSigma2FromInput(this.value)" class="param-value-input">
-        </div>
-        <button onclick="resetBivarNormal()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
-      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div id="bivar3D" style="width:100%;height:380px;"></div>
-        <div id="bivarContour" style="width:100%;height:380px;"></div>
-      </div>
-
-      <div class="exam-tip">
-        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
-        <span class="text-sm text-yellow-700">二维正态分布中，<strong>\(\rho = 0 \iff X, Y\) 独立</strong>。但普通分布不成立：\(\rho = 0\) 只代表不线性相关，不一定独立。</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 卡片3：二维概率积分区域 ===== -->
-  <section class="max-w-5xl mx-auto px-10">
-    <div class="card">
-      <h2 class="text-lg font-bold text-slate-800 mb-3">📐 二维概率积分区域</h2>
-
-      <div class="mb-4">
-        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
-        <p class="text-sm text-slate-600 leading-relaxed">
-          \(P\{(X,Y)\in D\}\) 是联合密度在区域 D 上的<strong>二重积分</strong>。
-          对于二维正态分布，可以通过数值积分计算矩形区域内的概率。
-        </p>
-      </div>
-
-      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 区域概率计算</h3>
-
-      <div class="flex flex-wrap items-center gap-4 mb-4">
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-slate-600">x ∈ [</span>
-          <input type="range" id="xMinSlider" min="-3" max="2" value="-1" step="0.1" oninput="updateIntegral()" class="slider-input w-28">
-          <input type="number" id="xMinVal" min="-3" max="2" value="-1" step="0.1" oninput="syncXMinFromInput(this.value)" class="param-value-input">
-          <span class="text-sm text-slate-600">,</span>
-          <input type="range" id="xMaxSlider" min="-1" max="3" value="1" step="0.1" oninput="updateIntegral()" class="slider-input w-28">
-          <input type="number" id="xMaxVal" min="-1" max="3" value="1" step="0.1" oninput="syncXMaxFromInput(this.value)" class="param-value-input">
-          <span class="text-sm text-slate-600">]</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-slate-600">y ∈ [</span>
-          <input type="range" id="yMinSlider" min="-3" max="2" value="-1" step="0.1" oninput="updateIntegral()" class="slider-input w-28">
-          <input type="number" id="yMinVal" min="-3" max="2" value="-1" step="0.1" oninput="syncYMinFromInput(this.value)" class="param-value-input">
-          <span class="text-sm text-slate-600">,</span>
-          <input type="range" id="yMaxSlider" min="-1" max="3" value="1" step="0.1" oninput="updateIntegral()" class="slider-input w-28">
-          <input type="number" id="yMaxVal" min="-1" max="3" value="1" step="0.1" oninput="syncYMaxFromInput(this.value)" class="param-value-input">
-          <span class="text-sm text-slate-600">]</span>
-        </div>
-        <button onclick="resetIntegral()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
-      </div>
-
-      <div class="text-center mb-3 text-sm">
-        <span class="text-slate-600">P{(X,Y) ∈ D} ≈ </span>
-        <strong id="integralProb" class="text-lg text-blue-600">0.4661</strong>
-      </div>
-
-      <div id="integralChart" style="width:100%;height:380px;"></div>
-
-      <div class="exam-tip">
-        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
-        <span class="text-sm text-yellow-700">考试二重积分求概率，注意<strong>积分上下限</strong>。先画图确定积分区域，再确定积分次序（先x后y或先y后x）。</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== 卡片4：二维独立判定演示 ===== -->
-  <section class="max-w-5xl mx-auto px-10">
-    <div class="card">
-      <h2 class="text-lg font-bold text-slate-800 mb-3">🔍 二维独立判定演示</h2>
-
-      <div class="mb-4">
-        <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
-        <p class="text-sm text-slate-600 leading-relaxed">
-          连续型：\(f(x,y) = f_X(x) f_Y(y)\) 对所有 (x,y) 成立则独立。<br>
-          离散型：\(P(X=x_i,Y=y_j) = P(X=x_i)P(Y=y_j)\) 对所有 i,j 成立则独立。
-        </p>
-      </div>
-
-      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 独立 vs 不独立对比</h3>
-
-      <div class="flex items-center gap-4 mb-4">
-        <div class="flex items-center gap-2">
-          <span class="text-sm text-slate-600">场景：</span>
-          <select id="indepSelect" onchange="updateIndep()" class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
-            <option value="independent">独立样本（ρ=0）</option>
-            <option value="dependent">不独立样本（ρ=0.7）</option>
-          </select>
-        </div>
-        <button onclick="updateIndep()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors" style="background:#2563eb;">▶ 生成样本</button>
-        <button onclick="resetIndep()" class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄 重置</button>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <div class="text-xs text-slate-400 mb-1 text-center">联合分布散点图</div>
-          <div id="indepScatter" style="width:100%;height:320px;"></div>
-        </div>
-        <div>
-          <div class="text-xs text-slate-400 mb-1 text-center">边缘分布对比</div>
-          <div id="indepMarginal" style="width:100%;height:320px;"></div>
+        <div class="exam-tip">
+          <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+          <span class="text-sm text-yellow-700">二维正态分布中，<strong>\(\rho = 0 \iff X, Y\) 独立</strong>。但普通分布不成立：\(\rho = 0\)
+            只代表不线性相关，不一定独立。</span>
         </div>
       </div>
+    </section>
 
-      <div class="exam-tip">
-        <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
-        <span class="text-sm text-yellow-700">独立意味着联合 = 边缘乘积。二维正态中 \(\rho=0\) 等价于独立，但<strong>一般分布不成立</strong>，这是高频易错点。</span>
-      </div>
-    </div>
-  </section>
+    <!-- ===== 卡片3：二维概率积分区域 ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <div class="card">
+        <h2 class="text-lg font-bold text-slate-800 mb-3">📐 二维概率积分区域</h2>
 
-  <!-- ===== 底部自测题 ===== -->
-  <section class="max-w-5xl mx-auto px-10 pb-10">
-    <div class="card">
-      <h2 class="text-lg font-bold text-slate-800 mb-4">📝 自测题（单选）</h2>
-
-      <div class="mb-6" id="quiz1">
-        <p class="text-sm font-semibold text-slate-700 mb-3">1. 已知联合分布 P(X=x, Y=y)，如何求 X 的边缘分布？</p>
-        <div class="space-y-2">
-          <div class="quiz-option" onclick="selectQuiz('q1', 0, this)">A. 对行求和</div>
-          <div class="quiz-option" onclick="selectQuiz('q1', 1, this)">B. 对列求和</div>
-          <div class="quiz-option" onclick="selectQuiz('q1', 2, this)">C. 取最大值</div>
-          <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">D. 取平均值</div>
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            \(P\{(X,Y)\in D\}\) 是联合密度在区域 D 上的<strong>二重积分</strong>。
+            下面可切换<strong>均匀分布</strong>（支撑域 \([-3,3]\times[-3,3]\)）与<strong>标准二维正态分布</strong>，用数值积分计算矩形区域内的概率。
+          </p>
         </div>
-        <div id="q1Feedback" class="text-sm mt-2 hidden"></div>
-      </div>
 
-      <div class="mb-6" id="quiz2">
-        <p class="text-sm font-semibold text-slate-700 mb-3">2. 二维正态分布中，\(\rho = 0\) 意味着什么？</p>
-        <div class="space-y-2">
-          <div class="quiz-option" onclick="selectQuiz('q2', 0, this)">A. X 和 Y 不独立</div>
-          <div class="quiz-option" onclick="selectQuiz('q2', 1, this)">B. X 和 Y 独立</div>
-          <div class="quiz-option" onclick="selectQuiz('q2', 2, this)">C. X 和 Y 不线性相关，但不一定独立</div>
-          <div class="quiz-option" onclick="selectQuiz('q2', 3, this)">D. 以上都不对</div>
+        <div class="formula-panel">
+          <div class="formula-toggle open" onclick="toggleFormula(this)">
+            <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
+          </div>
+          <div class="formula-body show">
+            <div class="space-y-3">
+              <div><span class="text-xs text-slate-400">区域概率：</span><span class="katex-render"
+                  data-expr="P\{(X,Y)\in D\}=\iint_D f(x,y)\,dx\,dy"></span></div>
+              <div><span class="text-xs text-slate-400">矩形区域：</span><span class="katex-render"
+                  data-expr="P\{a\le X\le b,\ c\le Y\le d\}=\int_a^b\!\int_c^d f(x,y)\,dy\,dx"></span></div>
+              <div><span class="text-xs text-slate-400">联合分布函数：</span><span class="katex-render"
+                  data-expr="F(x,y)=\int_{-\infty}^{x}\!\int_{-\infty}^{y} f(u,v)\,dv\,du"></span></div>
+              <div><span class="text-xs text-slate-400">由 F 求矩形概率：</span><span class="katex-render"
+                  data-expr="P\{x_1<X\le x_2,\;y_1<Y\le y_2\}=F(x_2,y_2)-F(x_2,y_1)+F(x_1,y_1)-F(x_1,y_2)"></span></div>
+              <div><span class="text-xs text-slate-400">均匀分布概率：</span><span class="katex-render"
+                  data-expr="P\{(X,Y)\in D\}=\frac{S_D}{36},\quad D\subseteq[-3,3]^2"></span></div>
+              <div><span class="text-xs text-slate-400">均匀分布密度：</span><span class="katex-render"
+                  data-expr="f(x,y)=\frac{1}{36},\quad -3\le x,y\le 3"></span></div>
+              <div><span class="text-xs text-slate-400">标准二维正态（ρ=0）：</span><span class="katex-render"
+                  data-expr="f(x,y)=\frac{1}{2\pi}e^{-\frac{x^2+y^2}{2}}"></span></div>
+              <div><span class="text-xs text-slate-400">归一化：</span><span class="katex-render"
+                  data-expr="\int_{-\infty}^{+\infty}\!\int_{-\infty}^{+\infty} f(x,y)\,dx\,dy=1"></span></div>
+            </div>
+          </div>
         </div>
-        <div id="q2Feedback" class="text-sm mt-2 hidden"></div>
-      </div>
 
-      <div class="mb-6" id="quiz3">
-        <p class="text-sm font-semibold text-slate-700 mb-3">3. 仅知道边缘分布能否确定联合分布？</p>
-        <div class="space-y-2">
-          <div class="quiz-option" onclick="selectQuiz('q3', 0, this)">A. 能，联合分布 = 边缘分布相乘</div>
-          <div class="quiz-option" onclick="selectQuiz('q3', 1, this)">B. 不能，除非 X 和 Y 独立</div>
-          <div class="quiz-option" onclick="selectQuiz('q3', 2, this)">C. 能，联合分布 = 边缘分布相加</div>
-          <div class="quiz-option" onclick="selectQuiz('q3', 3, this)">D. 不能，边缘分布与联合分布无关</div>
+        <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 区域概率计算</h3>
+
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">概率密度：</span>
+            <select id="densitySelect" onchange="updateIntegral()"
+              class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+              <option value="uniform" selected>均匀分布</option>
+              <option value="normal">标准二维正态分布</option>
+            </select>
+          </div>
+          <span id="densityHint" class="text-xs text-slate-400">f(x,y) = 1/36，定义在 [-3,3]×[-3,3]</span>
         </div>
-        <div id="q3Feedback" class="text-sm mt-2 hidden"></div>
+
+        <div class="flex flex-wrap items-center gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">x ∈ [</span>
+            <input type="range" id="xMinSlider" min="-3" max="2" value="-1" step="0.1" oninput="updateIntegral()"
+              class="slider-input w-28">
+            <input type="number" id="xMinVal" min="-3" max="2" value="-1" step="0.1"
+              oninput="syncXMinFromInput(this.value)" class="param-value-input">
+            <span class="text-sm text-slate-600">,</span>
+            <input type="range" id="xMaxSlider" min="-1" max="3" value="1" step="0.1" oninput="updateIntegral()"
+              class="slider-input w-28">
+            <input type="number" id="xMaxVal" min="-1" max="3" value="1" step="0.1"
+              oninput="syncXMaxFromInput(this.value)" class="param-value-input">
+            <span class="text-sm text-slate-600">]</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">y ∈ [</span>
+            <input type="range" id="yMinSlider" min="-3" max="2" value="-1" step="0.1" oninput="updateIntegral()"
+              class="slider-input w-28">
+            <input type="number" id="yMinVal" min="-3" max="2" value="-1" step="0.1"
+              oninput="syncYMinFromInput(this.value)" class="param-value-input">
+            <span class="text-sm text-slate-600">,</span>
+            <input type="range" id="yMaxSlider" min="-1" max="3" value="1" step="0.1" oninput="updateIntegral()"
+              class="slider-input w-28">
+            <input type="number" id="yMaxVal" min="-1" max="3" value="1" step="0.1"
+              oninput="syncYMaxFromInput(this.value)" class="param-value-input">
+            <span class="text-sm text-slate-600">]</span>
+          </div>
+          <button onclick="resetIntegral()"
+            class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
+            重置</button>
+        </div>
+
+        <div id="integralChart" style="width:100%;max-width:520px;margin:0 auto 10px;"></div>
+
+        <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-2">🧮 实时计算</h3>
+
+        <div class="text-center mb-3 text-sm flex flex-wrap items-center justify-center gap-1">
+          <span id="integralFormula" class="katex-render"
+            data-expr="P\{(X,Y)\in D\}=\int_{-1.0}^{1.0}\!\int_{-1.0}^{1.0} f(x,y)\,dy\,dx\approx"></span>
+          <strong id="integralProb" class="text-lg text-blue-600">0.1111</strong>
+        </div>
+
+        <div class="text-center mb-3 text-sm overflow-x-auto px-2">
+          <span class="text-xs text-slate-400">由分布函数计算：</span>
+          <span id="cdfFormula" class="katex-render"
+            data-expr="\begin{aligned}P\{x_1<X\le x_2,\;y_1<Y\le y_2\}&amp;=F(x_2,y_2)-F(x_2,y_1)+F(x_1,y_1)-F(x_1,y_2)\\&amp;=F(1.0,1.0)-F(1.0,-1.0)+F(-1.0,-1.0)-F(-1.0,1.0)\\&amp;=0.4444-0.2222+0.1111-0.2222=0.1111\end{aligned}"></span>
+        </div>
+
+        <div class="exam-tip">
+          <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+          <span class="text-sm text-yellow-700">考试二重积分求概率，注意<strong>积分上下限</strong>。先画图确定积分区域，再确定积分次序（先x后y或先y后x）。</span>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-</main>
+    <!-- ===== 卡片4：二维独立判定演示 ===== -->
+    <section class="max-w-5xl mx-auto px-10">
+      <div class="card">
+        <h2 class="text-lg font-bold text-slate-800 mb-3">🔍 二维独立判定演示</h2>
 
-<script>
-function renderAllKatex() {
-  document.querySelectorAll('.katex-render').forEach(function(el) {
-    try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
-    catch(e) { el.textContent = el.getAttribute('data-expr'); }
-  });
-}
-renderAllKatex();
+        <div class="mb-4">
+          <h3 class="text-sm font-semibold text-slate-700 mb-2">📖 知识点</h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            连续型：\(f(x,y) = f_X(x) f_Y(y)\) 对所有 (x,y) 成立则独立。<br>
+            离散型：\(P(X=x_i,Y=y_j) = P(X=x_i)P(Y=y_j)\) 对所有 i,j 成立则独立。
+          </p>
+        </div>
 
-function toggleFormula(toggle) {
-  toggle.classList.toggle('open');
-  var body = toggle.nextElementSibling;
-  body.classList.toggle('show');
-  if (body.classList.contains('show')) renderAllKatex();
-}
+        <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-3">🎛️ 独立 vs 不独立对比</h3>
 
-// ===== 卡片1：联合分布热力图 =====
-var jointChart = echarts.init(document.getElementById('jointHeatmap'));
+        <div class="flex items-center gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">场景：</span>
+            <select id="indepSelect" onchange="updateIndep()"
+              class="text-sm border border-slate-300 rounded-lg px-3 py-1.5">
+              <option value="independent">独立样本（ρ=0）</option>
+              <option value="dependent">不独立样本（ρ=0.7）</option>
+            </select>
+          </div>
+          <button onclick="updateIndep()" class="px-4 py-1.5 text-sm text-white rounded-lg transition-colors"
+            style="background:#2563eb;">▶ 生成样本</button>
+          <button onclick="resetIndep()"
+            class="px-4 py-1.5 text-sm bg-white border border-slate-300 text-slate-600 rounded-lg hover:border-blue-600 hover:text-blue-600 transition-colors">🔄
+            重置</button>
+        </div>
 
-var jointData = [
-  [0.06, 0.04, 0.02],
-  [0.10, 0.20, 0.08],
-  [0.04, 0.12, 0.14],
-  [0.02, 0.06, 0.12]
-];
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div class="text-xs text-slate-400 mb-1 text-center">联合分布散点图</div>
+            <div id="indepScatter" style="width:100%;height:320px;"></div>
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 mb-1 text-center">边缘分布对比</div>
+            <div id="indepMarginal" style="width:100%;height:320px;"></div>
+          </div>
+        </div>
 
-function calcMarginal() {
-  var xMarginal = [];
-  var yMarginal = [];
-  var rows = jointData.length, cols = jointData[0].length;
+        <div class="exam-tip">
+          <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
+          <span class="text-sm text-yellow-700">独立意味着联合 = 边缘乘积。二维正态中 \(\rho=0\)
+            等价于独立，但<strong>一般分布不成立</strong>，这是高频易错点。</span>
+        </div>
+      </div>
+    </section>
 
-  for (var i = 0; i < rows; i++) {
-    var sum = 0;
-    for (var j = 0; j < cols; j++) sum += jointData[i][j];
-    xMarginal.push(sum);
-  }
-  for (var j = 0; j < cols; j++) {
-    var sum = 0;
-    for (var i = 0; i < rows; i++) sum += jointData[i][j];
-    yMarginal.push(sum);
-  }
+    <!-- ===== 底部自测题 ===== -->
+    <section class="max-w-5xl mx-auto px-10 pb-10">
+      <div class="card">
+        <h2 class="text-lg font-bold text-slate-800 mb-4">📝 自测题（单选）</h2>
 
-  drawJointHeatmap(xMarginal, yMarginal);
-}
+        <div class="mb-6" id="quiz1">
+          <p class="text-sm font-semibold text-slate-700 mb-3">1. 已知联合分布 P(X=x, Y=y)，如何求 X 的边缘分布？</p>
+          <div class="space-y-2">
+            <div class="quiz-option" onclick="selectQuiz('q1', 0, this)">A. 对行求和</div>
+            <div class="quiz-option" onclick="selectQuiz('q1', 1, this)">B. 对列求和</div>
+            <div class="quiz-option" onclick="selectQuiz('q1', 2, this)">C. 取最大值</div>
+            <div class="quiz-option" onclick="selectQuiz('q1', 3, this)">D. 取平均值</div>
+          </div>
+          <div id="q1Feedback" class="text-sm mt-2 hidden"></div>
+        </div>
 
-function drawJointHeatmap(xMarginal, yMarginal) {
-  var xLabels = ['x₁', 'x₂', 'x₃', 'x₄'];
-  var yLabels = ['y₁', 'y₂', 'y₃'];
-  var heatData = [];
-  var maxVal = 0;
-  for (var i = 0; i < jointData.length; i++) {
-    for (var j = 0; j < jointData[0].length; j++) {
-      heatData.push([j, i, jointData[i][j]]);
-      if (jointData[i][j] > maxVal) maxVal = jointData[i][j];
+        <div class="mb-6" id="quiz2">
+          <p class="text-sm font-semibold text-slate-700 mb-3">2. 二维正态分布中，\(\rho = 0\) 意味着什么？</p>
+          <div class="space-y-2">
+            <div class="quiz-option" onclick="selectQuiz('q2', 0, this)">A. X 和 Y 不独立</div>
+            <div class="quiz-option" onclick="selectQuiz('q2', 1, this)">B. X 和 Y 独立</div>
+            <div class="quiz-option" onclick="selectQuiz('q2', 2, this)">C. X 和 Y 不线性相关，但不一定独立</div>
+            <div class="quiz-option" onclick="selectQuiz('q2', 3, this)">D. 以上都不对</div>
+          </div>
+          <div id="q2Feedback" class="text-sm mt-2 hidden"></div>
+        </div>
+
+        <div class="mb-6" id="quiz3">
+          <p class="text-sm font-semibold text-slate-700 mb-3">3. 仅知道边缘分布能否确定联合分布？</p>
+          <div class="space-y-2">
+            <div class="quiz-option" onclick="selectQuiz('q3', 0, this)">A. 能，联合分布 = 边缘分布相乘</div>
+            <div class="quiz-option" onclick="selectQuiz('q3', 1, this)">B. 不能，除非 X 和 Y 独立</div>
+            <div class="quiz-option" onclick="selectQuiz('q3', 2, this)">C. 能，联合分布 = 边缘分布相加</div>
+            <div class="quiz-option" onclick="selectQuiz('q3', 3, this)">D. 不能，边缘分布与联合分布无关</div>
+          </div>
+          <div id="q3Feedback" class="text-sm mt-2 hidden"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    function renderAllKatex() {
+      document.querySelectorAll('.katex-render').forEach(function (el) {
+        try { katex.render(el.getAttribute('data-expr'), el, { displayMode: false, throwOnError: false }); }
+        catch (e) { el.textContent = el.getAttribute('data-expr'); }
+      });
     }
-  }
-  if (xMarginal) {
-    for (var i = 0; i < xMarginal.length; i++) {
-      heatData.push([jointData[0].length, i, xMarginal[i]]);
+    renderAllKatex();
+
+    function toggleFormula(toggle) {
+      toggle.classList.toggle('open');
+      var body = toggle.nextElementSibling;
+      body.classList.toggle('show');
+      if (body.classList.contains('show')) renderAllKatex();
     }
-    yLabels.push('P (X)');
-  }
-  if (yMarginal) {
-    for (var j = 0; j < yMarginal.length; j++) {
-      heatData.push([j, jointData.length, yMarginal[j]]);
-    }
-    xLabels.push('P (Y)');
-  }
-  jointChart.setOption({
-    tooltip: {
-      formatter: function(p) {
-        return 'P (X=' + yLabels[p.data[0]] + ', Y=' + xLabels[p.data[1]] + ') = ' + p.data[2].toFixed(4);
+
+    // ===== 卡片1：联合分布热力图 =====
+    var jointChart = echarts.init(document.getElementById('jointHeatmap'));
+
+    var jointData = [
+      [0.06, 0.04, 0.02],
+      [0.10, 0.20, 0.08],
+      [0.04, 0.12, 0.14],
+      [0.02, 0.06, 0.12]
+    ];
+
+    function calcMarginal() {
+      var xMarginal = [];
+      var yMarginal = [];
+      var rows = jointData.length, cols = jointData[0].length;
+
+      for (var i = 0; i < rows; i++) {
+        var sum = 0;
+        for (var j = 0; j < cols; j++) sum += jointData[i][j];
+        xMarginal.push(sum);
       }
-    },
-    grid: { left: 60, right: 40, top: 20, bottom: 40 },
-    xAxis: { type: 'category', data: yLabels, axisLabel: { fontSize: 12 }, splitLine: { show: false } },
-    yAxis: { type: 'category', data: xLabels, axisLabel: { fontSize: 12 }, splitLine: { show: false }, inverse: true },
-    visualMap: { min: 0, max: maxVal || 0.2, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemWidth: 12, itemHeight: 100, inRange: { color: ['#eff6ff', '#2563eb'] } },
-    series: [{
-      type: 'heatmap', data: heatData,
-      label: { show: true, fontSize: 11, formatter: function(p) { return p.data[2].toFixed(3); } },
-      emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.3)' } }
-    }]
-  });
-}
-function resetJoint() {
-  jointData = [
-    [0.06, 0.04, 0.02],
-    [0.10, 0.20, 0.08],
-    [0.04, 0.12, 0.14],
-    [0.02, 0.06, 0.12]
-  ];
-  drawJointHeatmap(null, null);
-}
-drawJointHeatmap(null, null);
-
-// ===== 卡片2：二维正态 =====
-function bivarNormalPDF(x, y, rho, s1, s2) {
-  var z = (x*x)/(s1*s1) - 2*rho*x*y/(s1*s2) + (y*y)/(s2*s2);
-  return Math.exp(-z/(2*(1-rho*rho))) / (2*Math.PI*s1*s2*Math.sqrt(1-rho*rho));
-}
-
-function clamp(val, min, max) {
-  return Math.min(Math.max(parseFloat(val), parseFloat(min)), parseFloat(max));
-}
-function decimalsOf(step) {
-  var s = String(step);
-  return s.indexOf('.') >= 0 ? s.split('.')[1].length : 0;
-}
-
-// 标记当前正在输入的数值框，避免更新时回写打断用户输入
-var activeValueInputId = null;
-
-function syncValueInput(inputId, sliderId, updateFn, value) {
-  if (value === '') return;
-  var slider = document.getElementById(sliderId);
-  var num = parseFloat(value);
-  if (isNaN(num)) return;
-  var clamped = clamp(num, slider.min, slider.max);
-  slider.value = clamped;
-  activeValueInputId = inputId;
-  updateFn();
-  activeValueInputId = null;
-  // 仅当输入值超出范围被限制时，才回写规范化后的值
-  if (clamped !== num) {
-    document.getElementById(inputId).value = clamped.toFixed(decimalsOf(slider.step));
-  }
-}
-
-function syncRhoFromInput(value) { syncValueInput('rhoVal', 'rhoSlider', updateBivarNormal, value); }
-function syncSigma1FromInput(value) { syncValueInput('sigma1Val', 'sigma1Slider', updateBivarNormal, value); }
-function syncSigma2FromInput(value) { syncValueInput('sigma2Val', 'sigma2Slider', updateBivarNormal, value); }
-function syncXMinFromInput(value) { syncValueInput('xMinVal', 'xMinSlider', updateIntegral, value); }
-function syncXMaxFromInput(value) { syncValueInput('xMaxVal', 'xMaxSlider', updateIntegral, value); }
-function syncYMinFromInput(value) { syncValueInput('yMinVal', 'yMinSlider', updateIntegral, value); }
-function syncYMaxFromInput(value) { syncValueInput('yMaxVal', 'yMaxSlider', updateIntegral, value); }
-
-function updateBivarNormal() {
-  var rho = parseFloat(document.getElementById('rhoSlider').value);
-  var s1 = parseFloat(document.getElementById('sigma1Slider').value);
-  var s2 = parseFloat(document.getElementById('sigma2Slider').value);
-
-  if (activeValueInputId !== 'rhoVal') document.getElementById('rhoVal').value = rho.toFixed(2);
-  if (activeValueInputId !== 'sigma1Val') document.getElementById('sigma1Val').value = s1.toFixed(1);
-  if (activeValueInputId !== 'sigma2Val') document.getElementById('sigma2Val').value = s2.toFixed(1);
-
-  var N = 50;
-  var xs = [], ys = [], zs = [];
-  for (var i = 0; i < N; i++) {
-    xs.push(-3 + i*6/(N-1));
-    ys.push(-3 + i*6/(N-1));
-  }
-  var zData = [];
-  for (var i = 0; i < N; i++) {
-    var row = [];
-    for (var j = 0; j < N; j++) {
-      row.push(bivarNormalPDF(xs[i], ys[j], rho, s1, s2));
-    }
-    zData.push(row);
-  }
-
-  var surfaceData = {
-    type: 'surface',
-    x: xs, y: ys, z: zData,
-    colorscale: 'Blues',
-    showscale: false,
-    contours: { z: { show: true, usecolormap: true, project: { z: true } } }
-  };
-
-  var layout3D = {
-    margin: { l: 0, r: 0, t: 10, b: 10 },
-    scene: { xaxis: { title: 'X' }, yaxis: { title: 'Y' }, zaxis: { title: 'f(x,y)' } },
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)'
-  };
-
-  Plotly.newPlot('bivar3D', [surfaceData], layout3D, { displayModeBar: false });
-
-  var contourData = {
-    type: 'contour',
-    x: xs, y: ys, z: zData,
-    colorscale: 'Blues',
-    contours: { coloring: 'heatmap' },
-    ncontours: 15
-  };
-
-  var layoutContour = {
-    margin: { l: 50, r: 20, t: 10, b: 40 },
-    xaxis: { title: 'X' },
-    yaxis: { title: 'Y' },
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)'
-  };
-
-  Plotly.newPlot('bivarContour', [contourData], layoutContour, { displayModeBar: false });
-}
-
-function resetBivarNormal() {
-  document.getElementById('rhoSlider').value = 0;
-  document.getElementById('sigma1Slider').value = 1;
-  document.getElementById('sigma2Slider').value = 1;
-  updateBivarNormal();
-}
-updateBivarNormal();
-
-// ===== 卡片3：积分区域 =====
-var integralChart = echarts.init(document.getElementById('integralChart'));
-
-function updateIntegral() {
-  var xMin = parseFloat(document.getElementById('xMinSlider').value);
-  var xMax = parseFloat(document.getElementById('xMaxSlider').value);
-  var yMin = parseFloat(document.getElementById('yMinSlider').value);
-  var yMax = parseFloat(document.getElementById('yMaxSlider').value);
-
-  if (activeValueInputId !== 'xMinVal') document.getElementById('xMinVal').value = xMin.toFixed(1);
-  if (activeValueInputId !== 'xMaxVal') document.getElementById('xMaxVal').value = xMax.toFixed(1);
-  if (activeValueInputId !== 'yMinVal') document.getElementById('yMinVal').value = yMin.toFixed(1);
-  if (activeValueInputId !== 'yMaxVal') document.getElementById('yMaxVal').value = yMax.toFixed(1);
-
-  // 数值积分计算概率
-  var steps = 80;
-  var prob = 0;
-  var dx = (xMax - xMin) / steps;
-  var dy = (yMax - yMin) / steps;
-  for (var i = 0; i < steps; i++) {
-    for (var j = 0; j < steps; j++) {
-      var x = xMin + (i+0.5)*dx;
-      var y = yMin + (j+0.5)*dy;
-      prob += bivarNormalPDF(x, y, 0, 1, 1) * dx * dy;
-    }
-  }
-  document.getElementById('integralProb').textContent = prob.toFixed(4);
-
-  // 等高线图 + 矩形区域
-  var N = 60;
-  var xs = [], ys = [];
-  for (var i = 0; i < N; i++) { xs.push(-3 + i*6/(N-1)); ys.push(-3 + i*6/(N-1)); }
-  var contourData = [];
-  for (var i = 0; i < N; i++) {
-    for (var j = 0; j < N; j++) {
-      contourData.push([xs[i], ys[j], bivarNormalPDF(xs[i], ys[j], 0, 1, 1)]);
-    }
-  }
-
-  integralChart.setOption({
-    tooltip: { trigger: 'item' },
-    grid: { left: 50, right: 20, top: 20, bottom: 40 },
-    xAxis: { type: 'value', name: 'X', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    yAxis: { type: 'value', name: 'Y', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    series: [{
-      type: 'scatter', data: contourData, symbolSize: 4,
-      itemStyle: { color: 'rgba(37,99,235,0.15)' }
-    }, {
-      type: 'scatter',
-      data: [[xMin, yMin], [xMax, yMin], [xMax, yMax], [xMin, yMax], [xMin, yMin]],
-      symbolSize: 0,
-      lineStyle: { color: '#ef4444', width: 2, type: 'dashed' }
-    }]
-  });
-
-  // 用markArea标记矩形
-  integralChart.setOption({
-    series: [{}, {
-      markArea: {
-        silent: true,
-        itemStyle: { color: 'rgba(239,68,68,0.2)' },
-        data: [[{xAxis: xMin, yAxis: yMin}, {xAxis: xMax, yAxis: yMax}]]
+      for (var j = 0; j < cols; j++) {
+        var sum = 0;
+        for (var i = 0; i < rows; i++) sum += jointData[i][j];
+        yMarginal.push(sum);
       }
-    }]
-  });
-}
 
-function resetIntegral() {
-  document.getElementById('xMinSlider').value = -1;
-  document.getElementById('xMaxSlider').value = 1;
-  document.getElementById('yMinSlider').value = -1;
-  document.getElementById('yMaxSlider').value = 1;
-  updateIntegral();
-}
-updateIntegral();
-
-// ===== 卡片4：独立判定 =====
-var indepScatter = echarts.init(document.getElementById('indepScatter'));
-var indepMarginal = echarts.init(document.getElementById('indepMarginal'));
-
-function generateBivarSamples(N, rho) {
-  var xs = [], ys = [];
-  for (var i = 0; i < N; i++) {
-    var z1 = boxMuller(), z2 = boxMuller();
-    var x = z1;
-    var y = rho * z1 + Math.sqrt(1 - rho*rho) * z2;
-    xs.push(x); ys.push(y);
-  }
-  return { xs: xs, ys: ys };
-}
-
-function boxMuller() {
-  var u1 = Math.random(), u2 = Math.random();
-  return Math.sqrt(-2*Math.log(u1)) * Math.cos(2*Math.PI*u2);
-}
-
-function updateIndep() {
-  var mode = document.getElementById('indepSelect').value;
-  var rho = mode === 'independent' ? 0 : 0.7;
-  var samples = generateBivarSamples(300, rho);
-
-  indepScatter.setOption({
-    tooltip: { trigger: 'item' },
-    grid: { left: 50, right: 20, top: 20, bottom: 35 },
-    xAxis: { type: 'value', name: 'X', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    yAxis: { type: 'value', name: 'Y', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    series: [{
-      type: 'scatter', data: samples.xs.map(function(x, i) { return [x, samples.ys[i]]; }),
-      symbolSize: 5,
-      itemStyle: { color: 'rgba(37,99,235,0.4)' }
-    }]
-  });
-
-  // 边缘分布直方图
-  function histogram(data, bins) {
-    var min = Math.min.apply(null, data), max = Math.max.apply(null, data);
-    var binW = (max - min) / bins;
-    var counts = new Array(bins).fill(0);
-    for (var i = 0; i < data.length; i++) {
-      var idx = Math.min(Math.floor((data[i] - min) / binW), bins - 1);
-      counts[idx]++;
+      drawJointHeatmap(xMarginal, yMarginal);
     }
-    var result = [];
-    for (var i = 0; i < bins; i++) {
-      result.push({ value: counts[i]/data.length/binW, itemStyle: { color: '#2563eb', borderRadius: [0,0,0,0] } });
+
+    function drawJointHeatmap(xMarginal, yMarginal) {
+      var xLabels = ['x₁', 'x₂', 'x₃', 'x₄'];
+      var yLabels = ['y₁', 'y₂', 'y₃'];
+      var heatData = [];
+      var maxVal = 0;
+      for (var i = 0; i < jointData.length; i++) {
+        for (var j = 0; j < jointData[0].length; j++) {
+          heatData.push([j, i, jointData[i][j]]);
+          if (jointData[i][j] > maxVal) maxVal = jointData[i][j];
+        }
+      }
+      if (xMarginal) {
+        for (var i = 0; i < xMarginal.length; i++) {
+          heatData.push([jointData[0].length, i, xMarginal[i]]);
+        }
+        yLabels.push('P (X)');
+      }
+      if (yMarginal) {
+        for (var j = 0; j < yMarginal.length; j++) {
+          heatData.push([j, jointData.length, yMarginal[j]]);
+        }
+        xLabels.push('P (Y)');
+      }
+      jointChart.setOption({
+        tooltip: {
+          formatter: function (p) {
+            return 'P (X=' + yLabels[p.data[0]] + ', Y=' + xLabels[p.data[1]] + ') = ' + p.data[2].toFixed(4);
+          }
+        },
+        grid: { left: 60, right: 40, top: 20, bottom: 40 },
+        xAxis: { type: 'category', data: yLabels, axisLabel: { fontSize: 12 }, splitLine: { show: false } },
+        yAxis: { type: 'category', data: xLabels, axisLabel: { fontSize: 12 }, splitLine: { show: false }, inverse: true },
+        visualMap: { min: 0, max: maxVal || 0.2, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemWidth: 12, itemHeight: 100, inRange: { color: ['#eff6ff', '#2563eb'] } },
+        series: [{
+          type: 'heatmap', data: heatData,
+          label: { show: true, fontSize: 11, formatter: function (p) { return p.data[2].toFixed(3); } },
+          emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.3)' } }
+        }]
+      });
     }
-    return { data: result, min: min, max: max, binW: binW };
-  }
+    function resetJoint() {
+      jointData = [
+        [0.06, 0.04, 0.02],
+        [0.10, 0.20, 0.08],
+        [0.04, 0.12, 0.14],
+        [0.02, 0.06, 0.12]
+      ];
+      drawJointHeatmap(null, null);
+    }
+    drawJointHeatmap(null, null);
 
-  var hx = histogram(samples.xs, 30);
-  var hy = histogram(samples.ys, 30);
+    // ===== 卡片2：二维正态 =====
+    function bivarNormalPDF(x, y, rho, s1, s2) {
+      var z = (x * x) / (s1 * s1) - 2 * rho * x * y / (s1 * s2) + (y * y) / (s2 * s2);
+      return Math.exp(-z / (2 * (1 - rho * rho))) / (2 * Math.PI * s1 * s2 * Math.sqrt(1 - rho * rho));
+    }
 
-  var xCats = [];
-  for (var i = 0; i < 30; i++) xCats.push((hx.min + i*hx.binW).toFixed(1));
+    function clamp(val, min, max) {
+      return Math.min(Math.max(parseFloat(val), parseFloat(min)), parseFloat(max));
+    }
+    function decimalsOf(step) {
+      var s = String(step);
+      return s.indexOf('.') >= 0 ? s.split('.')[1].length : 0;
+    }
 
-  indepMarginal.setOption({
-    tooltip: { trigger: 'axis' },
-    legend: { data: ['X边缘（直方图）', 'Y边缘（直方图）', 'X正态理论', 'Y正态理论'], bottom: 0, textStyle: { fontSize: 10 } },
-    grid: { left: 50, right: 20, top: 20, bottom: 40 },
-    xAxis: { type: 'category', data: xCats, axisLabel: { fontSize: 9, interval: 4 }, splitLine: { show: false } },
-    yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
-    series: [
-      { name: 'X边缘（直方图）', type: 'bar', data: hx.data, barWidth: '80%', barGap: '10%' },
-      { name: 'Y边缘（直方图）', type: 'bar', data: hy.data, barWidth: '80%', itemStyle: { color: '#93c5fd' } }
-    ]
-  });
-}
+    // 标记当前正在输入的数值框，避免更新时回写打断用户输入
+    var activeValueInputId = null;
 
-function resetIndep() {
-  document.getElementById('indepSelect').value = 'independent';
-  updateIndep();
-}
-updateIndep();
+    function syncValueInput(inputId, sliderId, updateFn, value) {
+      if (value === '') return;
+      var slider = document.getElementById(sliderId);
+      var num = parseFloat(value);
+      if (isNaN(num)) return;
+      var clamped = clamp(num, slider.min, slider.max);
+      slider.value = clamped;
+      activeValueInputId = inputId;
+      updateFn();
+      activeValueInputId = null;
+      // 仅当输入值超出范围被限制时，才回写规范化后的值
+      if (clamped !== num) {
+        document.getElementById(inputId).value = clamped.toFixed(decimalsOf(slider.step));
+      }
+    }
 
-// ===== 自测题 =====
-var quizAnswers = { q1: 1, q2: 1, q3: 1 };
-var quizFeedback = {
-  q1: { correct: '正确！求 X 的边缘分布需要对列求和（对 Y 的所有取值求和）。', wrong: '错误。求 X 的边缘分布需要<strong>对列求和</strong>（即对 Y 的所有取值求和），正确答案是 B。' },
-  q2: { correct: '正确！在二维正态分布中，ρ=0 等价于 X 和 Y 独立。这是二维正态的特殊性质。', wrong: '错误。二维正态分布有一个特殊性质：ρ=0 等价于 X 和 Y 独立。正确答案是 B。' },
-  q3: { correct: '正确！仅知道边缘分布不能确定联合分布，除非 X 和 Y 相互独立。', wrong: '错误。仅知道边缘分布不能确定联合分布，除非 X 和 Y 独立时联合 = 边缘乘积。正确答案是 B。' }
-};
+    function syncRhoFromInput(value) { syncValueInput('rhoVal', 'rhoSlider', updateBivarNormal, value); }
+    function syncSigma1FromInput(value) { syncValueInput('sigma1Val', 'sigma1Slider', updateBivarNormal, value); }
+    function syncSigma2FromInput(value) { syncValueInput('sigma2Val', 'sigma2Slider', updateBivarNormal, value); }
+    function syncXMinFromInput(value) { syncValueInput('xMinVal', 'xMinSlider', updateIntegral, value); }
+    function syncXMaxFromInput(value) { syncValueInput('xMaxVal', 'xMaxSlider', updateIntegral, value); }
+    function syncYMinFromInput(value) { syncValueInput('yMinVal', 'yMinSlider', updateIntegral, value); }
+    function syncYMaxFromInput(value) { syncValueInput('yMaxVal', 'yMaxSlider', updateIntegral, value); }
 
-function selectQuiz(qid, choice, el) {
-  var container = document.getElementById('quiz' + qid.slice(1));
-  var allOptions = container.querySelectorAll('.quiz-option');
-  var feedback = document.getElementById(qid + 'Feedback');
-  var correctAnswer = quizAnswers[qid];
+    function updateBivarNormal() {
+      var rho = parseFloat(document.getElementById('rhoSlider').value);
+      var s1 = parseFloat(document.getElementById('sigma1Slider').value);
+      var s2 = parseFloat(document.getElementById('sigma2Slider').value);
 
-  allOptions.forEach(function(opt) { opt.classList.remove('selected', 'correct', 'wrong'); });
-  el.classList.add('selected');
+      if (activeValueInputId !== 'rhoVal') document.getElementById('rhoVal').value = rho.toFixed(2);
+      if (activeValueInputId !== 'sigma1Val') document.getElementById('sigma1Val').value = s1.toFixed(1);
+      if (activeValueInputId !== 'sigma2Val') document.getElementById('sigma2Val').value = s2.toFixed(1);
 
-  if (choice === correctAnswer) {
-    el.classList.add('correct');
-    feedback.className = 'text-sm mt-2 text-green-600';
-    feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
-  } else {
-    el.classList.add('wrong');
-    allOptions[correctAnswer].classList.add('correct');
-    feedback.className = 'text-sm mt-2 text-red-600';
-    feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
-  }
-  feedback.classList.remove('hidden');
-  renderAllKatex();
-}
+      var N = 50;
+      var xs = [], ys = [], zs = [];
+      for (var i = 0; i < N; i++) {
+        xs.push(-3 + i * 6 / (N - 1));
+        ys.push(-3 + i * 6 / (N - 1));
+      }
+      var zData = [];
+      for (var i = 0; i < N; i++) {
+        var row = [];
+        for (var j = 0; j < N; j++) {
+          row.push(bivarNormalPDF(xs[i], ys[j], rho, s1, s2));
+        }
+        zData.push(row);
+      }
 
-window.addEventListener('resize', function() {
-  jointChart.resize();
-  integralChart.resize();
-  indepScatter.resize();
-  indepMarginal.resize();
-});
-</script>
+      var surfaceData = {
+        type: 'surface',
+        x: xs, y: ys, z: zData,
+        colorscale: 'Blues',
+        showscale: false,
+        contours: { z: { show: true, usecolormap: true, project: { z: true } } }
+      };
 
-<script src="js/coze-widget.js"></script>
+      var layout3D = {
+        margin: { l: 0, r: 0, t: 10, b: 10 },
+        scene: { xaxis: { title: 'X' }, yaxis: { title: 'Y' }, zaxis: { title: 'f(x,y)' } },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)'
+      };
+
+      Plotly.newPlot('bivar3D', [surfaceData], layout3D, { displayModeBar: false });
+
+      var contourData = {
+        type: 'contour',
+        x: xs, y: ys, z: zData,
+        colorscale: 'Blues',
+        contours: { coloring: 'heatmap' },
+        ncontours: 15
+      };
+
+      var layoutContour = {
+        margin: { l: 50, r: 20, t: 10, b: 40 },
+        xaxis: { title: 'X' },
+        yaxis: { title: 'Y' },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)'
+      };
+
+      Plotly.newPlot('bivarContour', [contourData], layoutContour, { displayModeBar: false });
+    }
+
+    function resetBivarNormal() {
+      document.getElementById('rhoSlider').value = 0;
+      document.getElementById('sigma1Slider').value = 1;
+      document.getElementById('sigma2Slider').value = 1;
+      updateBivarNormal();
+    }
+    updateBivarNormal();
+
+    // ===== 卡片3：积分区域 =====
+    // 上下各多留 40px 放角点标签；配合 grid 边距，绘图区仍是正方形（横竖单元格等大）
+    var integralEl = document.getElementById('integralChart');
+    function sizeIntegralChart() {
+      var w = integralEl.clientWidth || 520;
+      integralEl.style.height = (w + 80) + 'px';
+    }
+    sizeIntegralChart();
+    var integralChart = echarts.init(integralEl);
+
+    // 演示用概率密度：均匀分布定义在 [-3,3]×[-3,3]，面积为 36
+    function uniformPDF(x, y) {
+      return (x >= -3 && x <= 3 && y >= -3 && y <= 3) ? 1 / 36 : 0;
+    }
+    function integralPDF(x, y, mode) {
+      return mode === 'normal' ? bivarNormalPDF(x, y, 0, 1, 1) : uniformPDF(x, y);
+    }
+    // 标准正态 CDF（Abramowitz-Stegun 近似）
+    function normCDF(z) {
+      var t = 1 / (1 + 0.2316419 * Math.abs(z));
+      var d = 0.3989422804014327 * Math.exp(-z * z / 2);
+      var p = d * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+      return z > 0 ? 1 - p : p;
+    }
+    // 联合分布函数 F(x,y)：均匀时为两个边缘均匀 CDF 之积，ρ=0 正态时为 Φ(x)Φ(y)
+    function integralCDF(x, y, mode) {
+      if (mode === 'normal') return normCDF(x) * normCDF(y);
+      var cx = Math.min(3, Math.max(-3, x));
+      var cy = Math.min(3, Math.max(-3, y));
+      return ((cx + 3) / 6) * ((cy + 3) / 6);
+    }
+    function currentDensityMode() {
+      var sel = document.getElementById('densitySelect');
+      return sel ? sel.value : 'uniform';
+    }
+
+    function updateIntegral() {
+      var xMin = parseFloat(document.getElementById('xMinSlider').value);
+      var xMax = parseFloat(document.getElementById('xMaxSlider').value);
+      var yMin = parseFloat(document.getElementById('yMinSlider').value);
+      var yMax = parseFloat(document.getElementById('yMaxSlider').value);
+
+      if (activeValueInputId !== 'xMinVal') document.getElementById('xMinVal').value = xMin.toFixed(1);
+      if (activeValueInputId !== 'xMaxVal') document.getElementById('xMaxVal').value = xMax.toFixed(1);
+      if (activeValueInputId !== 'yMinVal') document.getElementById('yMinVal').value = yMin.toFixed(1);
+      if (activeValueInputId !== 'yMaxVal') document.getElementById('yMaxVal').value = yMax.toFixed(1);
+
+      var mode = currentDensityMode();
+      var isUniform = mode !== 'normal';
+      var hint = document.getElementById('densityHint');
+      if (hint) hint.textContent = isUniform
+        ? 'f(x,y) = 1/36 为常数（角点 f 恒为 0.0278，随区域变化的是 F）；区域概率 = 矩形面积 / 36'
+        : 'f(x,y) = (1/2π)·exp(−(x²+y²)/2)，ρ = 0';
+
+      // 数值积分计算概率
+      var steps = 80;
+      var prob = 0;
+      var dx = (xMax - xMin) / steps;
+      var dy = (yMax - yMin) / steps;
+      for (var i = 0; i < steps; i++) {
+        for (var j = 0; j < steps; j++) {
+          var x = xMin + (i + 0.5) * dx;
+          var y = yMin + (j + 0.5) * dy;
+          prob += integralPDF(x, y, mode) * dx * dy;
+        }
+      }
+      document.getElementById('integralProb').textContent = prob.toFixed(4);
+
+      // 随滑块实时更新积分公式的上下限
+      var expr = 'P\\{(X,Y)\\in D\\}=\\int_{' + xMin.toFixed(1) + '}^{' + xMax.toFixed(1) +
+        '}\\!\\int_{' + yMin.toFixed(1) + '}^{' + yMax.toFixed(1) + '} f(x,y)\\,dy\\,dx\\approx';
+      var formulaEl = document.getElementById('integralFormula');
+      formulaEl.setAttribute('data-expr', expr);
+      try {
+        katex.render(expr, formulaEl, { displayMode: false, throwOnError: false });
+      } catch (e) {
+        formulaEl.textContent = expr;
+      }
+
+      // 由联合分布函数 F 计算矩形概率：F(x2,y2)-F(x2,y1)+F(x1,y1)-F(x1,y2)
+      var F22 = integralCDF(xMax, yMax, mode);
+      var F21 = integralCDF(xMax, yMin, mode);
+      var F11 = integralCDF(xMin, yMin, mode);
+      var F12 = integralCDF(xMin, yMax, mode);
+      var cdfProb = Math.max(0, Math.min(1, F22 - F21 + F11 - F12));
+      var fmt1 = function (v) { return v.toFixed(1); };
+      var fmt4 = function (v) { return v.toFixed(4); };
+      var cdfExpr = '\\begin{aligned}'
+        + 'P\\{x_1<X\\le x_2,\\;y_1<Y\\le y_2\\}&=F(x_2,y_2)-F(x_2,y_1)+F(x_1,y_1)-F(x_1,y_2)\\\\'
+        + '&=F(' + fmt1(xMax) + ',' + fmt1(yMax) + ')-F(' + fmt1(xMax) + ',' + fmt1(yMin)
+        + ')+F(' + fmt1(xMin) + ',' + fmt1(yMin) + ')-F(' + fmt1(xMin) + ',' + fmt1(yMax) + ')\\\\'
+        + '&=' + fmt4(F22) + '-' + fmt4(F21) + '+' + fmt4(F11) + '-' + fmt4(F12) + '=' + fmt4(cdfProb)
+        + '\\end{aligned}';
+      var cdfEl = document.getElementById('cdfFormula');
+      cdfEl.setAttribute('data-expr', cdfExpr);
+      try {
+        katex.render(cdfExpr, cdfEl, { displayMode: false, throwOnError: false });
+      } catch (e) {
+        cdfEl.textContent = cdfExpr;
+      }
+
+      // 密度取值散点：只放在整数坐标 -3,-2,-1,0,1,2,3 上，且全部淡化
+      var gridVals = [-3, -2, -1, 0, 1, 2, 3];
+      var contourData = [];
+      for (var i = 0; i < gridVals.length; i++) {
+        for (var j = 0; j < gridVals.length; j++) {
+          contourData.push([gridVals[i], gridVals[j], integralPDF(gridVals[i], gridVals[j], mode)]);
+        }
+      }
+      var maxDensity = isUniform ? 1 / 36 : bivarNormalPDF(0, 0, 0, 1, 1);
+
+      // 四个边角点：每次都重新计算 x、y、f(x,y)、F(x,y)，标签用字面量文本保证实时刷新
+      // 标签朝矩形外侧摆放：上边角向上、下边角向下，上下两组不会重叠
+      var cornerSpec = [
+        { x: xMin, y: yMin, F: F11, pos: 'bottom' },
+        { x: xMax, y: yMin, F: F21, pos: 'bottom' },
+        { x: xMax, y: yMax, F: F22, pos: 'top' },
+        { x: xMin, y: yMax, F: F12, pos: 'top' }
+      ];
+      var cornerData = cornerSpec.map(function (c) {
+        var f = integralPDF(c.x, c.y, mode);
+        var txt = '(' + c.x.toFixed(1) + ', ' + c.y.toFixed(1) + ')\nf = ' + f.toFixed(4) +
+          '\nF = ' + c.F.toFixed(4);
+        var inward = c.x < (xMin + xMax) / 2 ? 20 : -20;
+        return {
+          value: [c.x, c.y, f, c.F],
+          label: {
+            show: true, position: c.pos, formatter: txt, distance: 6, offset: [inward, 0],
+            fontSize: 10, color: '#1d4ed8', lineHeight: 13,
+            backgroundColor: 'rgba(255,255,255,0.9)', padding: [2, 4], borderRadius: 3
+          },
+          tooltip: {
+            formatter: 'x = ' + c.x.toFixed(1) + '<br>y = ' + c.y.toFixed(1) +
+              '<br>f(x,y) = ' + f.toFixed(4) + '<br>F(x,y) = ' + c.F.toFixed(4)
+          }
+        };
+      });
+
+      integralChart.setOption({
+        title: {
+          text: isUniform ? '均匀分布密度（常数 1/36）' : '标准二维正态密度（ρ = 0）',
+          left: 'center', top: 0,
+          textStyle: { fontSize: 12, fontWeight: 'normal', color: '#64748b' }
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: function (p) {
+            if (!p.value) return '';
+            var txt = 'x = ' + p.value[0].toFixed(1) + '<br>y = ' + p.value[1].toFixed(1);
+            if (p.value.length >= 3) txt += '<br>f(x,y) = ' + p.value[2].toFixed(4);
+            if (p.value.length >= 4) txt += '<br>F(x,y) = ' + p.value[3].toFixed(4);
+            return txt;
+          }
+        },
+        grid: { left: 50, right: 20, top: 70, bottom: 80 },
+        xAxis: { type: 'value', min: -3, max: 3, interval: 1, name: 'X', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+        yAxis: { type: 'value', min: -3, max: 3, interval: 1, name: 'Y', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+        series: [{
+          type: 'scatter', data: contourData,
+          symbolSize: isUniform ? 6 : function (v) { return 3 + 8 * v[2] / maxDensity; },
+          itemStyle: { color: '#c7d9f5', opacity: 0.3 }
+        }, {
+          type: 'scatter', z: 5, clip: false, data: cornerData,
+          symbolSize: 9,
+          itemStyle: { color: '#1d4ed8', borderColor: '#fff', borderWidth: 1 },
+          markArea: {
+            silent: true,
+            itemStyle: { color: 'rgba(239,68,68,0.2)' },
+            data: [[{ xAxis: xMin, yAxis: yMin }, { xAxis: xMax, yAxis: yMax }]]
+          }
+        }]
+      }, { notMerge: true });
+    }
+
+    function resetIntegral() {
+      document.getElementById('densitySelect').value = 'uniform';
+      document.getElementById('xMinSlider').value = -1;
+      document.getElementById('xMaxSlider').value = 1;
+      document.getElementById('yMinSlider').value = -1;
+      document.getElementById('yMaxSlider').value = 1;
+      updateIntegral();
+    }
+    updateIntegral();
+
+    // ===== 卡片4：独立判定 =====
+    var indepScatter = echarts.init(document.getElementById('indepScatter'));
+    var indepMarginal = echarts.init(document.getElementById('indepMarginal'));
+
+    function generateBivarSamples(N, rho) {
+      var xs = [], ys = [];
+      for (var i = 0; i < N; i++) {
+        var z1 = boxMuller(), z2 = boxMuller();
+        var x = z1;
+        var y = rho * z1 + Math.sqrt(1 - rho * rho) * z2;
+        xs.push(x); ys.push(y);
+      }
+      return { xs: xs, ys: ys };
+    }
+
+    function boxMuller() {
+      var u1 = Math.random(), u2 = Math.random();
+      return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    }
+
+    function updateIndep() {
+      var mode = document.getElementById('indepSelect').value;
+      var rho = mode === 'independent' ? 0 : 0.7;
+      var samples = generateBivarSamples(300, rho);
+
+      indepScatter.setOption({
+        tooltip: { trigger: 'item' },
+        grid: { left: 50, right: 20, top: 20, bottom: 35 },
+        xAxis: { type: 'value', name: 'X', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+        yAxis: { type: 'value', name: 'Y', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+        series: [{
+          type: 'scatter', data: samples.xs.map(function (x, i) { return [x, samples.ys[i]]; }),
+          symbolSize: 5,
+          itemStyle: { color: 'rgba(37,99,235,0.4)' }
+        }]
+      });
+
+      // 边缘分布直方图
+      function histogram(data, bins) {
+        var min = Math.min.apply(null, data), max = Math.max.apply(null, data);
+        var binW = (max - min) / bins;
+        var counts = new Array(bins).fill(0);
+        for (var i = 0; i < data.length; i++) {
+          var idx = Math.min(Math.floor((data[i] - min) / binW), bins - 1);
+          counts[idx]++;
+        }
+        var result = [];
+        for (var i = 0; i < bins; i++) {
+          result.push({ value: counts[i] / data.length / binW, itemStyle: { color: '#2563eb', borderRadius: [0, 0, 0, 0] } });
+        }
+        return { data: result, min: min, max: max, binW: binW };
+      }
+
+      var hx = histogram(samples.xs, 30);
+      var hy = histogram(samples.ys, 30);
+
+      var xCats = [];
+      for (var i = 0; i < 30; i++) xCats.push((hx.min + i * hx.binW).toFixed(1));
+
+      indepMarginal.setOption({
+        tooltip: { trigger: 'axis' },
+        legend: { data: ['X边缘（直方图）', 'Y边缘（直方图）', 'X正态理论', 'Y正态理论'], bottom: 0, textStyle: { fontSize: 10 } },
+        grid: { left: 50, right: 20, top: 20, bottom: 40 },
+        xAxis: { type: 'category', data: xCats, axisLabel: { fontSize: 9, interval: 4 }, splitLine: { show: false } },
+        yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#f1f5f9' } } },
+        series: [
+          { name: 'X边缘（直方图）', type: 'bar', data: hx.data, barWidth: '80%', barGap: '10%' },
+          { name: 'Y边缘（直方图）', type: 'bar', data: hy.data, barWidth: '80%', itemStyle: { color: '#93c5fd' } }
+        ]
+      });
+    }
+
+    function resetIndep() {
+      document.getElementById('indepSelect').value = 'independent';
+      updateIndep();
+    }
+    updateIndep();
+
+    // ===== 自测题 =====
+    var quizAnswers = { q1: 1, q2: 1, q3: 1 };
+    var quizFeedback = {
+      q1: { correct: '正确！求 X 的边缘分布需要对列求和（对 Y 的所有取值求和）。', wrong: '错误。求 X 的边缘分布需要<strong>对列求和</strong>（即对 Y 的所有取值求和），正确答案是 B。' },
+      q2: { correct: '正确！在二维正态分布中，ρ=0 等价于 X 和 Y 独立。这是二维正态的特殊性质。', wrong: '错误。二维正态分布有一个特殊性质：ρ=0 等价于 X 和 Y 独立。正确答案是 B。' },
+      q3: { correct: '正确！仅知道边缘分布不能确定联合分布，除非 X 和 Y 相互独立。', wrong: '错误。仅知道边缘分布不能确定联合分布，除非 X 和 Y 独立时联合 = 边缘乘积。正确答案是 B。' }
+    };
+
+    function selectQuiz(qid, choice, el) {
+      var container = document.getElementById('quiz' + qid.slice(1));
+      var allOptions = container.querySelectorAll('.quiz-option');
+      var feedback = document.getElementById(qid + 'Feedback');
+      var correctAnswer = quizAnswers[qid];
+
+      allOptions.forEach(function (opt) { opt.classList.remove('selected', 'correct', 'wrong'); });
+      el.classList.add('selected');
+
+      if (choice === correctAnswer) {
+        el.classList.add('correct');
+        feedback.className = 'text-sm mt-2 text-green-600';
+        feedback.innerHTML = '✅ ' + quizFeedback[qid].correct;
+      } else {
+        el.classList.add('wrong');
+        allOptions[correctAnswer].classList.add('correct');
+        feedback.className = 'text-sm mt-2 text-red-600';
+        feedback.innerHTML = '❌ ' + quizFeedback[qid].wrong;
+      }
+      feedback.classList.remove('hidden');
+      renderAllKatex();
+    }
+
+    window.addEventListener('resize', function () {
+      sizeIntegralChart();
+      jointChart.resize();
+      integralChart.resize();
+      indepScatter.resize();
+      indepMarginal.resize();
+    });
+  </script>
+
+  <script src="js/coze-widget.js"></script>
 </body>
+
 </html>
