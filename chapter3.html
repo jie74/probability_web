@@ -279,10 +279,10 @@
         </div>
 
         <div class="formula-panel">
-          <div class="formula-toggle open" onclick="toggleFormula(this)">
+          <div class="formula-toggle" onclick="toggleFormula(this)">
             <span class="arrow">▶</span>📐 核心公式（点击展开/收起）
           </div>
-          <div class="formula-body show">
+          <div class="formula-body">
             <div class="space-y-3">
               <div><span class="text-xs text-slate-400">区域概率：</span><span class="katex-render"
                   data-expr="P\{(X,Y)\in D\}=\iint_D f(x,y)\,dx\,dy"></span></div>
@@ -415,13 +415,43 @@
             重置</button>
         </div>
 
+        <div class="flex flex-wrap items-center gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">i（X ≤ x<sub>i</sub>）=</span>
+            <input type="range" id="jointISlider" min="1" max="4" value="2" step="1" oninput="updateJointF()"
+              class="slider-input w-28">
+            <span id="jointIVal" class="text-sm text-center"
+              style="min-width:40px;padding:2px 6px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;">2</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-slate-600">j（Y ≤ y<sub>j</sub>）=</span>
+            <input type="range" id="jointJSlider" min="1" max="3" value="2" step="1" oninput="updateJointF()"
+              class="slider-input w-28">
+            <span id="jointJVal" class="text-sm text-center"
+              style="min-width:40px;padding:2px 6px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;">2</span>
+          </div>
+          <span class="text-xs text-slate-400">红框格子为参与求和的 p<sub>kl</sub></span>
+        </div>
+
         <div class="heatmap-wrapper">
           <div id="jointHeatmap" style="width:100%;height:400px;"></div>
         </div>
 
+        <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-2">🧮 联合分布函数（p 的加和）</h3>
+        <div class="text-sm text-slate-600 mb-2 overflow-x-auto px-2">
+          <span class="katex-render"
+            data-expr="F(x_i,y_j)=P\{X\le x_i,\;Y\le y_j\}=\sum_{k=1}^{i}\sum_{l=1}^{j}p_{kl}"></span>
+        </div>
+        <div class="text-center mb-3 text-sm overflow-x-auto px-2">
+          <span id="jointFFormula" class="katex-render"
+            data-expr="F(x_2,y_2)=p_{11}+p_{12}+p_{21}+p_{22}=0.4000"></span>
+        </div>
+
         <div class="exam-tip">
           <span class="font-bold text-yellow-800 text-sm">💡 应试提示：</span>
-          <span class="text-sm text-yellow-700">大题<strong>经常考由联合求边缘</strong>。注意：求X边缘和Y边缘，行内相加，列内相加，别搞反方向。</span>
+          <span class="text-sm text-yellow-700">大题<strong>经常考由联合求边缘</strong>。注意：求X边缘和Y边缘，行内相加，列内相加，别搞反方向。拖动 i、j
+            时，<strong>F(x<sub>i</sub>,
+              y<sub>j</sub>)</strong> 就是左上角 i×j 个 p 的累加。</span>
         </div>
       </div>
     </section>
@@ -613,6 +643,57 @@
       [0.02, 0.06, 0.12]
     ];
 
+    // 当前是否展示边缘分布（滑块重绘热力图时沿用）
+    var jointMarginalX = null;
+    var jointMarginalY = null;
+
+    // 边缘概率共 7 个数字：加粗黑字 + 白底衬，保证在深色格子上也清晰
+    var MARGINAL_LABEL = {
+      fontWeight: 'bold', color: '#000',
+      backgroundColor: 'rgba(255,255,255,0.9)', padding: [2, 4], borderRadius: 3
+    };
+
+    function currentJointIJ() {
+      var si = document.getElementById('jointISlider');
+      var sj = document.getElementById('jointJSlider');
+      return {
+        i: si ? parseInt(si.value, 10) : 2,
+        j: sj ? parseInt(sj.value, 10) : 2
+      };
+    }
+
+    // F(x_i, y_j) = 左上角 i×j 个联合概率 p 的加和
+    function updateJointF() {
+      var sel = currentJointIJ();
+      var i = sel.i, j = sel.j;
+      document.getElementById('jointIVal').textContent = i;
+      document.getElementById('jointJVal').textContent = j;
+
+      var terms = [];
+      var sum = 0;
+      for (var k = 0; k < i; k++) {
+        for (var l = 0; l < j; l++) {
+          var v = jointData[k][l];
+          terms.push({ sym: 'p_{' + (k + 1) + (l + 1) + '}', val: v });
+          sum += v;
+        }
+      }
+      var expr = '\\begin{aligned}F(x_' + i + ',y_' + j + ')&=\\sum_{k=1}^{' + i +
+        '}\\sum_{l=1}^{' + j + '} p_{kl}=' +
+        terms.map(function (t) { return t.sym; }).join('+') + '\\\\' +
+        '&=' + terms.map(function (t) { return t.val.toFixed(2); }).join('+') +
+        '=' + sum.toFixed(4) + '\\end{aligned}';
+      var el = document.getElementById('jointFFormula');
+      el.setAttribute('data-expr', expr);
+      try {
+        katex.render(expr, el, { displayMode: false, throwOnError: false });
+      } catch (e) {
+        el.textContent = expr;
+      }
+
+      drawJointHeatmap(jointMarginalX, jointMarginalY);
+    }
+
     function calcMarginal() {
       var xMarginal = [];
       var yMarginal = [];
@@ -629,48 +710,73 @@
         yMarginal.push(sum);
       }
 
+      jointMarginalX = xMarginal;
+      jointMarginalY = yMarginal;
       drawJointHeatmap(xMarginal, yMarginal);
     }
 
     function drawJointHeatmap(xMarginal, yMarginal) {
       var xLabels = ['x₁', 'x₂', 'x₃', 'x₄'];
       var yLabels = ['y₁', 'y₂', 'y₃'];
+      var sel = currentJointIJ();
       var heatData = [];
       var maxVal = 0;
       for (var i = 0; i < jointData.length; i++) {
         for (var j = 0; j < jointData[0].length; j++) {
-          heatData.push([j, i, jointData[i][j]]);
-          if (jointData[i][j] > maxVal) maxVal = jointData[i][j];
+          var v = jointData[i][j];
+          // 左上角 i×j 个单元格用红框标出，即参与 F 求和的 p
+          var chosen = (i < sel.i && j < sel.j);
+          heatData.push({
+            value: [j, i, v],
+            itemStyle: chosen
+              ? { borderColor: '#dc2626', borderWidth: 2, opacity: 1 }
+              : { opacity: 0.35 }
+          });
+          if (v > maxVal) maxVal = v;
         }
       }
       if (xMarginal) {
         for (var i = 0; i < xMarginal.length; i++) {
-          heatData.push([jointData[0].length, i, xMarginal[i]]);
+          heatData.push({
+            value: [jointData[0].length, i, xMarginal[i]],
+            itemStyle: { opacity: 0.55 }, label: MARGINAL_LABEL
+          });
         }
         yLabels.push('P (X)');
       }
       if (yMarginal) {
         for (var j = 0; j < yMarginal.length; j++) {
-          heatData.push([j, jointData.length, yMarginal[j]]);
+          heatData.push({
+            value: [j, jointData.length, yMarginal[j]],
+            itemStyle: { opacity: 0.55 }, label: MARGINAL_LABEL
+          });
         }
         xLabels.push('P (Y)');
       }
+      function cellValue(p) {
+        return p.value || p.data;
+      }
       jointChart.setOption({
         tooltip: {
+          textStyle: { fontSize: 15 },
           formatter: function (p) {
-            return 'P (X=' + yLabels[p.data[0]] + ', Y=' + xLabels[p.data[1]] + ') = ' + p.data[2].toFixed(4);
+            var v = cellValue(p);
+            if (!v || v.length < 3) return '';
+            var val = Number(v[2]).toFixed(4);
+            if (v[1] >= jointData.length || v[0] >= jointData[0].length) return '边缘概率 = ' + val;
+            return 'P (X=' + xLabels[v[1]] + ', Y=' + yLabels[v[0]] + ') = ' + val;
           }
         },
-        grid: { left: 60, right: 40, top: 20, bottom: 40 },
-        xAxis: { type: 'category', data: yLabels, axisLabel: { fontSize: 12 }, splitLine: { show: false } },
-        yAxis: { type: 'category', data: xLabels, axisLabel: { fontSize: 12 }, splitLine: { show: false }, inverse: true },
-        visualMap: { min: 0, max: maxVal || 0.2, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemWidth: 12, itemHeight: 100, inRange: { color: ['#eff6ff', '#2563eb'] } },
+        grid: { left: 76, right: 52, top: 24, bottom: 54 },
+        xAxis: { type: 'category', data: yLabels, axisLabel: { fontSize: 16 }, splitLine: { show: false } },
+        yAxis: { type: 'category', data: xLabels, axisLabel: { fontSize: 16 }, splitLine: { show: false }, inverse: true },
+        visualMap: { min: 0, max: maxVal || 0.2, calculable: true, orient: 'horizontal', left: 'center', bottom: 0, itemWidth: 14, itemHeight: 100, textStyle: { fontSize: 14 }, inRange: { color: ['#eff6ff', '#2563eb'] } },
         series: [{
           type: 'heatmap', data: heatData,
-          label: { show: true, fontSize: 11, formatter: function (p) { return p.data[2].toFixed(3); } },
+          label: { show: true, fontSize: 17, formatter: function (p) { return Number(cellValue(p)[2]).toFixed(3); } },
           emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.3)' } }
         }]
-      });
+      }, { notMerge: true });
     }
     function resetJoint() {
       jointData = [
@@ -679,9 +785,13 @@
         [0.04, 0.12, 0.14],
         [0.02, 0.06, 0.12]
       ];
-      drawJointHeatmap(null, null);
+      jointMarginalX = null;
+      jointMarginalY = null;
+      document.getElementById('jointISlider').value = 2;
+      document.getElementById('jointJSlider').value = 2;
+      updateJointF();
     }
-    drawJointHeatmap(null, null);
+    updateJointF();
 
     // ===== 卡片2：二维正态 =====
     function bivarNormalPDF(x, y, rho, s1, s2) {
